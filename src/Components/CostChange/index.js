@@ -88,17 +88,17 @@ const useStyles = makeStyles({
 });
 
 const initialsearch = {
-  DEPT: [],
-  CLASS: [],
-  SUBCLASS: [],
+  HIER1: [],
+  HIER2: [],
+  HIER3: [],
   ITEM: [],
   LOCATION: [],
 }
 
 const initialItemData = {
-  DEPT: "",
-  CLASS: "",
-  SUBCLASS: "",
+  HIER1: "",
+  HIER2: "",
+  HIER3: "",
   ITEM: ""
 }
 
@@ -166,9 +166,9 @@ const CostChange = () => {
                   
              let test = Object.assign(reorder,item);
              newTabledata.push(test); 
-             initialsearch.DEPT = [];
-              initialsearch.CLASS = [];
-              initialsearch.SUBCLASS = [];
+             initialsearch.HIER1 = [];
+              initialsearch.HIER2 = [];
+              initialsearch.HIER3 = [];
               initialsearch.ITEM = [];
               initialsearch.LOCATION = [];
               setSearchData(initialsearch)
@@ -194,10 +194,6 @@ const CostChange = () => {
   useEffect(() => {
     if (CostChangeData.isError) {
       console.log("hello",CostChangeData["messgae"])
-
-      if (CostChangeData["messgae"]!=""){
-        
-      }
 
       setIsError(true)
     }else if(CostChangeData.isSuccess){
@@ -239,16 +235,6 @@ useEffect(()=> {
           setLoading(false);
           setSubmit(false);
           setSearch(false);
-          console.log("asd",allData)
-          if (allData.length===0){
-          console.log("asd",allData)
-          }
-          // else
-          // {
-          //   console.log("err")
-          // }
-          //console.log("asd2",Data)
-
         }else if(CostChangeData?.data?.itemData && Array.isArray(CostChangeData?.data?.itemData)){
           setItemData(CostChangeData?.data?.itemData);
           setOrigItemData(CostChangeData?.data?.itemData);
@@ -300,9 +286,9 @@ useEffect(()=> {
 
     dispatch(postCostChangeRequest(sendRow));
     setLoading(true);
-    initialsearch.DEPT = [];
-    initialsearch.CLASS = [];
-    initialsearch.SUBCLASS = [];
+    initialsearch.HIER1 = [];
+    initialsearch.HIER2 = [];
+    initialsearch.HIER3 = [];
     initialsearch.ITEM = [];
     initialsearch.LOCATION = [];
    
@@ -343,9 +329,9 @@ const handleMsgClose = () => {
 
 const onReset = (event) => {
 
-    initialsearch.DEPT = [];
-    initialsearch.CLASS = [];
-    initialsearch.SUBCLASS = [];
+    initialsearch.HIER1 = [];
+    initialsearch.HIER2 = [];
+    initialsearch.HIER3 = [];
     initialsearch.ITEM = [];
     initialsearch.LOCATION = [];
     
@@ -363,24 +349,24 @@ const onReset = (event) => {
 
 }
 
-const selectDept = (event, value) => {
-  let selectedDept = [];
+const selectHier1 = (event, value) => {
+  let selectedHier1 = [];
   if(value.length > 0){
     //console.log(itemData);
-  const filterClass = itemData.filter((item) => { return value.some((val) => { return item.DEPT === val.DEPT})});
+  const filterClass = itemData.filter((item) => { return value.some((val) => { return item.HIER1 === val.HIER1})});
     //console.log(filterClass);
     //const classFilter = (filterClass.length > 0 )?[...new Set(filterClass.map(item => item.CLASS))]:[];
     setFilterClass(filterClass);
 
     value.map(
       (item) => {
-        selectedDept.push(item.DEPT);
+        selectedHier1.push(item.HIER1);
       }
     )
     setSearchData((prev) => {
       return {
         ...prev,
-        DEPT : selectedDept
+        HIER1 : selectedHier1
       };
     });
 
@@ -389,30 +375,30 @@ const selectDept = (event, value) => {
     setSearchData((prev) => {
       return {
         ...prev,
-        DEPT : []
+        HIER1 : []
       };
     });
   }
 }
 //console.log(searchData);
 
-const selectClass = (event,value) => {
+const selectHier2 = (event,value) => {
   //console.log(value);
- let selectedClass = [];
+ let selectedHier2 = [];
   if(value.length > 0){
     //const subclassFilter = (filterSubClass.length > 0 )?[...new Set(filterSubClass.map(item => item.SUBCLASS))]:[];
-    const filterSubClass = itemData.filter((item) => { return value.some((val) => { return item.CLASS === val.CLASS})});  
+    const filterSubClass = itemData.filter((item) => { return value.some((val) => { return item.HIER2 === val.HIER2})});  
     //console.log(filterSubClass);
    setsubFilterClass(filterSubClass)
    value.map(
     (item) => {
-      selectedClass.push(item.CLASS);
+      selectedHier2.push(item.HIER2);
     }
   )
     setSearchData((prev) => {
       return {
         ...prev,
-        CLASS : selectedClass
+        HIER2 : selectedHier2
       };
     });
 
@@ -421,27 +407,27 @@ const selectClass = (event,value) => {
     setSearchData((prev) => {
       return {
         ...prev,
-        CLASS : []
+        HIER2 : []
       };
     });
   }
 }
-const selectSubClass = (event,value) => {
-  let selectedSubclass = [];
+const selectHier3 = (event,value) => {
+  let selectedHier3 = [];
   if(value.length > 0){
     //const itemFilter = (filterItem.length > 0 )?[...new Set(filterItem.map(item => item.ITEM))]:[];
    // console.log(itemFilter);
-   const filterItem = itemData.filter((item) => { return value.some((val) => { return item.SUBCLASS === val.SUBCLASS})});  
+   const filterItem = itemData.filter((item) => { return value.some((val) => { return item.HIER3 === val.HIER3})});  
     setFilterItem(filterItem)
     value.map(
       (item) => {
-        selectedSubclass.push(item.SUBCLASS);
+        selectedHier3.push(item.HIER3);
       }
     )
     setSearchData((prev) => {
       return {
         ...prev,
-        SUBCLASS : selectedSubclass
+        HIER3 : selectedHier3
       };
     });
 
@@ -450,7 +436,7 @@ const selectSubClass = (event,value) => {
     setSearchData((prev) => {
       return {
         ...prev,
-        SUBCLASS : []
+        HIER3 : []
       };
     });
   }
@@ -545,14 +531,14 @@ const searchPanel = () => (
               id="combo-box-item"
               sx={{ width: 250 }}
               options={(itemData.length > 0)?itemData:[]}
-              //value={searchData?.DEPT}
-              isOptionEqualToValue={(option, value) => option.DEPT === value.DEPT}
+              //value={searchData?.HIER1}
+              isOptionEqualToValue={(option, value) => option.HIER1 === value.HIER1}
               autoHighlight
-              onChange={selectDept}
-              getOptionLabel={(option) => `${option.DEPT.toString()}-${option.DEPT_DESC.toString()}`}
+              onChange={selectHier1}
+              getOptionLabel={(option) => `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`}
               renderOption={(props, option) => (
                 <Box component="li" {...props}>
-                  {option.DEPT}-{option.DEPT_DESC}
+                  {option.HIER1}-{option.HIER1_DESC}
                 </Box>
               )}
               renderInput={(params) => (
@@ -560,7 +546,7 @@ const searchPanel = () => (
                   {...params}
                   value={searchData?.ITEM}
                   variant="standard" 
-                  label="Choose a DEPT"
+                  label="Choose a HIER1"
                   inputProps={{
                     ...params.inputProps,
                     autoComplete: 'new-password', // disable autocomplete and autofill
@@ -576,20 +562,20 @@ const searchPanel = () => (
               sx={{ width: 250 }}
               options={(filterClass.length > 0)?filterClass:[]}
               //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-              isOptionEqualToValue={(option, value) => option.CLASS === value.CLASS}
+              isOptionEqualToValue={(option, value) => option.HIER2 === value.HIER2}
               autoHighlight
-              onChange={selectClass}
-              getOptionLabel={(option) => `${option.CLASS.toString()}-${option.CLASS_DESC.toString()}`}
+              onChange={selectHier2}
+              getOptionLabel={(option) => `${option.HIER2.toString()}-${option.HIER2_DESC.toString()}`}
               renderOption={(props, option) => (
                 <Box component="li" {...props}>
-                  {option.CLASS} {option.CLASS_DESC}
+                  {option.HIER2} {option.HIER2_DESC}
                 </Box>
               )}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   variant="standard" 
-                  label="Choose a CLASS"
+                  label="Choose a HIER2"
                   inputProps={{
                     ...params.inputProps,
                     autoComplete: 'new-password', // disable autocomplete and autofill
@@ -606,20 +592,20 @@ const searchPanel = () => (
               sx={{ width: 250 }}
               options={(subfilterClass.length > 0)?subfilterClass:[]}
               //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-              isOptionEqualToValue={(option, value) => option.SUBCLASS === value.SUBCLASS}
+              isOptionEqualToValue={(option, value) => option.HIER3 === value.HIER3}
               autoHighlight
-              onChange={selectSubClass}
-              getOptionLabel={(option) => `${option.SUBCLASS.toString()}-${option.SUBCLASS_DESC.toString()}`}
+              onChange={selectHier3}
+              getOptionLabel={(option) => `${option.HIER3.toString()}-${option.HIER3_DESC.toString()}`}
               renderOption={(props, option) => (
                 <Box component="li" {...props}>
-                  {option.SUBCLASS} {option.SUBCLASS_DESC}
+                  {option.HIER3} {option.HIER3_DESC}
                 </Box>
               )}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   variant="standard" 
-                  label="Choose a SUBCLASS"
+                  label="Choose a HIER3"
                   inputProps={{
                     ...params.inputProps,
                     autoComplete: 'new-password', // disable autocomplete and autofill
