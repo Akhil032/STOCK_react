@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\Constants",
+    "\\src\\Pages",
+    "\\src\\Pages\\Dashboard",
+    "\\src\\Redux",
+    "\\src\\services"
+  ],
+  "SelectedNode": "\\src\\Constants\\menu.js",
+  "PreviewInSolutionExplorer": false
+}

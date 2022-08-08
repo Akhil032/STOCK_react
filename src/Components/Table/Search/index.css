@@ -1,0 +1,26 @@
+input[type="search"]:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  text-align: left;
+}
+input[type="search"]::placeholder {
+  /* Firefox, Chrome, Opera */
+  text-align: left;
+}
+.form-control{
+  padding: 4px 0px;
+  font-size: 12px;
+  border-bottom: 1px solid gray;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+table,
+th,
+td {
+  border: 1px solid #e0e0e0;
+}
+
+thead tr {
+  background-color: grey;
+}

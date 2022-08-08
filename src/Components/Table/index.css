@@ -1,0 +1,12 @@
+table tbody tr:nth-child(even) {
+  background-color: #D3D3D3;
+}
+table tbody tr:nth-child(odd) {
+  background-color: #eeeeee;
+}
+/* table tr:nth-child(1) {
+  background-color: grey;
+} */
+input:focus{
+  outline: none;
+}
