@@ -2,7 +2,7 @@ import { all, fork } from "redux-saga/effects";
 import StagingProcessing from "./stagingProcessingSaga";
 import {ErrorProcessing,updateErrorProcessing,getClassData, getLocationData} from "./errorProcessingSaga";
 import { CostChange, updateCostChange } from "./CostChangeSaga"; //,getClassData, getLocationData
-
+import {FinanceInterface} from "./FinanceInterfaceSaga"
 export function* rootSaga() {
   yield all([
     fork(StagingProcessing),
@@ -11,6 +11,7 @@ export function* rootSaga() {
     fork(getClassData),
       fork(getLocationData),
       fork(CostChange),
-      fork(updateCostChange)
+      fork(updateCostChange),
+      fork(FinanceInterface)
   ]);
 }

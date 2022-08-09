@@ -139,6 +139,9 @@ export default function Index() {
       if (routeName === "Unit Cost Maintenance") {
           navigate("/Cost-Maintenance");
       }
+      if (routeName === "Finance Interface Data") {
+        navigate("/Finance-Interface");
+    }
   };
   const handleHomePage = (routedata) => {
     if (routedata == "Home") {

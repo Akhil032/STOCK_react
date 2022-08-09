@@ -6,7 +6,7 @@ import AdminLayout from "./Pages/Dashboard/AdminLayout";
 import ErrorProcessing from "./Components/ErrorProcessing";
 import SystemConfig from "./Pages/systemConfig";
 import CostChange from "./Components/CostChange";
-
+import FinanceInterface from "./Components/FinanaceInterface"
 
 function Routing() {
   return (
@@ -18,6 +18,7 @@ function Routing() {
         <Route path="/error-processing" element={<ErrorProcessing />} />
         <Route path="/system-config" element={<SystemConfig />} />
         <Route path="/Cost-Maintenance" element={<CostChange />} />
+        <Route path="/Finance-Interface" element={<FinanceInterface />} />
       </Route>
     </Routes>
   );

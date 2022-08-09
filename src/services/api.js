@@ -6,4 +6,6 @@ export const API = {
   GETLOCATIONDATA: "/location_validation/",
   FETCHITEMLOCATIONDATA: "/item_loc_data/",
   UPDATECOSTANDVAR: "/cost_update_stg_trn/",
+
+  FETCHSTGFIN:"/Retrieve_stg_fin/",
 };

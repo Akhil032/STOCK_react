@@ -147,7 +147,7 @@ const CostChange = () => {
   };
 
   const serializedata = (datatable) => {
-    // console.log("dt",datatable)
+     console.log("dt",datatable)
      //console.log("ad",allData)
     
      let newTabledata = [];
@@ -193,7 +193,7 @@ const CostChange = () => {
 
   useEffect(() => {
     if (CostChangeData.isError) {
-      console.log("hello",CostChangeData["messgae"])
+      //console.log("hello",CostChangeData["messgae"])
 
       setIsError(true)
     }else if(CostChangeData.isSuccess){

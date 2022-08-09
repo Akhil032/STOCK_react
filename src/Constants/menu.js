@@ -60,6 +60,19 @@ export const GetItems = () => {
             
         ],
       },
+      {
+        id: 4,
+        name: "Finance Interface",
+        icon: <ReceiptIcon sx={{color: "#66cdaa"}}/>,
+        subitems: [
+          {
+            id: 1,
+            name: "Finance Interface Data",
+            },
+
+            
+        ],
+      },
     ],
   };
   return json;
