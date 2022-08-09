@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
-import Table from "../../Components/Table/index";
+import Table from "../../Components/Table/indexFI";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
