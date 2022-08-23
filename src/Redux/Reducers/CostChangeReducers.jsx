@@ -63,7 +63,7 @@ const CostChangeReducers = (state = initialState, action) => {
           message: action.payload?.Data?.message,
           isSuccess: false,
         };
-        case actions.GET_CLASSDATA_REQUEST:
+        case actions.GET_HIER2DATA_REQUEST:
         return {
           ...state,
           isLoading: true,
@@ -72,7 +72,7 @@ const CostChangeReducers = (state = initialState, action) => {
           isSuccess: false,
         };
   
-      case actions.GET_CLASSDATA_SUCCESS:
+      case actions.GET_HIER2DATA_SUCCESS:
         return {
           ...state,
           isLoading: false,
@@ -81,7 +81,7 @@ const CostChangeReducers = (state = initialState, action) => {
           message: action.payload?.Data?.message,
           isSuccess: false,
         };
-      case actions.GET_CLASSDATA_ERROR:
+      case actions.GET_HIER2DATA_ERROR:
         return {
           ...state,
           isLoading: false,

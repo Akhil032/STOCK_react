@@ -37,7 +37,7 @@ export default function EnhancedTableToolbar(props) {
           {selected.length} selected
         </Typography>
       )}
-      {selected.length > 0 && (
+      {/* {selected.length > 0 && (
         <>
         {(edithandle === true) ?
         <Button size="small" variant="contained" onClick={() => seteditRows(selected)}startIcon={<EditIcon />}>EDIT</Button>
@@ -47,7 +47,7 @@ export default function EnhancedTableToolbar(props) {
         </>    
       }     
       </>
-      )}
+      )} */}
     </Toolbar>
   );
 }

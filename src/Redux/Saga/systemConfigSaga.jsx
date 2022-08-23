@@ -11,10 +11,12 @@ import { API } from "../../services/api";
 
 function* fetchDataSaga(action) {
   try {
-    const response = yield call(axiosCall, "POST", API.FETCHERRORDATA,action.payload);
+    const response = yield call(axiosCall, "POST", API.FETCHCONFIGDATA,action.payload);
+    console.log(response);
     if (response?.data?.status == 500) {
       yield put(getSystemConfigError({Data: response?.data}));
     } else {
+      console.log(response?.data);
       yield put(getSystemConfigListSuccess({ Data: response?.data }));
     }
   } catch (e) {
@@ -22,14 +24,14 @@ function* fetchDataSaga(action) {
   }
 }
 
-export function* ErrorProcessing() {
+export function* SystemConfig() {
   yield takeLatest(actions.GET_SYSTEMCONFIG_REQUEST, fetchDataSaga);
 }
 
 
 function* updateDataSaga(action) {
   try {
-    const response = yield call(axiosCall, "POST", API.UPDATEERRORDATA,action.payload);
+    const response = yield call(axiosCall, "POST", API.UPDATECONFIGDATA,action.payload);
     if (response?.status == 200) {
       yield put(postSystemConfigSucess({ Data: response?.data }));
     } else {
@@ -40,7 +42,7 @@ function* updateDataSaga(action) {
   }
 }
 
-export function* updateErrorProcessing() {
+export function* updateSystemConfig() {
   yield takeLatest(actions.POST_SYSTEMCONFIG_REQUEST, updateDataSaga);
 }
 

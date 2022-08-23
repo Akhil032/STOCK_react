@@ -71,7 +71,7 @@ const AppBar = styled(MuiAppBar, {
   }),
   ...(open && {
     marginLeft: drawerWidth,
-    width: `calc(100% - 290px)`,
+    width: `calc(100% - 310px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -89,7 +89,7 @@ const Drawer = styled(MuiDrawer, {
   ...(open && {
     ...openedMixin(theme),
     "& .MuiDrawer-paper": {
-      width: "290px",
+      width: "310px",
       backgroundColor: "grey"
     },
   }),
@@ -130,18 +130,43 @@ export default function Index() {
   };
 
   const handleNavigation = (routeName) => {
-    if (routeName === "Upload") {
+    if (routeName === "Upload Inventory") {
       navigate(`/stage-processing`);
+    }
+    if(routeName === "Download"){
+      navigate("/download");
     }
     if (routeName === "Error Processing") {
       navigate("/error-processing");
     }
-      if (routeName === "Unit Cost Maintenance") {
-          navigate("/Cost-Maintenance");
-      }
-      if (routeName === "Finance Interface Data") {
-        navigate("/Finance-Interface");
+    if(routeName === "Reconciliation"){
+      navigate("/reconciliation");
     }
+    if(routeName === "Inquiry"){
+      navigate("/Inquiry");
+    }
+    if(routeName === "Upload Non Inventory"){
+      navigate("/noninventory")
+    }
+    if (routeName === "Edit Transaction") {
+      navigate("/edit-transaction");
+    }
+    if (routeName === "Transaction Reversal") {
+      navigate("/transaction-reversal");
+    }
+    if (routeName === "Unit Cost Maintenance") {
+      navigate("/Cost-Maintenance");
+    }
+    if (routeName === "Finance Interface Data") {
+      navigate("/Finance-Interface");
+  }
+    if (routeName === "Account maintenance") {
+      navigate("/Account-maintenance");
+    }
+    if (routeName === "Account creation") {
+      navigate("/ACCOUNT-CREATION");
+    }
+    handleDrawerClose()
   };
   const handleHomePage = (routedata) => {
     if (routedata == "Home") {
@@ -158,9 +183,16 @@ export default function Index() {
   const handleSubMenuNavigation = () => {
     setIsOpen(!isOpen);
   };
-  const handleChange = (index) => {
+  const handleChange = (index, itemData) => {
+    //console.log("index",index);
     handleClick(index);
-    handleDrawerOpen();
+    handleHomePage(itemData?.name);
+   // console.log("open",open);
+    if(itemData?.id !== 0 && itemData?.id !== 1){
+      handleDrawerOpen()
+    }else{
+    setOpen(!open);
+    }
   };
   const handleErrorProcessing = () => {
     navigate("/error-processing");
@@ -207,7 +239,7 @@ export default function Index() {
             >
               <div>
                 {" "}
-                <Typography variant="h5">Stock Ledger </Typography>
+                <Typography variant="h5">Stock Ledger</Typography>
               </div>
 
               <IconButton onClick={handleDrawerClose} sx = {{bgcolor: "grey"}}>
@@ -230,7 +262,7 @@ export default function Index() {
                 <>
                   <ListItemButton
                     onClick={() => {
-                      handleChange(index);
+                      handleChange(index, itemsData);
                     }}
                   >
                     <ListItemIcon>{itemsData.icon}</ListItemIcon>
@@ -272,7 +304,6 @@ export default function Index() {
                                 </ListItemIcon>
                                 <ListItemText
                                   primary={dataSet.name}
-                                  onClick={handleDrawerClose}
                                 />
                               </ListItemButton>
                             </List>

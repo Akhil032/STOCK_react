@@ -19,3 +19,6 @@ export const postSystemConfigSucess = createAction(
 export const postSystemConfigError = createAction(
       actions.POST_SYSTEMCONFIG_ERROR
 );
+export const resetSystemConfig = createAction(
+  actions.RESET_SYSTEMCONFIG
+)

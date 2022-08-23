@@ -20,13 +20,13 @@ export const postCostChangeError = createAction(
       actions.POST_COSTCHANGE_ERROR
 );
 export const getClassDataRequest = createAction(
-    actions.GET_CLASSDATA_REQUEST
+    actions.GET_HIER2DATA_REQUEST
 );
 export const getClassDataSuccess = createAction(
-  actions.GET_CLASSDATA_SUCCESS
+  actions.GET_HIER2DATA_SUCCESS
 );
 export const getClassDataError = createAction(
-  actions.GET_CLASSDATA_ERROR
+  actions.GET_HIER2DATA_ERROR
 );
 export const getLocationDataRequest = createAction(
   actions.GET_LOCATIONDATA_REQUEST

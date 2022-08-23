@@ -113,7 +113,7 @@ const UserProfile = () => {
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
-          Settingst
+          Settings
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

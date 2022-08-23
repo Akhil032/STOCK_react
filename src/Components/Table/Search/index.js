@@ -8,8 +8,6 @@ const SearchTableData = ({
   onChange,
   value,
   width,
-  checkEditrows = false,
-  editRows = [],
 }) => {
   return (
     <div className="form-group">
@@ -21,7 +19,6 @@ const SearchTableData = ({
         placeholder={placeholder}
         onChange={onChange}
         style={{ width: width, background: 'white'}}
-        disabled={checkEditrows?editRows.length > 0:false}
       />
     </div>
   );

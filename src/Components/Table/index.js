@@ -6,10 +6,22 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Button from "@mui/material/Button";
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+
+  let c,d;
+  if(orderBy == "LOCATION_NAME"){
+      c = b[orderBy].replace('STORE-','');
+       d = a[orderBy].replace('STORE-','');
+       c = isNaN(c)?c:parseInt(c);
+       d = isNaN(d)?d:parseInt(d);
+      
+  }else {
+     c = isNaN(b[orderBy])?b[orderBy]:parseInt(b[orderBy]);
+     d = isNaN(a[orderBy])?a[orderBy]:parseInt(a[orderBy]);
+  }  
+  if (c < d) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (c > d) {
     return 1;
   }
   return 0;
@@ -53,6 +65,7 @@ export default function EnhancedTable({
   const [rowsPerPage, setRowsPerPage] = React.useState(30);
 
   const handleRequestSort = (event, property) => {
+    console.log("order",property);
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
@@ -64,11 +77,31 @@ export default function EnhancedTable({
       const newSelecteds = stageData?.map((value) => {
         return value['SR_NO']?value['SR_NO']:value['TRAN_SEQ_NO'];
       });
+      
+
+      // const newSelecteds = stableSort(stageData, getComparator(order, orderBy))
+      // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      // .map((value) => {  return value['SR_NO']?value['SR_NO']:value['TRAN_SEQ_NO'];});
       setSelected(newSelecteds);
+      //seteditRows(newSelecteds);
       return;
     }
     setSelected([]);
   };
+
+ // const handleSelectAllClick = (event) => {
+  //   if (event.target.checked) {
+  //     const newSelecteds = stableSort(tableData, getComparator(order, orderBy))
+  //       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  //       .map((value) => {  return value['SR_NO']?value['SR_NO']:value['TRAN_SEQ_NO'];});
+
+  //     setSelected(newSelecteds);
+  //     return;
+  //   }else{
+  //     console.log(selected);
+  //   setSelected([]);
+  //   }
+  // };
 
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
@@ -90,6 +123,7 @@ export default function EnhancedTable({
     //console.log(newSelected);
 
     setSelected(newSelected);
+    seteditRows(newSelected);
       //seteditRows(newSelected);     
   
   };

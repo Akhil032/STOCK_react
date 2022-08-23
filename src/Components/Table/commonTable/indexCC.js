@@ -1,50 +1,29 @@
 import React, { useEffect, useState } from "react";
-import Header from "../Header/indexCH";
+import Header from "../Header";
 import Autocomplete from '@mui/material/Autocomplete';
 import {Table, TableBody, TableCell, TableContainer, TablePagination, TableRow,Paper, Checkbox, TextField } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import TableToolbar from "../Toolbar/index";
 import { trnType } from "../../ErrorProcessing/transType";
 import "../index.css";
+import { bgcolor } from "@mui/system";
 
 const useStyles = makeStyles({
   tabCell: {
     padding: "6px 4px !important",
     fontSize: "0.7rem !important",
-    width: "110px"
+    width:"110px"
 },
   input: {
     '& .MuiInput-root': {
     fontSize: '12px !important',
       '& .MuiInput-input':{
         padding:'4px 0 1px',
-       
       }
     },
   },
-  '& Mui-disabled':{
-      opacity: '0.3',
-  }
-});
-
-const useStylesNew = makeStyles({
-  tabCell: {
-    padding: "6px 4px !important",
-    fontSize: "0.7rem !important",
-   // width: "110px"
-},
-  input: {
-    '& .MuiInput-root': {
-    fontSize: '12px !important',
-    
-      '& .MuiInput-input':{
-        padding:'4px 0 1px',
-        //width: "100px"
-      }
-    },
-  },
-  '& Mui-disabled':{
-      opacity: '0.3',
+  '& .Mui-disabled': {
+    opacity: '0.3',
   }
 });
 
@@ -81,38 +60,85 @@ const CommonTable = ({
 
     const [updateData, setupdateData] = useState({});  
     const rowClasses = useStyles();  
-    const rowClassesNew = useStylesNew();
+
+  // const onBlur = (event, value , row) => {
+  //   console.log("test", event.target.value, value, row);
+  //   row[event.target.name] = event.target.value;
+    
+  //   if(event.target.name == 'QTY') {
+  //     row['TOTAL_COST'] = parseInt(event.target.value) * parseInt(row['UNIT_COST']);
+  //   }
+    
+  //   var finalData = updateData;
+  //   if(updateData.length === 0) {
+  //     finalData.push(row);
+  //   }
+  //   else {
+  //     var t = finalData.findIndex(x => x.TRAN_SEQ_NO === row['TRAN_SEQ_NO']);
+  //     if(t === -1) {
+  //       finalData.push(row);
+  //     }
+  //     else {
+  //       finalData[t] = row;
+  //     }
+  //   }
+  //   setupdateData(finalData);
+  //   setUpdateRow(finalData);
+  //   console.log("testafter", row, updateData);
+  //     sessionStorage.setItem('updateColume',JSON.stringify(finalData));
+  //   // return;
+  //   // let temp = JSON.stringify(updateData);
+  //   // temp = JSON.parse(temp);
+  //   // console.log(temp);
+  //   //   //let oldrow = rows.filter((item) => item?.TRAN_SEQ_NO.includes(editRows) );
+  //   // if(temp.findIndex(x => x.TRAN_SEQ_NO === row['TRAN_SEQ_NO']) == -1 ){
+  //   // temp[row?.TRAN_SEQ_NO] = row;
+  //   // temp[row?.TRAN_SEQ_NO][event.target.name] = event.target.value; 
+  //   // if(event.target.name == 'QTY'){
+  //   //   temp[row?.TRAN_SEQ_NO]['TOTAL_COST'] = event.target.value * row['UNIT_COST']; 
+  //   // }
+  //   // //let updaterow = Object.values(temp);
+    
+  //   // console.log(temp);
+  //   // setupdateData(temp)
+  //   // }
+  // }
+
+
+
+  // useEffect(() => {
+  //   console.log("testafter1", updateData);
+    
+  //   setUpdateRow(updateData);
+    
+  // },[updateData])
+
+
   const onBlur = (event, value , row) => {
     let temp = {...updateData};
+    console.log(temp);
     temp[row?.ITEM] = row;
-    temp[row?.ITEM][event.target.name] = event.target.value;
-    //temp[row?.ITEM]["CREATE_ID"]=JSON.parse(localStorage.getItem("userData"))?.username;
- 
-   console.log("temp",)
+    temp[row?.ITEM][event.target.name] = event.target.value;    
     setupdateData(temp)
   }
 
   useEffect(() => {
     if(setUpdateRow){
-       //updateData["CREATE_ID"]=JSON.parse(localStorage.getItem("userData"))?.username;
-
-       console.log("up",updateData)
     setUpdateRow(updateData);
     }
   },[updateData])
-
+  console.log("ct",orderBy);
   return (
     <>
       <Paper sx={{ maxWidth: "100%", maxHeight: "fit-content", mb: 2 }}>
-      {(pageName != "stage") &&
+      {(pageName != "stage" && pageName != 'reconciliation' && pageName != 'inquiry') &&
         <TableToolbar selected={selected} handledelete={handleDelete} edithandle={handleEdit} seteditRows={seteditRows} setUpdateRow={setUpdateRow} setSelected={setSelected} editRows={editRows} setupdateData={setupdateData} setTabledata={setTabledata} allData={allData}/>
-      } 
+        } 
         <TableContainer sx={{ overflowX: "scroll", overflowY: "scroll",height: "fit-content", maxHeight: "70vh" }}>
           <Table
-            sx={{  maxWidth: "100%" }}
+            sx={{ maxWidth: "100%" }}
             aria-labelledby="tableTitle"
             size="small"
-            
           >
             <Header
               numSelected={selected.length}
@@ -131,22 +157,21 @@ const CommonTable = ({
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row?.ITEM);
+                  const isItemSelected = isSelected(row?.SR_NO?row?.SR_NO:row?.ITEM);
                   const labelId = `enhanced-table-checkbox-${index}`;
-                  //console.log("check123:",selected)
                   return (
                     <TableRow
                       hover
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row?.ITEM}
+                      key={row?.SR_NO?row?.SR_NO:row?.ITEM}
                       selected={isItemSelected}
                     >
-                      {/* <TableCell padding="checkbox">
+                      <TableCell padding="checkbox">
                         <Checkbox
                           color="primary"
-                          onClick={(event) => handleClick(event,  row?.ITEM)}
+                          onClick={(event) => handleClick(event, row?.SR_NO?row?.SR_NO:row?.ITEM)}
                           checked={isItemSelected}
                           inputProps={{
                             "aria-labelledby": labelId,
@@ -154,77 +179,49 @@ const CommonTable = ({
                           style={{
                             color: "#635b5bb8",
                           }}
-                          //disabled={editRows && editRows.length > 0}
+                         // disabled={editRows && editRows.length > 0}
                         />
-                      </TableCell> */}
-                      
-                     { (row?.ITEM) ? <>
-
+                      </TableCell>
+                      { editRows?.includes((row?.ITEM)?row?.ITEM:row?.SR_NO) ? <>
                         {Object.entries(row).map(([key, value]) => {
-                          
-                            let editable = false;
-                            if(key == "UNIT_COST"){
+                            let editable;
+                          if(pageName == "cost_maintenance"){
+                              editable = false;
+                              if(key == "UNIT_COST"){
                                 editable = true
                             }
-                            
-                           // console.log("check123:",row[5])
+                          }
 
                             return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell}>
                               {
                                 <TextField 
                             disabled={!editable}
-                      
                             size="small"
                             variant="standard"
                             className={rowClasses.input}
                             defaultValue={value} name={key} onChange={ (event, value) => onBlur(event,value,row)} />
-                              
+                             
                               
                               }
                             
                            </TableCell>
-                        
-
-                        // else {
-                        //       // var wid=""
-                        //       // if(key=="ITEM"){
-                        //       //   wid= "100px",
-                        //       // }
-
-                        //   return <TableCell padding="none" align="left" key={key} className={rowClassesNew.tabCell}  >
-                        //       {
-                        //         <TextField 
-                        //     disabled={!editable}
-                      
-                        //     size="small"
-                        //     variant="standard"
-                        //     className={rowClassesNew.input}
-                        //     defaultValue={value} name={key} />//onChange={ (event, value) => onBlur(event,value,row)} />
-                              
-                              
-                        //       }
-                            
-                        //    </TableCell>
-                          
-                        // }
                               }
                       )}
                       </> :           
                       <>
-{/* 
                       {Object.entries(row).map(([key, value])=> 
-                      
-                          <TableCell align="left" key={key} className={rowClasses.tabCell} >
+                          <TableCell align="left" key={key} className={rowClasses.tabCell} sx={((key == 'SR_NO')?'display:none':'')}>
                               {value || "" }
                           </TableCell>
-                      )} */}
+                      )}
                       </> }
                       
                     </TableRow>
+
                   );
                 })}
 
-              {emptyRows > 0 && (
+              {/* {emptyRows > 0 && (
                 <TableRow
                   style={{
                     height: 33 * emptyRows,
@@ -232,12 +229,12 @@ const CommonTable = ({
                 >
                   <TableCell colSpan={6} />
                 </TableRow>
-              )}
+              )} */}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[10, 20, 30]}
+          rowsPerPageOptions={[30, 50, 100]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}

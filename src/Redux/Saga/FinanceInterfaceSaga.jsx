@@ -45,7 +45,7 @@ export function* FinanceInterface() {
 
 // function* getClassDataSaga(action) {
 //   try {
-//     const response = yield call(axiosCall, "POST", API.GETCLASSDATA,action.payload);
+//     const response = yield call(axiosCall, "POST", API.GETHIER2DATA,action.payload);
 //     //console.log(response);
 //     if (response?.status == 200) {
 //       yield put(getClassDataSuccess({ itemData: response?.data }));
@@ -58,7 +58,7 @@ export function* FinanceInterface() {
 // }
 
 // export function* getClassData() {
-//   yield takeLatest(actions.GET_CLASSDATA_REQUEST, getClassDataSaga);
+//   yield takeLatest(actions.GET_HIER2DATA_REQUEST, getClassDataSaga);
 // }
 
 // function* getLocationDataSaga(action) {

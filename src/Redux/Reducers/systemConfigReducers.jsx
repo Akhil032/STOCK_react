@@ -26,7 +26,7 @@ const SystemConfigReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: true,
+        isSuccess: false,
       };
 
     case actions.GET_SYSTEMCONFIG_ERROR:
@@ -63,6 +63,14 @@ const SystemConfigReducers = (state = initialState, action) => {
           messgae: action.payload?.Data?.message,
           isSuccess: false,
         };
+      case actions.RESET_SYSTEMCONFIG:
+      return {
+        isLoading: false,
+        data: [],
+        isError: false,
+        messgae: '',
+        isSuccess: false,
+      };
     default:
       return { ...state };
   }

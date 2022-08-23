@@ -26,7 +26,7 @@ const ErrorProcessingReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: true,
+        isSuccess: false,
       };
 
     case actions.GET_ERRORPROCESSING_ERROR:
@@ -63,7 +63,7 @@ const ErrorProcessingReducers = (state = initialState, action) => {
           messgae: action.payload?.Data?.message,
           isSuccess: false,
         };
-        case actions.GET_CLASSDATA_REQUEST:
+        case actions.GET_HIER2DATA_REQUEST:
         return {
           ...state,
           isLoading: true,
@@ -72,16 +72,16 @@ const ErrorProcessingReducers = (state = initialState, action) => {
           isSuccess: false,
         };
   
-      case actions.GET_CLASSDATA_SUCCESS:
+      case actions.GET_HIER2DATA_SUCCESS:
         return {
           ...state,
           isLoading: false,
           data: action.payload,
           isError: false,
           messgae: action.payload?.Data?.message,
-          isSuccess: true,
+          isSuccess: false,
         };
-      case actions.GET_CLASSDATA_ERROR:
+      case actions.GET_HIER2DATA_ERROR:
         return {
           ...state,
           isLoading: false,
@@ -105,7 +105,7 @@ const ErrorProcessingReducers = (state = initialState, action) => {
           data: action.payload,
           isError: false,
           messgae: action.payload?.Data?.message,
-          isSuccess: true,
+          isSuccess: false,
         };
       case actions.GET_LOCATIONDATA_ERROR:
         return {
@@ -115,7 +115,32 @@ const ErrorProcessingReducers = (state = initialState, action) => {
           messgae: action.payload?.Data?.message,
           isSuccess: false,
         };
-
+        case actions.GET_TRNTYPE_REQUEST:
+          return {
+            ...state,
+            isLoading: true,
+            isError: false,
+            messgae: "",
+            isSuccess: false,
+          };
+    
+        case actions.GET_TRNTYPE_SUCCESS:
+          return {
+            ...state,
+            isLoading: false,
+            data: action.payload,
+            isError: false,
+            messgae: action.payload?.Data?.message,
+            isSuccess: false,
+          };
+        case actions.GET_TRNTYPE_ERROR:
+          return {
+            ...state,
+            isLoading: false,
+            isError: true,
+            messgae: action.payload?.Data?.message,
+            isSuccess: false,
+          };
     default:
       return { ...state };
   }

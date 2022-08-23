@@ -45,7 +45,10 @@ const useStyles = makeStyles({
               },
               '& td:nth-child(15)':{
                 display: 'none'
-          }
+              },
+              '& td:nth-child(16)':{
+                display: 'none'
+              }
         }
     }
   },
@@ -159,8 +162,8 @@ const StageProcessing = () => {
         const formatData = formattedExcelData(resp.rows);
         formatData.map(item => {
             item['SR_NO']= count;
-            item['UNIT_COST'] = item.UNIT_COST?.toFixed(4);
-            item['UNIT_RETAIL'] = item.UNIT_RETAIL?.toFixed(4);
+            item['UNIT_COST'] = item.UNIT_COST;
+            item['UNIT_RETAIL'] = item.UNIT_RETAIL;
             count++;
         })
         setTabledata(formatData);
@@ -226,7 +229,7 @@ const StageProcessing = () => {
   // Final Submit data handler 
   const finalSubmit = () => {
     tabledata.map( item => {
-      delete item?.SR_NO;
+      //delete item?.SR_NO;
       item['CREATE_DATETIME'] = new Date().toLocaleString();
       item['CREATE_ID'] = getcurrentUser();
             
@@ -239,9 +242,17 @@ const StageProcessing = () => {
     setOpen(false)
   }
   const handleMsgClose = () => {
-    setIsError(false);
-    setIsSuccess(false);
-    setTabledata(allData);
+    if(isSuccess === true){
+      setTabledata("");
+      setIsSuccess(false);
+    }
+    if(isError === true){
+      setTabledata(allData);
+      setIsError(false);
+    }
+
+
+    
   }
 
   const tableSearch = (event) => {
@@ -274,7 +285,7 @@ const StageProcessing = () => {
         <Grid item xs={4}>
           <Box className={StageProceesClasses.boxDiv}>
             <div className={StageProceesClasses.uploaddiv}>
-              <h4>Stage Processing Data</h4>
+              <h4>Inventory Transaction</h4>
               <Button variant="contained" component="label" startIcon={<UploadFileIcon />}>
                 Upload File
                 <input onChange={handleCapture} type="file" hidden />
@@ -410,11 +421,11 @@ const StageProcessing = () => {
       }}
     >
       <DialogTitle id="responsive-dialog-title">
-        {"Are you want to submit data?"}
+        {"Do you want to submit data?"}
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Please click to continue for submit data. 
+           
         </DialogContentText>
       </DialogContent>
       <DialogActions>

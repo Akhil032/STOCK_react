@@ -129,12 +129,7 @@ const CostChange = () => {
   // console.log("128",FinanceInterfaceData);
   const dispatch = useDispatch();
 
-  // const toggleDrawer = (anchor, open) => (event) => {
-  //   if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-  //     return;
-  //   }
-  //   setState({ ...state, [anchor]: open });
-  // };
+
 
   const serializedata = (datatable) => {
      console.log("dt",datatable)
@@ -144,15 +139,6 @@ const CostChange = () => {
      if(datatable.length > 0){
        datatable.map( item => {
            const reorder = {
-            //  'ITEM' : null,
-            //  'ITEM_DESC': null,
-            //  'LOCATION': null,
-            //  'LOCATION_NAME': "",
-            //  'ITEM_SOH': "",
-            //  'UNIT_COST': "",
-            
-
-             
           'SET_OF_BOOKS_ID' :null,
           'ACCOUNTING_DATE' :"", 
           'CURRENCY' :"", 
@@ -170,7 +156,6 @@ const CostChange = () => {
           'PRIMARY_CREDIT_AMT' :null,
 
            }
-          //console.log("158 reorder:",reorder)
                   
              let test = Object.assign(reorder,item);
              newTabledata.push(test); 
@@ -178,6 +163,7 @@ const CostChange = () => {
      })
      return newTabledata;
    } 
+   setLoading(true);
    }
 
   useEffect(() => {
@@ -269,14 +255,6 @@ const handleSubmit = (event) => {
     setState({ ...state, 'right': open });
 }
 
-// const onChange = (e) => {
-//   setSearchData((prev) => {
-//     return {
-//       ...prev,
-//       [e.target.name]: e.target.value,
-//     };
-//   });
-// }
 
 const handleMsgClose = () => {
   setIsError(false)
