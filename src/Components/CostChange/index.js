@@ -38,6 +38,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const animatedComponents = makeAnimated();
+
 const styleSelect = {
   control: base => ({
     ...base,
@@ -107,6 +108,7 @@ const initialItemData = {
   ITEM: ""
 }
 const CostChange = () => {
+  const selectRef = null;
   const [valLoc, setValLoc] = useState([]);
   const [valH1,setValH1]=useState([]);
   const [valH2,setValH2]=useState([]);
@@ -239,6 +241,7 @@ const CostChange = () => {
          console.log("194 SD", searchData)
         
         dispatch(getCostChangeRequest([searchData]))
+        
       }, 1000)
     }
   }, [isSubmit]);
@@ -247,7 +250,6 @@ const CostChange = () => {
     if (isSearch) {
       console.log("278 SD", searchData)
       dispatch(getCostChangeRequest([searchData]))
-
     }
   }, [isSearch])
 
@@ -275,6 +277,7 @@ const CostChange = () => {
     } else {
       setSearch(false)
     }
+    
   }, [CostChangeData?.data])
 
   const handleChange = (e) => {
@@ -348,6 +351,7 @@ const CostChange = () => {
   }
 
   const onReset = (event) => {
+    this.selectRef.select.clearValue();
     initialsearch.HIER1 = [];
     initialsearch.HIER2 = [];
     initialsearch.HIER3 = [];
@@ -574,6 +578,9 @@ console.log("src",searchData);
     > <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
         <Stack spacing={2} sx={{ width: 250 }}>
         <Select 
+                // ref={ref => {
+                //   selectRef = ref;
+                // }}
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -582,10 +589,12 @@ console.log("src",searchData);
                 getOptionValue={option => option.HIER1}
                 options={itemData}
                 isSearchable={true}
+                isClearable={true}
                 onChange={handleHier1}
                 placeholder={"Choose a HIER1"}
                 styles={styleSelect}
                 components={animatedComponents}  
+                //autoFocus={true}
                 isMulti 
                 />
 
@@ -598,6 +607,7 @@ console.log("src",searchData);
                 getOptionValue={option => option.HIER2}
                 options={(filterClass.length > 0) ? filterClass : []}
                 isSearchable={true}
+                isClearable={false}
                 onChange={handleHier2}
                 placeholder={"Choose a HIER2"}
                 styles={styleSelect}
@@ -622,7 +632,7 @@ console.log("src",searchData);
                 />
               
           <Select 
-               //disabled={filterItem.length > 0 ?false:true}
+               
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
