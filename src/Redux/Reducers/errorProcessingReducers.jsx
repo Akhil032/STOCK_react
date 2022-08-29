@@ -26,7 +26,7 @@ const ErrorProcessingReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: false,
+        isSuccess: true,
       };
 
     case actions.GET_ERRORPROCESSING_ERROR:
@@ -115,32 +115,7 @@ const ErrorProcessingReducers = (state = initialState, action) => {
           messgae: action.payload?.Data?.message,
           isSuccess: false,
         };
-        case actions.GET_TRNTYPE_REQUEST:
-          return {
-            ...state,
-            isLoading: true,
-            isError: false,
-            messgae: "",
-            isSuccess: false,
-          };
-    
-        case actions.GET_TRNTYPE_SUCCESS:
-          return {
-            ...state,
-            isLoading: false,
-            data: action.payload,
-            isError: false,
-            messgae: action.payload?.Data?.message,
-            isSuccess: false,
-          };
-        case actions.GET_TRNTYPE_ERROR:
-          return {
-            ...state,
-            isLoading: false,
-            isError: true,
-            messgae: action.payload?.Data?.message,
-            isSuccess: false,
-          };
+
     default:
       return { ...state };
   }

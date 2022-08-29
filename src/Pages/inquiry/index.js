@@ -20,7 +20,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { trnType } from "../../Components/ErrorProcessing/transType.js";
 import swal from '@sweetalert/with-react';
-
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -82,6 +83,17 @@ const useStyles = makeStyles({
     padding: "20px 20px 20px 20px",
   },
 });
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
 
 const initialsearch = {
   HIER1: [],
@@ -102,6 +114,11 @@ const initialItemData = {
 };
 
 const InquryScreen = () => {
+  const [valH1,setValH1]=useState([]);
+  const [valH2,setValH2]=useState([]);
+  const [valH3,setValH3]=useState([]);
+  const [valItem,setValItem]=useState([]);
+  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -231,7 +248,7 @@ const InquryScreen = () => {
           </div>
         )  
         setSearch(false);
-    }else if(InquiryData.isSuccess ){
+    }else if(InquiryData.isSuccess && InquiryData.isupdate ){
       setIsSuccess(true);
       swal(
         <div>     
@@ -487,6 +504,226 @@ const InquryScreen = () => {
     itemData.length > 0
       ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]
       : [];
+
+
+
+      const handleHier1=(e,value) =>
+      {
+          console.log("h1",value);
+          console.log("srch1",searchData);
+        let selectedDept = [];
+        if (value.option) {
+            valH1.push(value.option)
+        }else if (value.removedValue) {
+            let index = valH1.indexOf(value.removedValue.HIER1);
+            valH1.splice(index,1);
+        //}
+        }else if(value.action==="clear"){
+            valH1.splice(0,valH1.length);
+        }
+      console.log("V1",valH1);
+    //Filtering HIER2 based on HIER1
+        if (valH1.length >0) {
+          const filterClass = itemData.filter((item) => {
+            return (valH1).some((val) => {
+              return item.HIER1 === val.HIER1;
+            });
+          });
+          let UniqClass =
+              filterClass.length > 0
+                ? [
+                    ...new Map(
+                      filterClass.map((item) => [item["HIER2"], item])
+                    ).values(),
+                  ]
+                : [];
+                setFilterClass(UniqClass);
+                valH1.map((item) => {
+                  selectedDept.push(item.HIER1);
+                });
+                setSearchData((prev) => {
+                  return {
+                    ...prev,
+                    HIER1: selectedDept,
+                  };
+                });
+        }else {
+          setFilterClass([])
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              HIER1: []
+            };
+          });
+        }
+    }
+    
+    const handleHier2=(e,value) =>
+      {
+        let selectedHier2 = [];
+        if (value.option) {
+          valH2.push(value.option)
+        }else if (value.removedValue) {
+            let index = valH2.indexOf(value.removedValue.HIER2);
+            valH2.splice(index,1);
+    
+        }else if(value.action==="clear"){
+          valH2.splice(0,valH2.length);
+        }
+    //Filtering HIER2 based on HIER1
+      if (valH2.length >0) {
+        const filterSubClass = itemData.filter((item) => {
+          return (valH2).some((val) => {
+            return item.HIER2 === val.HIER2;
+          });
+        });
+        let UniqClass =
+        filterSubClass.length > 0
+              ? [
+                  ...new Map(
+                    filterSubClass.map((item) => [item["HIER3"], item])
+                  ).values(),
+                ]
+              : [];
+              setsubFilterClass(UniqClass);
+              valH2.map((item) => {
+                selectedHier2.push(item.HIER2);
+              });
+              setSearchData((prev) => {
+                return {
+                  ...prev,
+                  HIER2: selectedHier2,
+                };
+              });
+        }else {
+          setsubFilterClass([]);
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              HIER2: []
+            };
+          });
+      }
+    }
+    
+    
+    const handleHier3=(e,value) =>
+      {
+        let selectedHier3 = [];
+        if (value.option) {
+          valH3.push(value.option)
+        }else if (value.removedValue) {
+            let index = valH3.indexOf(value.removedValue.HIER3);
+            valH3.splice(index,1);
+    
+        }else if(value.action==="clear"){
+          valH3.splice(0,valH3.length);
+        }
+    //Filtering HIER3 based on HIER2
+        if (valH3.length >0) {
+          const filterItem = itemData.filter((item) => {
+            return (valH3).some((val) => {
+              return item.HIER3 === val.HIER3;
+            });
+          });
+          setFilterItem(filterItem);
+                valH3.map((item) => {
+                  selectedHier3.push(item.HIER3);
+                });
+                setSearchData((prev) => {
+                  return {
+                    ...prev,
+                    HIER3: selectedHier3,
+                  };
+                });
+          }else {
+            setFilterItem([]);
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                HIER3: []
+              };
+            });
+          }
+    }
+    const handleItem=(e,value) =>
+      {
+        let selectedItem = [];
+        if (value.option) {
+          valItem.push(value.option)
+      }else if (value.removedValue) {
+          let index = valItem.indexOf(value.removedValue.ITEM);
+          valItem.splice(index,1);
+    
+      }else if(value.action==="clear"){
+        valItem.splice(0,valItem.length);
+       }
+    //Filtering ITEM based on HIER3
+    if (valItem.length >0) {
+    
+            valItem.map((item) => {
+              selectedItem.push(item.ITEM);
+            });
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                ITEM: selectedItem,
+              };
+            });
+    }else {
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          ITEM: selectedItem,
+        };
+      });
+    }
+    }
+    
+   
+    
+    const handleTranType=(e,value) =>
+    {
+      let selectedTrantype = [];
+      let selectedAref = [];
+      if (value.option) {
+        valTRN.push(value.option)
+      }else if (value.removedValue) {
+    
+        for(let i= 0; i< valTRN.length;i++)
+        {
+          if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
+            if(valTRN[i]["AREF"]===value.removedValue.AREF){
+              valTRN.splice(i,1);
+          }
+          }
+        }
+      }else if(value.action="clear"){
+        valTRN.splice(0,valTRN.length);
+      }
+      if (valTRN.length >0) {
+      valTRN.map((item) => {
+          selectedTrantype.push(item.TRN_TYPE);
+          selectedAref.push(item.AREF)
+        });
+        setSearchData((prev) => {
+            return {
+              ...prev,
+              TRN_TYPE: selectedTrantype,
+              AREF:selectedAref
+    
+            };
+          });
+      }else {
+          setSearchData((prev) => {
+          return {
+            ...prev,
+            TRN_TYPE : [],
+            AREF: []
+          };
+          });
+      }
+    }
   console.log(searchData);
   const searchPanel = () => (
     <Box
@@ -502,151 +739,97 @@ const InquryScreen = () => {
         sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
       >
         <Stack spacing={2} sx={{ width: 250 }}>
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-item"
-            sx={{ width: 250 }}
-            options={UniqDept.length > 0 ? UniqDept : []}
-            //value={searchData?.HIER1}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER1 === value.HIER1
-            }
-            autoHighlight
-            onChange={selectDept}
-            getOptionLabel={(option) =>
-              `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER1}-{option.HIER1_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a HIER1"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
+        <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`}
+                getOptionValue={option => option.HIER1}
+                options={UniqDept.length > 0 ? UniqDept : []}
+                isSearchable={true}
+                onChange={handleHier1}
+                placeholder={"Choose HIER1"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                isClearable={true}
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))}
+                />
 
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-class"
-            sx={{ width: 250 }}
-            options={filterClass.length > 0 ? filterClass : []}
-            //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER2 === value.HIER2
-            }
-            autoHighlight
-            onChange={selectClass}
-            getOptionLabel={(option) =>
-              `${option.HIER2.toString()}-${option.HIER2_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER2} {option.HIER2_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a HIER2"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
+        <Select
 
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-subclass"
-            sx={{ width: 250 }}
-            options={subfilterClass.length > 0 ? subfilterClass : []}
-            //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER3 === value.HIER3
-            }
-            autoHighlight
-            onChange={selectSubClass}
-            getOptionLabel={(option) =>
-              `${option.HIER3.toString()}-${option.HIER3_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER3} {option.HIER3_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a HIER3"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER2.toString()}-${option.HIER2_DESC.toString()}`}
+                getOptionValue={option => option.HIER2}
+                options={(filterClass.length > 0) ? filterClass : []}
+                isSearchable={true}
+                onChange={handleHier2}
+                placeholder={"Choose a HIER2"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))}
 
-          <Autocomplete
-            disabled={filterItem.length > 0 ?false:true}
-            multiple
-            size="small"
-            id="combo-box-item"
-            sx={{ width: 250 }}
-            options={filterItem.length > 0 ? filterItem : []}
-            //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-            isOptionEqualToValue={(option, value) => option.ITEM === value.ITEM}
-            autoHighlight
-            onChange={selectItem}
-            getOptionLabel={(option) =>
-              `${option.ITEM.toString()}-${option.ITEM_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.ITEM} {option.ITEM_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a ITEM"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
+                />
 
-          <Autocomplete
-            multiple
-            disablePortal
-            size="small"
-            id="combo-box-trn-type"
-            // value={(searchData?.TRN_TYPE.length > 0)?searchData?.TRN_TYPE:[]}
-            onChange={selectTrantype}
-            options={trnType}
-            getOptionLabel={(option) => option.TRN_NAME}
-            sx={{ width: 250 }}
-            renderInput={(params) => (
-              <TextField {...params} label="TRN TYPE" variant="standard" />
-            )}
-          />
+        <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER3.toString()}-${option.HIER3_DESC.toString()}`}
+                getOptionValue={option => option.HIER2}
+                options={(subfilterClass.length > 0) ? subfilterClass : []}
+                isSearchable={true}
+                onChange={handleHier3}
+                placeholder={"Choose a HIER3"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))}
+                />
+
+          <Select
+               //disabled={filterItem.length > 0 ?false:true}
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.ITEM.toString()}`}
+                getOptionValue={option => option.ITEM}
+                options={(filterItem.length > 0) ? filterItem : []}
+                isSearchable={true}
+                onChange={handleItem}
+                placeholder={"Choose a ITEM"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))}
+                isDisabled={filterItem.length > 0 ?false:true}
+                />
+
+
+          <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  option.TRN_NAME}
+                getOptionValue={option => option.TRN_NAME}
+                options={trnType}
+                isSearchable={true}
+                onChange={handleTranType}
+                placeholder={'TRN TYPE'}
+                styles={styleSelect}
+                components={animatedComponents}
+                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}        
+                isMulti
+                />
+
 
           <TextField
             className={ErrorProceesClasses.textField}

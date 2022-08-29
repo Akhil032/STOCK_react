@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Header from "../Header/indexFIH";
+import Header from "../Header/indexDV";
 import Autocomplete from '@mui/material/Autocomplete';
 import {Table, TableBody, TableCell, TableContainer, TablePagination, TableRow,Paper, Checkbox, TextField } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -54,66 +54,12 @@ const CommonTable = ({
   pageName,
   setTabledata,
   allData,
-  handleSearchClick,
-  freeze,
-  handleCopyDown,
 }) => {
 
 
     const [updateData, setupdateData] = useState({});  
     const rowClasses = useStyles();  
 
-  // const onBlur = (event, value , row) => {
-  //   console.log("test", event.target.value, value, row);
-  //   row[event.target.name] = event.target.value;
-    
-  //   if(event.target.name == 'QTY') {
-  //     row['TOTAL_COST'] = parseInt(event.target.value) * parseInt(row['UNIT_COST']);
-  //   }
-    
-  //   var finalData = updateData;
-  //   if(updateData.length === 0) {
-  //     finalData.push(row);
-  //   }
-  //   else {
-  //     var t = finalData.findIndex(x => x.TRAN_SEQ_NO === row['TRAN_SEQ_NO']);
-  //     if(t === -1) {
-  //       finalData.push(row);
-  //     }
-  //     else {
-  //       finalData[t] = row;
-  //     }
-  //   }
-  //   setupdateData(finalData);
-  //   setUpdateRow(finalData);
-  //   console.log("testafter", row, updateData);
-  //     sessionStorage.setItem('updateColume',JSON.stringify(finalData));
-  //   // return;
-  //   // let temp = JSON.stringify(updateData);
-  //   // temp = JSON.parse(temp);
-  //   // console.log(temp);
-  //   //   //let oldrow = rows.filter((item) => item?.TRAN_SEQ_NO.includes(editRows) );
-  //   // if(temp.findIndex(x => x.TRAN_SEQ_NO === row['TRAN_SEQ_NO']) == -1 ){
-  //   // temp[row?.TRAN_SEQ_NO] = row;
-  //   // temp[row?.TRAN_SEQ_NO][event.target.name] = event.target.value; 
-  //   // if(event.target.name == 'QTY'){
-  //   //   temp[row?.TRAN_SEQ_NO]['TOTAL_COST'] = event.target.value * row['UNIT_COST']; 
-  //   // }
-  //   // //let updaterow = Object.values(temp);
-    
-  //   // console.log(temp);
-  //   // setupdateData(temp)
-  //   // }
-  // }
-
-
-
-  // useEffect(() => {
-  //   console.log("testafter1", updateData);
-    
-  //   setUpdateRow(updateData);
-    
-  // },[updateData])
 
 
   const onBlur = (event, value , row) => {
@@ -157,14 +103,10 @@ const CommonTable = ({
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               handleSearch={handleSearch}
-              handleSearchClick={handleSearchClick}
               searchText={searchText}
               headCells={headCells}
               editRows={editRows}
               checkEditrows={true}
-              freeze={freeze}
-              handleCopyDown={handleCopyDown}
-              pageName={pageName}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
@@ -181,7 +123,7 @@ const CommonTable = ({
                       key={row?.SR_NO?row?.SR_NO:row?.TRAN_SEQ_NO}
                       selected={isItemSelected}
                     >
-                      {/* <TableCell padding="checkbox">
+                      {/* <TableCell padding="checkbox" >
                         <Checkbox
                           color="primary"
                           onClick={(event) => handleClick(event, row?.SR_NO?row?.SR_NO:row?.TRAN_SEQ_NO)}
@@ -196,7 +138,72 @@ const CommonTable = ({
                         />
                       </TableCell> */}
                       { editRows?.includes((row?.TRAN_SEQ_NO)?row?.TRAN_SEQ_NO:row?.SR_NO) ? <>
-                       
+                        {Object.entries(row).map(([key, value]) => {
+                            let editable;
+                          if(pageName == "error"){
+                              editable = false;
+                            if(key == "ITEM"){
+                                editable = row["ERR_MSG"].toLowerCase().search("item") !== -1;
+                            }if(key == "LOCATION"){
+                              editable = row["ERR_MSG"].toLowerCase().search("location") !== -1;
+                            }if(key == "TRN_NAME"){
+                              editable = row["ERR_MSG"].toLowerCase().search("trn_type") !== -1;
+                            }if(key == "QTY"){
+                              editable = row["ERR_MSG"].toLowerCase().search("qty") !== -1;
+                            }if(key == "CURRENCY"){
+                              editable = row["ERR_MSG"].toLowerCase().search("currency") !== -1;
+                            }if(key == 'TRN_DATE'){
+                              editable = row["ERR_MSG"].toLowerCase().search("trn_date") !== -1;
+                            }
+                          }
+                          if(pageName == "config"){
+                              editable = true;
+                            if(key == 'TRN_NAME'){
+                              editable = false;
+                              console.log(editable);
+                              }
+                          }
+                          if(pageName == "edit_Transaction"){
+                            editable = false;
+                          if(key == 'QTY'){
+                            editable = true;
+                            }
+                          if(key == 'UNIT_COST'){
+                            editable = true;
+                          }
+                          if(key == 'UNIT_RETAIL'){
+                            editable = true;
+                          }}
+
+                            return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell}>
+                              {(key == 'TRN_NAME' && pageName == 'error') ? (
+                                    <Autocomplete
+                                    disabled={!editable}
+                                    disablePortal
+                                    size="small"
+                                    id="combo-box-trn-type"
+                                    // value={(row?.TRN_TYPE == option?.TRN_TYPE)?row?.TRN_TYPE: }
+                                    onChange={ (event, value) => onBlur(event, value, row)}
+                                    options={trnType}
+                                    getOptionLabel={(option) => option.TRN_NAME}
+                                    sx={{ width: 200 }}
+                                    renderInput={(params) => <TextField {...params} variant="standard" />}
+                                  />
+                              ) : (
+                                <TextField 
+                            disabled={!editable}
+                            size="small"
+                            type={(key == 'TRN_DATE')?'date':'text'}
+                            variant="standard"
+                            className={rowClasses.input}
+                            defaultValue={value} name={key} onChange={ (event, value) => onBlur(event,value,row)} />
+                              )
+                              
+                              }
+                            
+                           </TableCell>
+                              }       
+                      )}
                       </> :           
                       <>
                       {Object.entries(row).map(([key, value])=> {
@@ -230,6 +237,7 @@ const CommonTable = ({
                       </> }
                       
                     </TableRow>
+
                   );
                 })}
 

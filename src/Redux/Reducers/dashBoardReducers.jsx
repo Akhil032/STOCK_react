@@ -26,7 +26,7 @@ const DashboardReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: false,
+        isSuccess: true,
       };
 
     case actions.GET_DAILYCOUNT_ERROR:
@@ -53,7 +53,7 @@ const DashboardReducers = (state = initialState, action) => {
           data: action.payload,
           isError: false,
           messgae: action.payload?.Data?.message,
-          isSuccess: false,
+          isSuccess: true,
         };
       case actions.GET_STAGECOUNT_ERROR:
         return {
@@ -79,7 +79,7 @@ const DashboardReducers = (state = initialState, action) => {
             data: action.payload,
             isError: false,
             messgae: action.payload?.Data?.message,
-            isSuccess: false,
+            isSuccess: true,
           };
         case actions.GET_ERRORCOUNT_ERROR:
           return {

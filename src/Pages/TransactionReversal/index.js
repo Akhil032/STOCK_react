@@ -2,42 +2,36 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+import Grid from '@mui/material/Grid';
 import Table from "../../Components/Table/indexRev";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
-import Modal from "@mui/material/Modal";
-import Autocomplete from "@mui/material/Autocomplete";
+import Modal from '@mui/material/Modal';
+import Autocomplete from '@mui/material/Autocomplete';
 import IconButton from "@mui/material/IconButton";
 import FormControl from "@mui/material/FormControl";
-import Typography from "@mui/material/Typography";
+import Typography from '@mui/material/Typography';
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Drawer from "@mui/material/Drawer";
 import { makeStyles } from "@mui/styles";
-import {
-  getTransactionReversalRequest,
-  postTransactionCancelRequest,
-  getClassDataRequest,
-  getLocationDataRequest,
-  resetTransactionReversal,
-} from "../../Redux/Action/transactionReversal";
+import { getTransactionReversalRequest, postTransactionCancelRequest, getClassDataRequest, getLocationDataRequest } from "../../Redux/Action/transactionReversal";
 import CircularProgress from "@mui/material/CircularProgress";
 import { headCells } from "./tableHead";
-import SearchIcon from "@mui/icons-material/Search";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SendIcon from "@mui/icons-material/Send";
+import SearchIcon from '@mui/icons-material/Search';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import SendIcon from '@mui/icons-material/Send';
 import { trnType } from "./transType.js";
-//import { errorList } from "./errorType.js";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
-import swal from '@sweetalert/with-react';
-//import "./index.css";
+//import { errorList } from "./errorType.js"; 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle'; 
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles'; 
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -46,21 +40,20 @@ const useStyles = makeStyles({
   maindiv: {
     position: "relative",
     width: "calc(95vw - 0px)",
-    "& table": {
-      "& tr": {
-        "& td:nth-child(28)": {
-          display: "none",
-        },
-        "& td:nth-child(29)": {
-          display: "none",
-        },
-        "& td:nth-child(30)": {
-          display: "none",
-        },
-      },
-    },
-  },
-  boxDiv: {
+    '& table':{
+      '& tr':{
+            '& td:nth-child(28)':{
+                  display: 'none'
+            },
+            '& td:nth-child(29)':{
+              display: 'none'
+           },
+           '& td:nth-child(30)':{
+             display: 'none'
+          }
+      }
+  }
+},  boxDiv: {
     textAlign: "initial",
     position: "relative",
     maxWidth: "1400px",
@@ -78,23 +71,34 @@ const useStyles = makeStyles({
   textField: {
     marginRight: "10px !important",
   },
-  dateField: {
-    "& .MuiInput-input": {
-      color: "rgba(102,102,102,1)",
-    },
+  dateField:{
+      '& .MuiInput-input': {
+        color:  "rgba(102,102,102,1)",
+      }
   },
   popUp: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     width: 400,
-    backgroundColor: "white",
-    border: "2px solid #000",
+    backgroundColor: 'white',
+    border: '2px solid #000',
     boxShadow: 24,
-    padding: "20px 20px 20px 20px",
+    padding: '20px 20px 20px 20px',
   },
 });
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
 
 const initialsearch = {
   HIER1: [],
@@ -104,25 +108,33 @@ const initialsearch = {
   LOCATION: [],
   TRN_TYPE: [],
   AREF: [],
+  //ERR_MSG: [],
   CREATE_ID: JSON.parse(localStorage.getItem("userData"))?.username,
   TRN_DATE: "",
-};
+}
 
 const initialItemData = {
   HIER1: "",
   HIER2: "",
   HIER3: "",
-  ITEM: "",
-};
+  ITEM: ""
+}
+
 
 const TransactionReversal = () => {
+  const [valLoc, setValLoc] = useState([]);
+  const [valH1,setValH1]=useState([]);
+  const [valH2,setValH2]=useState([]);
+  const [valH3,setValH3]=useState([]);
+  const [valItem,setValItem]=useState([]);
+  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
   const [editRows, seteditRows] = useState([]);
-  const [updateRow, setUpdateRow] = useState([]);
+  const [updateRow, setUpdateRow] =  useState([]);
   const [itemData, setItemData] = useState(initialItemData);
-  const [origItemData, setOrigItemData] = useState({});
+  const [origItemData, setOrigItemData ] = useState({});
   const [filterClass, setFilterClass] = useState([]);
   const [subfilterClass, setsubFilterClass] = useState([]);
   const [filterItem, setFilterItem] = useState([]);
@@ -133,11 +145,11 @@ const TransactionReversal = () => {
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
-  const [updateData, setupdateData] = useState([]);
-  const [valueSelect,setValueSelect] = useState([]);
   const [open, setOpen] = useState(false);
+  const [updateData, setupdateData] = useState([]);
+  const [valueSelect,setValueSelect] = useState([]); 
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -148,15 +160,12 @@ const TransactionReversal = () => {
   const TransactionReversalData = useSelector(
     (state) => state.TransactionReversalReducers
   );
-  console.log(TransactionReversalData?.data?.Data);
+  console.log(TransactionReversalData);
   const dispatch = useDispatch();
-console.log("search:",initialsearch)
+
   const toggleDrawer = (anchor, open) => (event) => {
     setSearchData(initialsearch)
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
     setState({ ...state, [anchor]: open });
@@ -164,283 +173,473 @@ console.log("search:",initialsearch)
 
   const serializedata = (datatable) => {
     let newTabledata = [];
-    if (datatable.length > 0) {
-      datatable.map((item) => {
-        const reorder = {
-          ITEM: null,
-          ITEM_DESC: null,
-          HIER1: null,
-          HIER1_DESC: null,
-          HIER2: null,
-          HIER2_DESC: null,
-          HIER3: null,
-          HIER3_DESC: null,
-          LOCATION_TYPE: null,
-          LOCATION: null,
-          LOCATION_NAME: "",
-          TRN_DATE: "",
-          TRN_NAME: "",
-          TRN_TYPE: "",
-          QTY: "",
-          UNIT_COST: "",
-          UNIT_RETAIL: "",
-          TOTAL_COST: "",
-          TOTAL_RETAIL: "",
-          REF_NO1: "",
-          REF_NO2: "",
-          REF_NO3: "",
-          REF_NO4: "",
-          CURRENCY: "",
-          TRAN_SEQ_NO: null,
-          AREF: null,
-        };
-        parseFloat(item.LOCATION?.toFixed(1));
-        delete item?.PROCESS_IND;
-        delete item?.SELLING_UOM;
-        delete item?.TRN_POST_DATE;
-        delete item?.REF_ITEM;
-        delete item?.REF_ITEM_TYPE;
-        delete item?.PACK_QTY;
-        delete item?.PACK_COST;
-        delete item?.PACK_RETAIL;
-        delete item?.CREATE_ID;
-        delete item?.CREATE_DATETIME;
-        delete item?.REV_NO;
-        delete item?.REV_TRN_NO;
-        delete item?.ARCHIEVE_DATETIME;
-        let test = Object.assign(reorder, item);
-        newTabledata.push(test);
-      });
-      return newTabledata;
-    }
-  };
+    if(datatable.length > 0){
+      datatable.map( item => {
+          const reorder = {
+            ITEM: null,
+            ITEM_DESC: null,
+            HIER1: null,
+            HIER1_DESC: null,
+            HIER2: null,
+            HIER2_DESC: null,
+            HIER3: null,
+            HIER3_DESC: null,
+            LOCATION_TYPE: null,
+            LOCATION: null,
+            LOCATION_NAME: "",
+            TRN_DATE: "",
+            TRN_NAME: "",
+            TRN_TYPE: "",
+            QTY: "",
+            UNIT_COST: "",
+            UNIT_RETAIL: "",
+            TOTAL_COST: "",
+            TOTAL_RETAIL: "",
+            REF_NO1: "",
+            REF_NO2: "",
+            REF_NO3: "",
+            REF_NO4: "",
+            CURRENCY: "",
+            TRAN_SEQ_NO: null,
+            AREF: null,
+          }
+          parseFloat(item.LOCATION?.toFixed(1));
+          parseInt(item?.HIER1);
+          delete item?.PROCESS_IND;
+          delete item?.SELLING_UOM;
+          delete item?.TRN_POST_DATE;
+          delete item?.REF_ITEM;
+          delete item?.REF_ITEM_TYPE;
+          delete item?.PACK_QTY;
+          delete item?.PACK_COST;
+          delete item?.PACK_RETAIL;
+          delete item?.CREATE_ID;
+          delete item?.CREATE_DATETIME;
+          delete item?.REV_NO;
+          delete item?.REV_TRN_NO;
+          delete item?.ARCHIEVE_DATETIME;
+            let test = Object.assign(reorder,item);
+            newTabledata.push(test); 
+    })
+    return newTabledata;
+  } 
+  }
 
   useEffect(() => {
     if (inputValue) {
-      const filteredTable = tabledata.filter((props) =>
-        Object.entries(inputValue).every(
-          ([key, val]) =>
+      const filteredTable = tabledata.filter(props => 
+        Object
+          .entries(inputValue)
+          .every(([key,val]) => 
             !val.length ||
-            props[key]
-              ?.toString()
-              .toLowerCase()
-              .includes(val?.toString().toLowerCase())
-        )
-      );
+            props[key]?.toString().toLowerCase().includes(val?.toString().toLowerCase()))
+      )
       setTabledata(filteredTable);
     }
   }, [inputValue]);
 
   // useEffect(() => {
   //   if (TransactionReversalData.isError) {
-  //     setIsError(true);
-  //   } else if (TransactionReversalData.isSuccess) {
+  //     setIsError(true)
+  //   }else if(TransactionReversalData.isSuccess){
   //     setIsSuccess(true);
-  //   } else {
-  //     setIsError(false);
-  //     setTabledata("");
+  //   }else {
+  //     setIsError(false)
+  //     setTabledata("")
   //   }
-  // }, [TransactionReversalData]);
+  // }, [TransactionReversalData])
 
-  useEffect(() => {
-    if (TransactionReversalData.isError) {
-        setIsError(true)
-        swal(
-          <div>     
-            <p>{TransactionReversalData["messgae"]}</p>
-          </div>
-        )  
-    }else if(TransactionReversalData.isSuccess){
-      setIsSuccess(true);
-      swal(
-        <div>     
-           <p>{TransactionReversalData["messgae"]}</p>
-        </div>
-      )
-      setLoading(true);
-    }else {
-      setIsError(false)
-      setTabledata("")
-    }
-  }, [TransactionReversalData])
-
-  useEffect(() => {
-    if (isSubmit) {
+  useEffect(() => { 
+    if(isSubmit){
       setTimeout(() => {
-        dispatch(getTransactionReversalRequest([searchData]));
-      }, 500);
+        dispatch(getTransactionReversalRequest([searchData])) 
+      },1000)
     }
-    return () => {
-      dispatch(resetTransactionReversal());
-    }
-  }, [isSubmit]);
+},[isSubmit]);
+
+useEffect(() => {
+  if(isSearch){
+    dispatch(getTransactionReversalRequest([searchData])) 
+  }
+},[isSearch])
+
+useEffect(()=> {
+  setLoading(true);
+  dispatch(getClassDataRequest([{}]));
+  dispatch(getLocationDataRequest([{}]));
+},[''])
 
   useEffect(() => {
-    if (isSearch) {
-      dispatch(getTransactionReversalRequest([searchData]));
-    }
-  }, [isSearch]);
+        if(TransactionReversalData?.data?.Data && Array.isArray(TransactionReversalData?.data?.Data)){
+          setTabledata(serializedata(TransactionReversalData?.data?.Data));
+          setAllData(serializedata(TransactionReversalData?.data?.Data));
+          setLoading(false);
+          setSubmit(false);
+          setSearch(false);
+        }else if(TransactionReversalData?.data?.itemData && Array.isArray(TransactionReversalData?.data?.itemData)){
+          setItemData(TransactionReversalData?.data?.itemData);
+          setOrigItemData(TransactionReversalData?.data?.itemData);
+          setLoading(false);
+        }else if(TransactionReversalData?.data?.locationData && Array.isArray(TransactionReversalData?.data?.locationData)){
+          setLocationData(TransactionReversalData?.data?.locationData);
+          setLoading(false);
+        }else {
+          setSearch(false)
+        }
+        
+  },[TransactionReversalData?.data])
 
-  useEffect(() => {
-    setLoading(true);
-    dispatch(getClassDataRequest([{}]));
-    dispatch(getLocationDataRequest([{}]));
-  }, [""]);
 
-  useEffect(() => {
-    if (TransactionReversalData?.data?.Data && Array.isArray(TransactionReversalData?.data?.Data)) {
-      setTabledata(serializedata(TransactionReversalData?.data?.Data));
-      setAllData(serializedata(TransactionReversalData?.data?.Data));
-      setLoading(false);
-      setSubmit(false);
-      setSearch(false);
-    } else if (
-      TransactionReversalData?.data?.itemData &&
-      Array.isArray(TransactionReversalData?.data?.itemData)
-    ) {
-      setItemData(TransactionReversalData?.data?.itemData);
-      setOrigItemData(TransactionReversalData?.data?.itemData);
-      setLoading(false);
-    } else if (
-      TransactionReversalData?.data?.locationData &&
-      Array.isArray(TransactionReversalData?.data?.locationData)
-    ) {
-      setLocationData(TransactionReversalData?.data?.locationData);
-      setLoading(false);
-    } else {
-      setSearch(false);
-    }
-  }, [TransactionReversalData?.data]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value == "") {
-      setInputValue((prevState) => ({
+      setInputValue(prevState => ({
         ...prevState,
-        [name]: value,
-      }));
+        [name]: value
+    }));
       setTabledata(allData);
     } else {
-      setInputValue((prevState) => ({
+      setInputValue(prevState => ({
         ...prevState,
-        [name]: value,
-      }));
+        [name]: value
+    }));
     }
   };
-console.log("test",tabledata)
-  const confirmSubmit = () => {
-    setOpen(true);
-  };
 
-  const cancelReverse=(valueSelect)=>{
-    const cancelReverseRow = tabledata.filter((item) => { return valueSelect.some((val) => { return item.TRAN_SEQ_NO === val})});
-    console.log("class",cancelReverseRow)
-    if(Object.keys(cancelReverseRow).length > 0){
-          let sendRow = Object.values(cancelReverseRow);
-          sendRow.map((item)=> {
-            item['CREATE_ID'] = JSON.parse(localStorage.getItem("userData"))?.username;})}
-    setupdateData(cancelReverseRow)
-    dispatch(postTransactionCancelRequest(cancelReverseRow));
-    //console.log("update",updateData)
-    setSubmit(true);
-    setOpen(false);
-    setupdateData([]);
-    setLoading(true);
-  }
+const confirmSubmit = () => {
+  setOpen(true);
+}
+
+const cancelReverse=(valueSelect)=>{
+  const cancelReverseRow = tabledata.filter((item) => { return valueSelect.some((val) => { return item.TRAN_SEQ_NO === val})});
+  //console.log("class",cancelReverseRow)
+  setupdateData(cancelReverseRow)
+  dispatch(postTransactionCancelRequest(cancelReverseRow));
+  //console.log("update",updateData)
+  setSubmit(true);
+  setOpen(false);
+  setupdateData([]);
+  setLoading(true);
+}
   // const SubmitList = () => {
   //   console.log(updateRow);
-  //   if (Object.keys(updateRow).length > 0) {
+  //   if(Object.keys(updateRow).length > 0){
   //     let sendRow = Object.values(updateRow);
-  //     sendRow.map((item) => {
-  //       delete item?.ITEM_DESC;
-  //       delete item?.HIER1_DESC;
-  //       delete item?.HIER2_DESC;
-  //       delete item?.HIER3_DESC;
-  //       delete item?.TRN_NAME;
-  //       delete item?.LOCATION_NAME;
-  //       delete item?.undefined;
-  //       item['CREATE_ID'] = JSON.parse(localStorage.getItem("userData"))?.username;
-  //     });
-  //     console.log("admin",sendRow);
-  //     setLoading(true);
-  //     dispatch(postTransactionReversalRequest(sendRow));
-  //     initialsearch.HIER1 = [];
-  //     initialsearch.HIER2 = [];
-  //     initialsearch.HIER3 = [];
-  //     initialsearch.ITEM = [];
-  //     initialsearch.LOCATION = [];
-  //     initialsearch.TRN_TYPE = [];
-  //     initialsearch.TRN_DATE = [];
-  //     initialsearch.AREF = [];
-  //     initialsearch.CREATE_ID = [];
-  //     if((searchData).length===0){
-  //       setSearchData(initialsearch);
-  //   }
-  //     setFilterClass([]);
-  //     setsubFilterClass([]);
-  //     setFilterItem([]);
-  //     setSubmit(true);
-  //     seteditRows([]);
-  //     setOpen(false);
-  //   }
-  // };
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  //     sendRow.map((item)=> {
+  //         delete item?.ITEM_DESC;
+  //         delete item?.HIER1_DESC;
+  //         delete item?.HIER2_DESC;
+  //         delete item?.HIER3_DESC;
+  //         delete item?.TRN_NAME;
+  //         delete item?.LOCATION_NAME;
+  //         delete item?.undefined;
+  //     })
+  //     console.log(sendRow);
+  //   setLoading(true);
+  //   dispatch(postTransactionReversalRequest(sendRow));
+  //   initialsearch.HIER1 = [];
+  //   initialsearch.HIER2 = [];
+  //   initialsearch.HIER3 = [];
+  //   initialsearch.ITEM = [];
+  //   initialsearch.LOCATION = [];
+  //   initialsearch.TRN_TYPE= [];
+  //   initialsearch.TRN_DATE= [];
+  //   initialsearch.AREF = [];
+  //   initialsearch.ERR_MSG= [];
+  //   initialsearch.CREATE_ID= [];
+  //   if((searchData).length===0){
+  //     setSearchData(initialsearch);
+  // }
+  //   setFilterClass([]);
+  //   setsubFilterClass([]);
+  //   setFilterItem([]);
+  //   setSubmit(true);
+  //   seteditRows([]);
+  //   setOpen(false);
+  //   }else{
+  //     setOpen(true);
+  // }};
+const handleSubmit = (event) => {
+  event.preventDefault();
     setSearch(true);
-    setState({ ...state, right: open });
-  };
+    setState({ ...state, 'right': open });
+}
 
-  const onChange = (e) => {
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        [e.target.name]: e.target.value,
-      };
-    });
-  };
+const onChange = (e) => {
+  setSearchData((prev) => {
+    return {
+      ...prev,
+      [e.target.name]: e.target.value,
+    };
+  });
+}
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+const handleClose = () => {
+  setOpen(false);
+};
 
-  // const handleMsgClose = () => {
-  //   setIsError(false);
-  //   setIsSuccess(false);
-  // };
+// const handleMsgClose = () => {
+//   setIsError(false)
+//   setIsSuccess(false)
+// }
 
-  const onReset = (event) => {
+const onReset = (event) => {
+
     initialsearch.HIER1 = [];
     initialsearch.HIER2 = [];
     initialsearch.HIER3 = [];
     initialsearch.ITEM = [];
     initialsearch.LOCATION = [];
-    initialsearch.TRN_TYPE = [];
-    initialsearch.TRN_DATE = [];
+    initialsearch.TRN_TYPE= [];
+    initialsearch.TRN_DATE= [];
     initialsearch.AREF = [];
-    initialsearch.CREATE_ID = [];
-    console.log("datainitial", initialsearch);
-    setSearchData(initialsearch);
-    setFilterClass([]);
-    setsubFilterClass([]);
-    setFilterItem([]);
+    //initialsearch.ERR_MSG= [];
+    initialsearch.CREATE_ID= [];
+    console.log('datainitial',initialsearch);
+      setSearchData(initialsearch)
+      setFilterClass([]);
+      setsubFilterClass([]);
+      setFilterItem([]);
 
-    console.log("data", searchData);
-    setSearch(false);
-    setTabledata("");
-    //dispatch(resetTransactionReversal());
-  };
+      
+      console.log('data',searchData);
+      setSearch(false);
+      setTabledata("");
 
-  const selectDept = (event, value) => {
-    let selectedDept = [];
-    if (value.length > 0) {
-      console.log(itemData);
-      const filterClass = itemData.filter((item) => {
-        return value.some((val) => {
-          return item.HIER1 === val.HIER1;
-        });
+}
+
+const selectDept = (event, value) => {
+  let selectedDept = [];
+  if(value.length > 0){
+    console.log(itemData);
+  const filterClass = itemData.filter((item) => { return value.some((val) => { return item.HIER1 === val.HIER1})});
+    console.log(filterClass);
+    let UniqClass = (filterClass.length > 0 )?[...new Map(filterClass.map((item) => [item["HIER2"], item])).values()]:[];
+    //const classFilter = (filterClass.length > 0 )?[...new Set(filterClass.map(item => item.HIER2))]:[];
+    setFilterClass(UniqClass);
+
+    value.map(
+      (item) => {
+        selectedDept.push(item.HIER1);
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER1 : selectedDept
+      };
+    });
+
+  }else{
+   setFilterClass([])
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER1 : []
+      };
+    });
+  }
+}
+console.log(searchData);
+
+const selectClass = (event,value) => {
+  console.log(value);
+ let selectedClass = [];
+  if(value.length > 0){
+    //const subclassFilter = (filterSubClass.length > 0 )?[...new Set(filterSubClass.map(item => item.HIER3))]:[];
+    const filterSubClass = itemData.filter((item) => { return value.some((val) => { return item.HIER2 === val.HIER2})});  
+    let UniqSubClass = (filterSubClass.length > 0 )?[...new Map(filterSubClass.map((item) => [item["HIER3"], item])).values()]:[];
+    
+    console.log(UniqSubClass);
+   setsubFilterClass(UniqSubClass)
+   value.map(
+    (item) => {
+      selectedClass.push(item.HIER2);
+    }
+  )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER2 : selectedClass
+      };
+    });
+
+  }else{
+    setsubFilterClass([])
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER2 : []
+      };
+    });
+  }
+}
+const selectSubClass = (event,value) => {
+  let selectedSubclass = [];
+  if(value.length > 0){
+    //const itemFilter = (filterItem.length > 0 )?[...new Set(filterItem.map(item => item.ITEM))]:[];
+   // console.log(itemFilter);
+   const filterItem = itemData.filter((item) => { return value.some((val) => { return item.HIER3 === val.HIER3})});  
+    setFilterItem(filterItem)
+    value.map(
+      (item) => {
+        selectedSubclass.push(item.HIER3);
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER3 : selectedSubclass
+      };
+    });
+
+  }else{
+    setFilterItem([])
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER3 : []
+      };
+    });
+  }
+}
+
+const selectItem = (event, value) => {
+  let selectedItem = [];
+  if(value.length > 0){
+    value.map(
+      (item) => {
+          selectedItem.push(item.ITEM);
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        ITEM : selectedItem
+      };
+    });
+  }else{
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        ITEM : selectedItem
+      };
+    });
+  }
+}
+
+const selectLocation = (event, value) => {
+  console.log(value);
+      let selectedLocation = [];
+      if(value.length > 0){
+        value.map(
+          (item) => {
+            selectedLocation.push(item.LOCATION);
+          }
+        )
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          LOCATION : selectedLocation
+        };
       });
-      console.log(filterClass);
-      let UniqClass =
+      }else{
+        initialsearch.LOCATION = '';
+        setSearchData((prev) => {
+          return {
+            ...prev,
+            LOCATION : []
+          };
+        });
+      }
+}
+
+// const selectError = (event, value) => {
+//   let selectedError = [];
+//   if(value.length > 0){
+//     value.map(
+//       (item) => {
+//           selectedError.push(item);
+//       }
+//     )
+//     setSearchData((prev) => {
+//       return {
+//         ...prev,
+//         ERR_MSG : selectedError
+//       };
+//     });
+//   }else{
+//     setSearchData((prev) => {
+//       return {
+//         ...prev,
+//         ERR_MSG : []
+//       };
+//     });
+//   }
+// }
+ const selectTrantype = (event, value) => {
+   console.log(value);
+  let selectedTrantype = [];
+  let selectedAref = [];
+  if(value.length > 0){
+    value.map(
+      (item) => {
+        selectedTrantype.push(item.TRN_TYPE);
+        selectedAref.push(item.AREF)
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        TRN_TYPE : selectedTrantype,
+        AREF: selectedAref
+      };
+    });
+  }else{
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        TRN_TYPE : [],
+        AREF: []
+      };
+    });
+  }
+
+ }
+
+ let UniqDept = (itemData.length > 0 )?[...new Map(itemData.map((item) => [item["HIER1"], item])).values()]:[];
+
+ const handleCancel = () => {
+  setOpen(false)
+ }
+const handleClickOpen = () =>{ 
+setOpen(true);
+}
+  
+const handleHier1=(e,value) =>
+{
+    console.log("h1",value);
+    console.log("srch1",searchData);
+  let selectedDept = [];
+  if (value.option) {
+      valH1.push(value.option)
+  }else if (value.removedValue) {
+      let index = valH1.indexOf(value.removedValue.HIER1);
+      valH1.splice(index,1);
+  //}
+  }else if(value.action==="clear"){
+      valH1.splice(0,valH1.length);
+  }
+console.log("V1",valH1);
+//Filtering HIER2 based on HIER1
+  if (valH1.length >0) {
+    const filterClass = itemData.filter((item) => {
+      return (valH1).some((val) => {
+        return item.HIER1 === val.HIER1;
+      });
+    });
+    let UniqClass =
         filterClass.length > 0
           ? [
               ...new Map(
@@ -448,105 +647,131 @@ console.log("test",tabledata)
               ).values(),
             ]
           : [];
-      //const classFilter = (filterClass.length > 0 )?[...new Set(filterClass.map(item => item.HIER2))]:[];
-      setFilterClass(UniqClass);
+          setFilterClass(UniqClass);
+          valH1.map((item) => {
+            selectedDept.push(item.HIER1);
+          });
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              HIER1: selectedDept,
+            };
+          });
+  }else {
+    setFilterClass([])
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER1: []
+      };
+    });
+  }
+}
 
-      value.map((item) => {
-        selectedDept.push(item.HIER1);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER1: selectedDept,
-        };
-      });
-    } else {
-      setFilterClass([]);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER1: [],
-        };
-      });
-    }
-  };
-  console.log(searchData);
+const handleHier2=(e,value) =>
+{
+  let selectedHier2 = [];
+  if (value.option) {
+    valH2.push(value.option)
+  }else if (value.removedValue) {
+      let index = valH2.indexOf(value.removedValue.HIER2);
+      valH2.splice(index,1);
 
-  const selectClass = (event, value) => {
-    console.log(value);
-    let selectedClass = [];
-    if (value.length > 0) {
-      //const subclassFilter = (filterSubClass.length > 0 )?[...new Set(filterSubClass.map(item => item.HIER3))]:[];
-      const filterSubClass = itemData.filter((item) => {
-        return value.some((val) => {
-          return item.HIER2 === val.HIER2;
+  }else if(value.action==="clear"){
+    valH2.splice(0,valH2.length);
+  }
+//Filtering HIER2 based on HIER1
+if (valH2.length >0) {
+  const filterSubClass = itemData.filter((item) => {
+    return (valH2).some((val) => {
+      return item.HIER2 === val.HIER2;
+    });
+  });
+  let UniqClass =
+  filterSubClass.length > 0
+        ? [
+            ...new Map(
+              filterSubClass.map((item) => [item["HIER3"], item])
+            ).values(),
+          ]
+        : [];
+        setsubFilterClass(UniqClass);
+        valH2.map((item) => {
+          selectedHier2.push(item.HIER2);
         });
-      });
-      let UniqSubClass =
-        filterSubClass.length > 0
-          ? [
-              ...new Map(
-                filterSubClass.map((item) => [item["HIER3"], item])
-              ).values(),
-            ]
-          : [];
-
-      console.log(UniqSubClass);
-      setsubFilterClass(UniqSubClass);
-      value.map((item) => {
-        selectedClass.push(item.HIER2);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER2: selectedClass,
-        };
-      });
-    } else {
-      setsubFilterClass([]);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER2: [],
-        };
-      });
-    }
-  };
-  const selectSubClass = (event, value) => {
-    let selectedSubclass = [];
-    if (value.length > 0) {
-      //const itemFilter = (filterItem.length > 0 )?[...new Set(filterItem.map(item => item.ITEM))]:[];
-      // console.log(itemFilter);
-      const filterItem = itemData.filter((item) => {
-        return value.some((val) => {
-          return item.HIER3 === val.HIER3;
+        setSearchData((prev) => {
+          return {
+            ...prev,
+            HIER2: selectedHier2,
+          };
         });
+  }else {
+    setsubFilterClass([]);
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        HIER2: []
+      };
+    });
+}
+}
+
+
+const handleHier3=(e,value) =>
+{
+  let selectedHier3 = [];
+  if (value.option) {
+    valH3.push(value.option)
+  }else if (value.removedValue) {
+      let index = valH3.indexOf(value.removedValue.HIER3);
+      valH3.splice(index,1);
+
+  }else if(value.action==="clear"){
+    valH3.splice(0,valH3.length);
+  }
+//Filtering HIER3 based on HIER2
+  if (valH3.length >0) {
+    const filterItem = itemData.filter((item) => {
+      return (valH3).some((val) => {
+        return item.HIER3 === val.HIER3;
       });
-      setFilterItem(filterItem);
-      value.map((item) => {
-        selectedSubclass.push(item.HIER3);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER3: selectedSubclass,
-        };
-      });
-    } else {
+    });
+    setFilterItem(filterItem);
+          valH3.map((item) => {
+            selectedHier3.push(item.HIER3);
+          });
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              HIER3: selectedHier3,
+            };
+          });
+    }else {
       setFilterItem([]);
       setSearchData((prev) => {
         return {
           ...prev,
-          HIER3: [],
+          HIER3: []
         };
       });
     }
-  };
+}
+const handleItem=(e,value) =>
+{
+  let selectedItem = [];
+  if (value.option) {
+    valItem.push(value.option)
+}else if (value.removedValue) {
+    let index = valItem.indexOf(value.removedValue.ITEM);
+    valItem.splice(index,1);
 
-  const selectItem = (event, value) => {
-    let selectedItem = [];
-    if (value.length > 0) {
-      value.map((item) => {
+}else if(value.action==="clear"){
+  valItem.splice(0,valItem.length);
+ }
+//Filtering ITEM based on HIER3
+if (valItem.length >0) {
+
+      valItem.map((item) => {
         selectedItem.push(item.ITEM);
       });
       setSearchData((prev) => {
@@ -555,392 +780,272 @@ console.log("test",tabledata)
           ITEM: selectedItem,
         };
       });
-    } else {
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          ITEM: selectedItem,
-        };
-      });
-    }
+}else {
+setSearchData((prev) => {
+  return {
+    ...prev,
+    ITEM: selectedItem,
   };
+});
+}
+}
 
-  const selectLocation = (event, value) => {
-    console.log(value);
-    let selectedLocation = [];
-    if (value.length > 0) {
-      value.map((item) => {
-        selectedLocation.push(item.LOCATION);
-      });
-      setSearchData((prev) => {
+const handleLocation=(e,value) =>
+{
+  let selectedLocation = [];
+  if (value.option) {
+    valLoc.push(value.option)
+
+  }else if (value.removedValue) {
+      
+          let index = valLoc.indexOf(value.removedValue.LOCATION);
+          valLoc.splice(index,1);
+  }else if(value.action="clear"){
+    valLoc.splice(0,valLoc.length);
+  }
+
+ if (valLoc.length >0) {
+    valLoc.map((item) => {
+      selectedLocation.push(item.LOCATION);
+    });
+    setSearchData((prev) => {
         return {
           ...prev,
           LOCATION: selectedLocation,
         };
       });
-    } else {
-      initialsearch.LOCATION = "";
+  }else {
       setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION: [],
-        };
+      return {
+        ...prev,
+        LOCATION: selectedLocation,
+      };
       });
+  }
+}
+
+const handleTranType=(e,value) =>
+{
+let selectedTrantype = [];
+let selectedAref = [];
+if (value.option) {
+  valTRN.push(value.option)
+}else if (value.removedValue) {
+
+  for(let i= 0; i< valTRN.length;i++)
+  {
+    if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
+      if(valTRN[i]["AREF"]===value.removedValue.AREF){
+        valTRN.splice(i,1);
     }
-  };
-
-  // const selectError = (event, value) => {
-  //   let selectedError = [];
-  //   if (value.length > 0) {
-  //     value.map((item) => {
-  //       selectedError.push(item);
-  //     });
-  //     setSearchData((prev) => {
-  //       return {
-  //         ...prev,
-  //         ERR_MSG: selectedError,
-  //       };
-  //     });
-  //   } else {
-  //     setSearchData((prev) => {
-  //       return {
-  //         ...prev,
-  //         ERR_MSG: [],
-  //       };
-  //     });
-  //   }
-  // };
-  const selectTrantype = (event, value) => {
-    console.log(value);
-    let selectedTrantype = [];
-    let selectedAref = [];
-    if (value.length > 0) {
-      value.map((item) => {
-        selectedTrantype.push(item.TRN_TYPE);
-        selectedAref.push(item.AREF);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: selectedTrantype,
-          AREF: selectedAref,
-        };
-      });
-    } else {
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: [],
-          AREF: [],
-        };
-      });
     }
-  };
+  }
+}else if(value.action="clear"){
+  valTRN.splice(0,valTRN.length);
+}
+if (valTRN.length >0) {
+valTRN.map((item) => {
+    selectedTrantype.push(item.TRN_TYPE);
+    selectedAref.push(item.AREF)
+  });
+  setSearchData((prev) => {
+      return {
+        ...prev,
+        TRN_TYPE: selectedTrantype,
+        AREF:selectedAref
 
-  let UniqDept =
-    itemData.length > 0
-      ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]
-      : [];
+      };
+    });
+}else {
+    setSearchData((prev) => {
+    return {
+      ...prev,
+      TRN_TYPE : [],
+      AREF: []
+    };
+    });
+}
+}
+const searchPanel = () => (
+  <Box
+    sx={{ width: 350, marginTop: '80px'}}
+    role="presentation"
+    component="form"
+    onSubmit={handleSubmit}
+  > <Grid item xs={12} sx={{display:'flex', justifyContent:'center', marginTop: '15px'}}>
+         <Stack spacing={2} sx={{ width: 250 }}>
+         <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`}
+                getOptionValue={option => option.HIER1}
+                options={UniqDept.length > 0 ? UniqDept : []}
+                isSearchable={true}
+                onChange={handleHier1}
+                placeholder={"Choose HIER1"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                isClearable={true}
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))}
+                />
 
-  const handleCancel = () => {
-    setOpen(false);
-  };
-  const handleClickOpen = () =>{ 
-    setOpen(true);
-    }
+        <Select
 
-  const searchPanel = () => (
-    <Box
-      sx={{ width: 350, marginTop: "80px" }}
-      role="presentation"
-      component="form"
-      onSubmit={handleSubmit}
-    >
-      {" "}
-      <Grid
-        item
-        xs={12}
-        sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
-      >
-        <Stack spacing={2} sx={{ width: 250 }}>
-          {/* <Autocomplete
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER2.toString()}-${option.HIER2_DESC.toString()}`}
+                getOptionValue={option => option.HIER2}
+                options={(filterClass.length > 0) ? filterClass : []}
+                isSearchable={true}
+                onChange={handleHier2}
+                placeholder={"Choose a HIER2"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))}
+
+                />
+
+        <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER3.toString()}-${option.HIER3_DESC.toString()}`}
+                getOptionValue={option => option.HIER2}
+                options={(subfilterClass.length > 0) ? subfilterClass : []}
+                isSearchable={true}
+                onChange={handleHier3}
+                placeholder={"Choose a HIER3"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))}
+                />
+
+          <Select
+               //disabled={filterItem.length > 0 ?false:true}
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.ITEM.toString()}`}
+                getOptionValue={option => option.ITEM}
+                options={(filterItem.length > 0) ? filterItem : []}
+                isSearchable={true}
+                onChange={handleItem}
+                placeholder={"Choose a ITEM"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))}
+                isDisabled={filterItem.length > 0 ?false:true}
+                />
+
+          <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
+                getOptionValue={option => option.LOCATION}
+                options={locationData}
+                isSearchable={true}
+                onChange={handleLocation}
+                placeholder={"Choose a Location"}
+                styles={styleSelect}
+                components={animatedComponents}
+                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION))}
+                isMulti
+                />
+
+          <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  option.TRN_NAME}
+                getOptionValue={option => option.TRN_NAME}
+                options={trnType}
+                isSearchable={true}
+                onChange={handleTranType}
+                placeholder={'TRN TYPE'}
+                styles={styleSelect}
+                components={animatedComponents}
+                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}        
+                isMulti
+                />
+
+            {/* <Autocomplete
               multiple
+              disablePortal
               size="small"
-              id="combo-box-dept"
-              options={itemData}
-              //value={(searchData?.HIER1.length > 0)?searchData?.HIER1:[]}
-              sx={{ width: 250 }}
-              onChange={selectDept} 
-              renderInput={(params) => <TextField {...params} label="HIER1" variant="standard" />}
-            />
-           
-            <Autocomplete
-              multiple
-              size="small"
-              id="combo-box-class"
-              options={(filterClass.length > 0)?filterClass:[]}
-             // value={(searchData?.HIER2.length > 0)?searchData?.HIER2:[]}
-              sx={{ width: 250 }}
-              onChange={selectClass} 
-              renderInput={(params) => <TextField {...params} label="HIER2" variant="standard" />}
-            />
-         
-            <Autocomplete
-              multiple
-              size="small"
-              id="combo-box-subclass"
-              options={(subfilterClass.length > 0)?subfilterClass:[]}
-             // value={(searchData?.HIER3.length > 0)?searchData?.HIER3:[]}
-              sx={{ width: 250 }}
-              onChange={selectSubClass} 
-              renderInput={(params) => <TextField {...params} label="HIER3" variant="standard" />}
-            /> */}
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-item"
-            sx={{ width: 250 }}
-            options={UniqDept.length > 0 ? UniqDept : []}
-            // value={searchData?.HIER1}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER1 === value.HIER1
-            }
-            autoHighlight
-            onChange={selectDept}
-            getOptionLabel={(option) =>
-              `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER1}-{option.HIER1_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a HIER1"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-class"
-            sx={{ width: 250 }}
-            options={filterClass.length > 0 ? filterClass : []}
-            //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER2 === value.HIER2
-            }
-            autoHighlight
-            onChange={selectClass}
-            getOptionLabel={(option) =>
-              `${option.HIER2.toString()}-${option.HIER2_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER2} {option.HIER2_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a HIER2"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-subclass"
-            sx={{ width: 250 }}
-            options={subfilterClass.length > 0 ? subfilterClass : []}
-            //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER3 === value.HIER3
-            }
-            autoHighlight
-            onChange={selectSubClass}
-            getOptionLabel={(option) =>
-              `${option.HIER3.toString()}-${option.HIER3_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER3} {option.HIER3_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a HIER3"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-
-          <Autocomplete
-            disabled={filterItem.length > 0 ?false:true}
-            multiple
-            size="small"
-            id="combo-box-item"
-            sx={{ width: 250 }}
-            options={filterItem.length > 0 ? filterItem : []}
-            //value={(searchData?.ITEM.length > 0)?searchData?.ITEM:[]}
-            isOptionEqualToValue={(option, value) => option.ITEM === value.ITEM}
-            autoHighlight
-            onChange={selectItem}
-            getOptionLabel={(option) =>
-              `${option.ITEM.toString()}-${option.ITEM_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.ITEM} {option.ITEM_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a ITEM"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-location"
-            sx={{ width: 250 }}
-            options={locationData.length > 0 ? locationData : []}
-            // value={searchData.LOCATION}
-            autoHighlight
-            isOptionEqualToValue={(option, value) =>
-              option.LOCATION === value.LOCATION
-            }
-            onChange={selectLocation}
-            getOptionLabel={(option) =>
-              `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.LOCATION} ({option.LOCATION_NAME})
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a Location"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-
-          <Autocomplete
-            multiple
-            disablePortal
-            size="small"
-            id="combo-box-trn-type"
-            // value={(searchData?.TRN_TYPE.length > 0)?searchData?.TRN_TYPE:[]}
-            onChange={selectTrantype}
-            options={trnType}
-            getOptionLabel={(option) => option.TRN_NAME}
-            sx={{ width: 250 }}
-            renderInput={(params) => (
-              <TextField {...params} label="TRN TYPE" variant="standard" />
-            )}
-          />
-
-          {/* <Autocomplete
-            multiple
-            disablePortal
-            size="small"
-            id="combo-box-err-type"
+              id="combo-box-err-type"
             //  value={(searchData?.ERR_MSG.length > 0)?searchData?.ERR_MSG:[]}
-            options={errorList.length > 0 ? errorList : []}
-            sx={{ width: 250 }}
-            onChange={selectError}
-            renderInput={(params) => (
-              <TextField {...params} label="ERR MESSAGE" variant="standard" />
-            )}
-          /> */}
-          <TextField
-            className={TransactionReversalClasses.textField}
-            disabled
-            margin="normal"
-            size="small"
-            variant="standard"
-            name="CREATE_ID"
-            label="CREATE ID"
-            type="text"
-            sx={{ width: 250 }}
-            value={JSON.parse(localStorage.getItem("userData"))?.username}
-          />
-          <TextField
-            className={TransactionReversalClasses.dateField}
-            margin="normal"
-            size="small"
-            variant="standard"
-            name="TRN_DATE"
-            label="TRN DATE"
-            type="date"
-            inputProps={{ max: "2022-07-27" }}
-            value={searchData.TRN_DATE}
-            onChange={onChange}
-            sx={{ width: 250 }}
-            style={{
-              color: "#D3D3D3",
-            }}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <div>
+              options={(errorList.length > 0)?errorList:[]}
+              sx={{ width: 250 }}
+              onChange={selectError}
+              renderInput={(params) => <TextField {...params} label="ERR MESSAGE" variant="standard" />}
+            /> */}
+            <TextField
+              className={TransactionReversalClasses.textField}
+              disabled
+              margin="normal"
+              size="small"
+              variant="standard" 
+              name="CREATE_ID"
+              label="CREATE ID"
+              type="text"
+              sx={{ width: 250 }}
+              value={JSON.parse(localStorage.getItem("userData"))?.username}
+            />
+             <TextField
+              className={TransactionReversalClasses.dateField}
+              margin="normal"
+              size="small"
+              variant="standard" 
+              name="TRN_DATE"
+              label="TRN DATE"
+              type="date"
+              inputProps={{ max:"2022-07-27"}}
+              value={searchData.TRN_DATE}
+              onChange={onChange}
+              sx={{ width: 250 }}
+              style={{
+                color: "#D3D3D3",
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <div>
             <Button
               className={TransactionReversalClasses.textField}
               type="submit"
               variant="contained"
-              sx={{ width: "120px" }}
+              sx={{ width:'120px'}}
               startIcon={<SearchIcon />}
             >
               Search
             </Button>
             <Button
               variant="contained"
-              sx={{ width: "120px" }}
+              sx={{ width:'120px'}}
               onClick={onReset}
               startIcon={<RestartAltIcon />}
             >
               Reset
             </Button>
-          </div>
-        </Stack>
-      </Grid>
-    </Box>
-  );
+            </div>
+            </Stack>
+            </Grid>
+  </Box>
+);
 
   return (
     <Box className={TransactionReversalClasses.maindiv}>
@@ -953,101 +1058,118 @@ console.log("test",tabledata)
           </Box>
         </Grid>
         <Grid item xs={6}>
-          <Box
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="flex-end"
-            className={TransactionReversalClasses.boxDiv}
-          >
+        <Box display="flex"
+              justifyContent="flex-end"
+              alignItems="flex-end" className={TransactionReversalClasses.boxDiv}>
             <div className={TransactionReversalClasses.uploaddiv}>
-              {/* {Object.keys(updateRow).length > 0 && (
-                <Button
-                  variant="contained"
-                  sx={{ marginTop: "15px" }}
-                  onClick={confirmSubmit}
-                  startIcon={<SendIcon />}
-                >
+              {/* {(Object.keys(updateRow).length > 0) && 
+            <Button variant="contained" sx={{marginTop: '15px'}} onClick={confirmSubmit} startIcon={<SendIcon />}>
                   Submit
-                </Button>
-              )} */}
-
-              <Button
-                disableRipple
-                variant="contained"
-                sx={{ marginTop: "15px", textAlign: "right" }}
-                onClick={toggleDrawer("right", true)}
-                startIcon={<SearchIcon />}
-              >
-                Search
-              </Button>
-              <Drawer
-                anchor={"right"}
-                open={state["right"]}
-                onClose={toggleDrawer("right", false)}
-                transitionDuration={700}
-              >
-                {searchPanel("right")}
-              </Drawer>
-            </div>
+              </Button> 
+                  } */}
+       
+          <Button variant="contained" sx={{ marginTop: '15px', textAlign:'right' }} onClick={toggleDrawer('right', true)} startIcon={<SearchIcon />}>Search</Button>
+          <Drawer
+            anchor={'right'}
+            open={state['right']}
+            onClose={toggleDrawer('right', false)}
+            transitionDuration={700}
+          >
+            {searchPanel('right')}
+          </Drawer>
+       </div>
           </Box>
         </Grid>
       </Grid>
 
       {loading ? (
-        <CircularProgress color="inherit" />
-      ) : (
-        tabledata && (
-          <Table
-            tableData={tabledata}
-            //handleDelete={handleDelete}
-            handleSearch={handleChange}
-            searchText={inputValue}
-            handleEdit={true}
-            editRows={editRows}
-            seteditRows={seteditRows}
-            setUpdateRow={setUpdateRow}
-            headCells={headCells}
-            setTabledata={setTabledata}
-            allData={allData}
-            handleClickOpen={handleClickOpen}
-            valueSelect={valueSelect}
-            setValueSelect={setValueSelect}
-            pageName="TransactionReversal"
-          />
-        )
+                  <CircularProgress color="inherit" />
+                ) : (
+        tabledata &&
+        <Table
+          tableData={tabledata}
+          //handleDelete={handleDelete}
+          handleSearch={handleChange}
+          searchText={inputValue}
+          handleEdit={true}
+          editRows={editRows}
+          seteditRows={seteditRows}
+          setUpdateRow={setUpdateRow}
+          headCells={headCells}
+          cancelReverse={cancelReverse}
+          handleClickOpen={handleClickOpen}
+          valueSelect={valueSelect}
+          setValueSelect={setValueSelect}
+          setTabledata={setTabledata}
+          allData={allData}
+          pageName="TransactionReversal"
+        />
       )}
+
+      {/* <Stack spacing={2} sx={{ width: "100%" }}>
+        <Snackbar open={isError || isSuccess} autoHideDuration={3000} onClose={handleMsgClose} sx={{height:"100%"}}
+        anchorOrigin={{
+          vertical:"top",
+          horizontal:"center",
+        }}>
+          <Alert
+            onClose={handleMsgClose}
+            severity={TransactionReversalData?.isSuccess ? "success" : "error"}
+            sx={{ width: "100%" }}
+          >
+          {TransactionReversalData?.messgae}
+          </Alert>
+          </Snackbar>
+      </Stack> */}
+      {/* <Modal
+        open={open}
+        onClose={() => {setOpen(false)}}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={TransactionReversalClasses.popUp}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Note:-
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Please update record before click submit button.
+          </Typography>
+        </Box>
+      </Modal> */}
+
       <div>
-        <Dialog
-          fullScreen={fullScreen}
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="responsive-dialog-title"
-          className={TransactionReversalData.popUp}
-          PaperProps={{
-            style: {
-              backgroundColor: "#D3D3D3",
-              borderRadius: "10px",
-            },
-          }}
-        >
-          <DialogTitle id="responsive-dialog-title">
-            {"Do you want to submit data?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button autoFocus onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button onClick={()=>cancelReverse(valueSelect)} autoFocus>
-              Continue
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+    <Dialog
+      fullScreen={fullScreen}
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="responsive-dialog-title"
+      className={TransactionReversalData.popUp}
+      PaperProps={{
+        style: {
+          backgroundColor: '#D3D3D3',
+          borderRadius: '10px',
+        },
+      }}
+    >
+      <DialogTitle id="responsive-dialog-title">
+        {"Do you want to submit data?"}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Please click to continue to Transaction Reversal. 
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button autoFocus onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button onClick={()=>cancelReverse(valueSelect)} autoFocus>
+          Continue
+        </Button>
+      </DialogActions>
+    </Dialog>
+  </div>
+
     </Box>
   );
 };

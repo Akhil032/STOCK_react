@@ -38,7 +38,6 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const animatedComponents = makeAnimated();
-
 const styleSelect = {
   control: base => ({
     ...base,
@@ -108,7 +107,6 @@ const initialItemData = {
   ITEM: ""
 }
 const CostChange = () => {
-  const selectRef = null;
   const [valLoc, setValLoc] = useState([]);
   const [valH1,setValH1]=useState([]);
   const [valH2,setValH2]=useState([]);
@@ -168,12 +166,12 @@ const CostChange = () => {
         }
         let test = Object.assign(reorder, item);
         newTabledata.push(test);
-        initialsearch.HIER1 = [];
-        initialsearch.HIER2 = [];
-        initialsearch.HIER3 = [];
-        initialsearch.ITEM = [];
-        initialsearch.LOCATION = [];
-        setSearchData(initialsearch)
+        // initialsearch.HIER1 = [];
+        // initialsearch.HIER2 = [];
+        // initialsearch.HIER3 = [];
+        // initialsearch.ITEM = [];
+        // initialsearch.LOCATION = [];
+        // setSearchData(initialsearch)
       })
       return newTabledata;
     }
@@ -202,18 +200,8 @@ const CostChange = () => {
           <p>{CostChangeData?.message}</p>
         </div>
       )
-        //clear reset
-        initialsearch.HIER1 = [];
-        initialsearch.HIER2 = [];
-        initialsearch.HIER3 = [];
-        initialsearch.ITEM = [];
-        initialsearch.LOCATION = [];
-        setSearchData(initialsearch)
-        setFilterClass([]);
-        setsubFilterClass([]);
-        setFilterItem([]);
-        setSearch(false);
-        setTabledata("");
+        
+         setSearch(false);
       }
     } else if (CostChangeData.isSuccess) {
       if ((CostChangeData["message"]).length > 0) {
@@ -241,7 +229,6 @@ const CostChange = () => {
          console.log("194 SD", searchData)
         
         dispatch(getCostChangeRequest([searchData]))
-        
       }, 1000)
     }
   }, [isSubmit]);
@@ -250,6 +237,7 @@ const CostChange = () => {
     if (isSearch) {
       console.log("278 SD", searchData)
       dispatch(getCostChangeRequest([searchData]))
+
     }
   }, [isSearch])
 
@@ -277,7 +265,6 @@ const CostChange = () => {
     } else {
       setSearch(false)
     }
-    
   }, [CostChangeData?.data])
 
   const handleChange = (e) => {
@@ -296,6 +283,11 @@ const CostChange = () => {
     }
   };
 
+  let UniqDept =
+  itemData.length > 0
+    ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]
+    : [];
+
   const SubmitList = () => {
     for (let i = 0; i < Object.values(updateRow).length; i++) {
       Object.values(updateRow)[i]["CREATE_ID"] = JSON.parse(localStorage.getItem("userData"))?.username;
@@ -312,15 +304,15 @@ const CostChange = () => {
       console.log("post:", sendRow);
       dispatch(postCostChangeRequest(sendRow));
       setLoading(true);
-      initialsearch.HIER1 = [];
-      initialsearch.HIER2 = [];
-      initialsearch.HIER3 = [];
-      initialsearch.ITEM = [];
-      initialsearch.LOCATION = [];
-      setSearchData(initialsearch);
-      setFilterClass([]);
-      setsubFilterClass([]);
-      setFilterItem([]);
+      // initialsearch.HIER1 = [];
+      // initialsearch.HIER2 = [];
+      // initialsearch.HIER3 = [];
+      // initialsearch.ITEM = [];
+      // initialsearch.LOCATION = [];
+      // setSearchData(initialsearch);
+      // setFilterClass([]);
+      // setsubFilterClass([]);
+      // setFilterItem([]);
       setSubmit(true);
       seteditRows([]);
       setOpen(false)
@@ -336,28 +328,18 @@ const CostChange = () => {
     setState({ ...state, 'right': open });
   }
 
-  // const onChange = (e) => {
-  //   setSearchData((prev) => {
-  //     return {
-  //       ...prev,
-  //       [e.target.name]: e.target.value,
-  //     };
-  //   });
-  // }
-
-  const handleMsgClose = () => {
-    setIsError(false)
-    setIsSuccess(false)
-  }
-
   const onReset = (event) => {
-    this.selectRef.select.clearValue();
     initialsearch.HIER1 = [];
     initialsearch.HIER2 = [];
     initialsearch.HIER3 = [];
     initialsearch.ITEM = [];
     initialsearch.LOCATION = [];
-    setSearchData(initialsearch)
+    console.log("Ini",initialsearch);
+    setSearchData(initialsearch);
+    console.log("Sdata",searchData);
+    setValH1([]);
+    setValH2([]);
+    setValH3([]);
     setFilterClass([]);
     setsubFilterClass([]);
     setFilterItem([]);
@@ -367,6 +349,8 @@ const CostChange = () => {
 
   const handleHier1=(e,value) =>
   {
+      console.log("h1",value);
+      console.log("srch1",searchData);
     let selectedDept = [];
     if (value.option) {     
         valH1.push(value.option)
@@ -377,6 +361,7 @@ const CostChange = () => {
     }else if(value.action==="clear"){ 
         valH1.splice(0,valH1.length);
     }
+  console.log("V1",valH1);
 //Filtering HIER2 based on HIER1
     if (valH1.length >0) {
       const filterClass = itemData.filter((item) => {      
@@ -540,15 +525,16 @@ const handleLocation=(e,value) =>
     let selectedLocation = [];
     if (value.option) {
       valLoc.push(value.option)
+      
     }else if (value.removedValue) {
-        if (valLoc.includes(value.removedValue.LOCATION)){
+       
             let index = valLoc.indexOf(value.removedValue.LOCATION);
             valLoc.splice(index,1);
-            }
+           
     }else if(value.action="clear"){      
       valLoc.splice(0,valLoc.length);
     }
-
+console.log("Sdsdddf",valLoc)
    if (valLoc.length >0) {
       valLoc.map((item) => {
         selectedLocation.push(item.LOCATION);
@@ -578,27 +564,25 @@ console.log("src",searchData);
     > <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
         <Stack spacing={2} sx={{ width: 250 }}>
         <Select 
-                // ref={ref => {
-                //   selectRef = ref;
-                // }}
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
                   `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`}
                 getOptionValue={option => option.HIER1}
-                options={itemData}
+                options={UniqDept.length > 0 ? UniqDept : []}
                 isSearchable={true}
-                isClearable={true}
                 onChange={handleHier1}
-                placeholder={"Choose a HIER1"}
+                placeholder={"Choose HIER1"}
                 styles={styleSelect}
                 components={animatedComponents}  
-                //autoFocus={true}
                 isMulti 
+                isClearable={true}
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))} 
                 />
 
         <Select 
+          
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -607,12 +591,13 @@ console.log("src",searchData);
                 getOptionValue={option => option.HIER2}
                 options={(filterClass.length > 0) ? filterClass : []}
                 isSearchable={true}
-                isClearable={false}
                 onChange={handleHier2}
                 placeholder={"Choose a HIER2"}
                 styles={styleSelect}
                 components={animatedComponents}  
                 isMulti 
+                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))} 
+                
                 />
 
         <Select 
@@ -629,15 +614,16 @@ console.log("src",searchData);
                 styles={styleSelect}
                 components={animatedComponents}  
                 isMulti 
+                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))} 
                 />
               
           <Select 
-               
+               //disabled={filterItem.length > 0 ?false:true}
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                  `${option.ITEM.toString()}-${option.ITEM.toString()}`}
+                  `${option.ITEM.toString()}`}
                 getOptionValue={option => option.ITEM}
                 options={(filterItem.length > 0) ? filterItem : []}
                 isSearchable={true}
@@ -646,6 +632,8 @@ console.log("src",searchData);
                 styles={styleSelect}
                 components={animatedComponents}  
                 isMulti 
+                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))} 
+                isDisabled={filterItem.length > 0 ?false:true}
                 />
 
           <Select 
@@ -660,7 +648,8 @@ console.log("src",searchData);
                 onChange={handleLocation}
                 placeholder={"Choose a Location"}
                 styles={styleSelect}
-                components={animatedComponents}  
+                components={animatedComponents} 
+                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION))}  
                 isMulti 
                 />
           <div>
@@ -784,24 +773,7 @@ console.log("src",searchData);
           pageName="cost_maintenance"
         />
       )}
-      {/* <Stack spacing={2} sx={{ width: "100%" }}>
-        <Snackbar open={isError || isSuccess} autoHideDuration={3000} onClose={handleMsgClose} sx={{
-          height: "100%"
-        }} anchorOrigin={{
-          vertical: "top",
-          horizontal: "center"
-        }}>
-
-          <Alert
-            onClose={handleMsgClose}
-            severity={CostChangeData?.isSuccess ? "success" : "error"}
-          sx={{ width: "100%" }}
-          >
-            {CostChangeData?.message}
-            
-          </Alert>
-        </Snackbar> 
-      </Stack>  */}
+     
     </Box>
   );
 };

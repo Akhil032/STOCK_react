@@ -141,14 +141,7 @@ const TransactionReversalReducers = (state = initialState, action) => {
           messgae: action.payload?.Data?.message,
           isSuccess: false,
         };
-      case actions.RESET_TRANSACTIONREVERSAL:
-          return {
-            isLoading: false,
-            data: [],
-            isError: false,
-            messgae: '',
-            isSuccess: false,
-          };
+
     default:
       return { ...state };
   }

@@ -26,10 +26,11 @@ import { trnType } from "../../Components/ErrorProcessing/transType";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
+//import Select from "@mui/material/Select";
 import { CSVLink } from "react-csv";
 import swal from '@sweetalert/with-react';
-
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -93,6 +94,17 @@ const useStyles = makeStyles({
     padding: "20px 20px 20px 20px",
   },
 });
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
 
 const initialsearch = {
   HIER1: [],
@@ -110,6 +122,9 @@ const initialItemData = {
 };
 
 const Reconciliation = () => {
+  const [valLoc, setValLoc] = useState([]);
+  const [valH1,setValH1]=useState([]);
+  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -130,6 +145,11 @@ const Reconciliation = () => {
     bottom: false,
     right: false,
   });
+  const sortValue=[
+    {value:"All"},
+    {value:"All Matched"},
+    {value:"All Unmatched"},
+  ]
   const ErrorProceesClasses = useStyles();
   const DailySkuRollupData = useSelector(
     (state) => state.ReconciliationReducers
@@ -224,14 +244,14 @@ const Reconciliation = () => {
             <p>{DailySkuRollupData["messgae"]}</p>
           </div>
         )  
-    // }else if(DailySkuRollupData.isSuccess ){
-    //   setIsSuccess(true);
-    //   swal(
-    //     <div>     
-    //        <p>{DailySkuRollupData["messgae"]}</p>
-    //     </div>
-    //   )
-    //   setLoading(true);
+    }else if(DailySkuRollupData.isSuccess && DailySkuRollupData.isupdate ){
+      setIsSuccess(true);
+      swal(
+        <div>     
+           <p>{DailySkuRollupData["messgae"]}</p>
+        </div>
+      )
+      setLoading(true);
     }else {
       setIsError(false)
       setTabledata("")
@@ -450,39 +470,213 @@ const Reconciliation = () => {
     filename: "ReconciliationReport.csv",
   };
 
-  const handleSort = (event) => {
-    setSort(event.target.value);
-    let sortval = event.target.value;
-    let sortData = [];
-    if (allData.length > 0) {
-      if (sortval == 2) {
-        sortData = allData.filter((item) => {
-          return (
-            item.QTY_MATCHED == "Y" &&
-            item.COST_MATCHED == "Y" &&
-            item.RETAIL_MATCHED == "Y"
-          );
+  
+  const handleHier1=(e,value) =>
+  {
+      console.log("h1",value);
+      console.log("srch1",searchData);
+    let selectedDept = [];
+    if (value.option) {
+        valH1.push(value.option)
+    }else if (value.removedValue) {
+        let index = valH1.indexOf(value.removedValue.HIER1);
+        valH1.splice(index,1);
+    //}
+    }else if(value.action==="clear"){
+        valH1.splice(0,valH1.length);
+    }
+  console.log("V1",valH1);
+//Filtering HIER2 based on HIER1
+    if (valH1.length >0) {
+      // const filterClass = itemData.filter((item) => {
+      //   return (valH1).some((val) => {
+      //     return item.HIER1 === val.HIER1;
+      //   });
+      // });
+      // let UniqClass =
+      //     filterClass.length > 0
+      //       ? [
+      //           ...new Map(
+      //             filterClass.map((item) => [item["HIER2"], item])
+      //           ).values(),
+      //         ]
+      //       : [];
+      //       setFilterClass(UniqClass);
+      //       valH1.map((item) => {
+      //         selectedDept.push(item.HIER1);
+      //       });
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                HIER1: selectedDept,
+              };
+            });
+    }else {
+      //setFilterClass([])
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          HIER1: []
+        };
+      });
+    }
+}
+
+const handleLocation=(e,value) =>
+  {
+    let selectedLocation = [];
+    if (value.option) {
+      valLoc.push(value.option)
+
+    }else if (value.removedValue) {
+            let index = valLoc.indexOf(value.removedValue.LOCATION);
+            valLoc.splice(index,1);
+    }else if(value.action="clear"){
+      valLoc.splice(0,valLoc.length);
+    }
+
+   if (valLoc.length >0) {
+      valLoc.map((item) => {
+        selectedLocation.push(item.LOCATION);
+      });
+      setSearchData((prev) => {
+          return {
+            ...prev,
+            LOCATION: selectedLocation,
+          };
         });
-        console.log("matched", sortData);
-        setTabledata(sortData);
-        setSort(sortval);
-      } else if (sortval == 3) {
-        sortData = allData.filter((item) => {
-          return (
-            item.QTY_MATCHED == "N" ||
-            item.COST_MATCHED == "N" ||
-            item.RETAIL_MATCHED == "N"
-          );
+    }else {
+        setSearchData((prev) => {
+        return {
+          ...prev,
+          LOCATION: selectedLocation,
+        };
         });
-        setTabledata(sortData);
-        setSort(sortval);
-      } else {
-        console.log("Test");
-        setTabledata(allData);
-        setSort(1);
+    }
+}
+
+const handleTranType=(e,value) =>
+{
+  let selectedTrantype = [];
+  let selectedAref = [];
+  if (value.option) {
+    valTRN.push(value.option)
+  }else if (value.removedValue) {
+
+    for(let i= 0; i< valTRN.length;i++)
+    {
+      if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
+        if(valTRN[i]["AREF"]===value.removedValue.AREF){
+          valTRN.splice(i,1);
+      }
       }
     }
-  };
+  }else if(value.action="clear"){
+    valTRN.splice(0,valTRN.length);
+  }
+  if (valTRN.length >0) {
+  valTRN.map((item) => {
+      selectedTrantype.push(item.TRN_TYPE);
+      selectedAref.push(item.AREF)
+    });
+    setSearchData((prev) => {
+        return {
+          ...prev,
+          TRN_TYPE: selectedTrantype,
+          AREF:selectedAref
+
+        };
+      });
+  }else {
+      setSearchData((prev) => {
+      return {
+        ...prev,
+        TRN_TYPE : [],
+        AREF: []
+      };
+      });
+  }
+}
+const handleSortV=(sortV) =>
+{
+console.log(sortV)
+var Sdata=0
+if (sortV.value==="All"){
+  Sdata=1;
+}else if(sortV.value==="All Matched"){
+  Sdata=2;
+}
+else{
+  Sdata=3;
+}
+
+  let sortval =Sdata
+  let sortData = [];
+  if (allData.length > 0) {
+    if (sortval == 2) {
+      sortData = allData.filter((item) => {
+        return (
+          item.QTY_MATCHED == "Y" &&
+          item.COST_MATCHED == "Y" &&
+          item.RETAIL_MATCHED == "Y"
+        );
+      });
+      console.log("matched", sortData);
+      setTabledata(sortData);
+      setSort(sortval);
+    } else if (sortval == 3) {
+      sortData = allData.filter((item) => {
+        return (
+          item.QTY_MATCHED == "N" ||
+          item.COST_MATCHED == "N" ||
+          item.RETAIL_MATCHED == "N"
+        );
+      });
+      setTabledata(sortData);
+      setSort(sortval);
+    } else {
+      console.log("Test");
+      setTabledata(allData);
+      setSort(1);
+    }
+  }
+};
+const handleSort = (event) => {
+  console.log("event.target.value",event.target.value)
+  setSort(event.target.value);
+  let sortval = event.target.value;
+  let sortData = [];
+  if (allData.length > 0) {
+    if (sortval == 2) {
+      sortData = allData.filter((item) => {
+        return (
+          item.QTY_MATCHED == "Y" &&
+          item.COST_MATCHED == "Y" &&
+          item.RETAIL_MATCHED == "Y"
+        );
+      });
+      console.log("matched", sortData);
+      setTabledata(sortData);
+      setSort(sortval);
+    } else if (sortval == 3) {
+      sortData = allData.filter((item) => {
+        return (
+          item.QTY_MATCHED == "N" ||
+          item.COST_MATCHED == "N" ||
+          item.RETAIL_MATCHED == "N"
+        );
+      });
+      setTabledata(sortData);
+      setSort(sortval);
+    } else {
+      console.log("Test");
+      setTabledata(allData);
+      setSort(1);
+    }
+  }
+};
+
+
 
   const searchPanel = () => (
     <Box
@@ -498,7 +692,25 @@ const Reconciliation = () => {
         sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
       >
         <Stack spacing={2} sx={{ width: 250 }}>
-          <Autocomplete
+         <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`}
+                getOptionValue={option => option.HIER1}
+                options={UniqDept.length > 0 ? UniqDept : []}
+                isSearchable={true}
+                onChange={handleHier1}
+                placeholder={"Choose HIER1"}
+                styles={styleSelect}
+                components={animatedComponents}
+                isMulti
+                isClearable={true}
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))}
+                /> 
+
+           {/* <Autocomplete
             multiple
             size="small"
             id="combo-box-item"
@@ -563,9 +775,42 @@ const Reconciliation = () => {
                 }}
               />
             )}
-          />
+          />  */}
+          <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
+                getOptionValue={option => option.LOCATION}
+                options={locationData}
+                isSearchable={true}
+                onChange={handleLocation}
+                placeholder={"Choose a Location"}
+                styles={styleSelect}
+                components={animatedComponents}
+                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION))}
+                isMulti
+                />
 
-          <Autocomplete
+          <Select
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  option.TRN_NAME}
+                getOptionValue={option => option.TRN_NAME}
+                options={trnType}
+                isSearchable={true}
+                onChange={handleTranType}
+                placeholder={'TRN TYPE'}
+                styles={styleSelect}
+                components={animatedComponents}
+                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}
+                isMulti
+                />
+
+            {/* <Autocomplete
             multiple
             disablePortal
             size="small"
@@ -578,7 +823,7 @@ const Reconciliation = () => {
             renderInput={(params) => (
               <TextField {...params} label="TRN TYPE" variant="standard" />
             )}
-          />
+          />   */}
 
           <TextField
             className={ErrorProceesClasses.dateField}
@@ -658,13 +903,13 @@ const Reconciliation = () => {
 
                   <div style={{ marginTop: "20px" }}>
                     <FormControl>
-                      <InputLabel
+                      {/* <InputLabel
                         id="demo-simple-select-label"
                         style={{ width: "100px" }}
                       >
                         Sort
-                      </InputLabel>
-                      <Select
+                      </InputLabel> 
+                       <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={sort}
@@ -676,7 +921,25 @@ const Reconciliation = () => {
                         <MenuItem value={1}>All</MenuItem>
                         <MenuItem value={2}>All Matched</MenuItem>
                         <MenuItem value={3}>All Unmatched</MenuItem>
-                      </Select>
+                      </Select> */}
+                      <div style={{width: '100px'}}>
+                      <Select
+                        closeMenuOnSelect={true}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        getOptionLabel={option =>
+                          option.value}
+                        getOptionValue={option => option.value}
+                        options={sortValue}
+                        isSearchable={true}
+                        onChange={handleSortV}
+                        placeholder={'Sort'}
+                        // styles={styleSelect}
+                        // components={animatedComponents}
+                        //value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE))}
+                        //isMulti
+                      /></div>
+
                     </FormControl>
                   </div>
                 </>

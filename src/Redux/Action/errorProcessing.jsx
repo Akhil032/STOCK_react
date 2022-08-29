@@ -37,12 +37,3 @@ actions.GET_LOCATIONDATA_SUCCESS
 export const getLocationDataError = createAction(
 actions.GET_LOCATIONDATA_ERROR
 );
-export const getTrnTypeDataRequest = createAction(
-  actions.GET_TRNTYPE_REQUEST
-);
-export const getTrnTypeDataSuccess = createAction(
-actions.GET_TRNTYPE_SUCCESS
-);
-export const getTrnTypeDataError = createAction(
-actions.GET_TRNTYPE_ERROR
-);

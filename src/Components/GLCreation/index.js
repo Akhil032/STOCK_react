@@ -17,7 +17,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 const useStyles = makeStyles({
     maindiv: {
         position: "relative",
@@ -69,6 +70,17 @@ const useStyles = makeStyles({
     //     padding: '20px 20px 20px 20px',
     //   }
 });
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black",
+  })
+};
 
 const initialsearch = {
     CURRENCY: [],
@@ -96,7 +108,8 @@ console.log("valus:", sendGLData)
 const Forms = () => {
     // we're using react-hook-form library 
     //const { register, handleSubmit } = useForm();
-    const [itemData, setItemData] = useState(initialItemData);
+     const [valCurr, setValCurr] = useState([]);
+    const [itemData, setItemData] = useState([{}]);
     const [filterClass, setFilterClass] = useState([]);
     const [searchData, setSearchData] = useState(initialsearch);
     const [origItemData, setOrigItemData] = useState({});
@@ -231,6 +244,41 @@ const Forms = () => {
         }
     }
 
+    const handleCURRENCY=(e,value) =>
+    {
+      console.log("HC",value)
+      let selectedCURRENCY= [];
+      if (value.option) {
+        valCurr.push(value.option)
+    
+      }else if (value.removedValue) {
+         
+              let index = valCurr.indexOf(value.removedValue.CURRENCY);
+              valCurr.splice(index,1);
+      
+      }else if(value.action="clear"){
+        valCurr.splice(0,valCurr.length);
+      }
+    console.log("valCurr",valCurr)
+     if (valCurr.length >0) {
+      valCurr.map((item) => {
+        selectedCURRENCY.push(item.CURRENCY);
+        });
+        setSearchData((prev) => {
+            return {
+              ...prev,
+              CURRENCY: selectedCURRENCY,
+            };
+          });
+      }else {
+          setSearchData((prev) => {
+          return {
+            ...prev,
+            CURRENCY:[],
+          };
+          });
+      }
+    }
     const handleCancel = () => {
         setOpen(false)
     }
@@ -378,7 +426,7 @@ const Forms = () => {
 
                             //   {...register('SEGMENT7', { required: false })}
                             />
-                            <Autocomplete
+                            {/* <Autocomplete
                                 multiple
                                 size="small"
                                 id="combo-box-item"
@@ -406,7 +454,25 @@ const Forms = () => {
                                         }}
                                     />
                                 )}
+                            /> */}
+                            <div style={{width: '300px'}}>
+                            <Select 
+                            closeMenuOnSelect={true}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            getOptionLabel={option =>
+                            `${option.CURRENCY.toString()}`}
+                            getOptionValue={option => option.CURRENCY}
+                            options={itemData}
+                            isSearchable={true}
+                            onChange={handleCURRENCY}
+                            placeholder={"CURRENCY"}
+                            styles={styleSelect}
+                            components={animatedComponents}
+                            value={itemData.filter(obj => searchData?.CURRENCY.includes(obj.CURRENCY))}
+                            isMulti
                             />
+                            </div>
                             <Grid item xs={6}>
                                 <Box display="flex"
                                     justifyContent="flex-end"

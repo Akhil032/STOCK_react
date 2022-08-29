@@ -114,7 +114,7 @@ const CommonTable = ({
                       key={row?.SR_NO?row?.SR_NO:row?.ITEM}
                       selected={isItemSelected}
                     >
-                      <TableCell padding="checkbox">
+                      <TableCell padding="checkbox" style={{width: '1%'}}>
                         <Checkbox
                           color="primary"
                           onClick={(event) => handleClick(event, row?.SR_NO?row?.SR_NO:row?.ITEM)}
@@ -138,7 +138,7 @@ const CommonTable = ({
                             }
                           }
 
-                            return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell}>
+                            return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell} >
                               {
                                 <TextField 
                             disabled={!editable}

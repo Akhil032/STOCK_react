@@ -3,29 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
-import Table from "../../Components/Table/indexFI";
+import Table from "../../Components/Table/indexDV";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
-import TextField from "@mui/material/TextField";
-import Modal from '@mui/material/Modal';
-import Autocomplete from '@mui/material/Autocomplete';
-import IconButton from "@mui/material/IconButton";
-import FormControl from "@mui/material/FormControl";
-import Typography from '@mui/material/Typography';
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
-import Drawer from "@mui/material/Drawer";
 import { makeStyles } from "@mui/styles";
-import { getFinanceInterfaceRequest } from "../../Redux/Action/financeInterface";
+import {getDailyViewRequest} from "../../Redux/Action/DailyView"
+//import { getFinanceInterfaceRequest } from "../../Redux/Action/financeInterface";
 import CircularProgress from "@mui/material/CircularProgress";
-import { headCells } from "./tableHead";
+//import { headCells } from "./tableHead";
 import SearchIcon from '@mui/icons-material/Search';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import SendIcon from '@mui/icons-material/Send';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
@@ -40,15 +27,15 @@ const useStyles = makeStyles({
     width: "calc(95vw - 0px)",
     '& table':{
       '& tr':{
-            '& td:nth-child(28)':{
-                  display: 'none'
-            },
-            '& td:nth-child(29)':{
-              display: 'none'
-           },
-           '& td:nth-child(30)':{
-             display: 'none'
-          }
+          //   '& td:nth-child(28)':{
+          //         display: 'none'
+          //   },
+          //   '& td:nth-child(29)':{
+          //     display: 'none'
+          //  },
+          //  '& td:nth-child(30)':{
+          //    display: 'none'
+          // }
       }
   }
 },  boxDiv: {
@@ -76,38 +63,16 @@ const useStyles = makeStyles({
   },
  
 });
-
-const initialsearch = {
-  HIER1: [],
-  HIER2: [],
-  HIER3: [],
-  ITEM: [],
-  LOCATION: [],
-}
-
-const initialItemData = {
-  HIER1: "",
-  HIER2: "",
-  HIER3: "",
-  ITEM: ""
-}
-
-
-const CostChange = () => {
+const headCells=[]
+const DailyView = () => {
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
   const [editRows, seteditRows] = useState([]);
   const [updateRow, setUpdateRow] =  useState([]);
-  const [itemData, setItemData] = useState(initialItemData);
-  const [origItemData, setOrigItemData ] = useState({});
-  const [filterClass, setFilterClass] = useState([]);
-  const [subfilterClass, setsubFilterClass] = useState([]);
-  const [filterItem, setFilterItem] = useState([]);
-  const [locationData, setLocationData] = useState([{}]);
   const [loading, setLoading] = useState(false);
   const [isSearch, setSearch] = useState(false);
-  const [searchData, setSearchData] = useState(initialsearch);
+  const [searchData, setSearchData] = useState();
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
@@ -115,6 +80,7 @@ const CostChange = () => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   
+  var headColumns=[]
 
   const [state, setState] = React.useState({
     top: false,
@@ -122,50 +88,50 @@ const CostChange = () => {
     bottom: false,
     right: false,
   });
-  const FinanceInterfaceClasses = useStyles();
-  const FinanceInterfaceData = useSelector(
-    (state) => state.FinanceInterfaceReducers
+  const DailyViewClasses = useStyles();
+  const DailyViewData = useSelector(
+    (state) => state.DailyViewReducers
   );
-  // console.log("128",FinanceInterfaceData);
+  // console.log("128",DailyViewData);
   const dispatch = useDispatch();
 
 
 
   const serializedata = (datatable) => {
      console.log("dt",datatable)
-     //console.log("ad",allData)
-    
+     headColumns=Object.keys(datatable[0])
+     console.log("columns",headColumns)
      let newTabledata = [];
+     var headcell={id: '', 
+           numeric: true, disablePadding: false, label: '', 
+           width: '100%'}
+           headCells.splice(0,headCells.length);     
+     for(let i= 0; i< headColumns.length;i++)
+           {
+            headcell.id=headColumns[i];
+            headcell.label=headColumns[i];
+            console.log("headcell",JSON.stringify(headcell))
+            //jString=(JSON.stringify(headcell)).replace("/","").replace('"id"',"id").replace('"numeric"',"numeric").replace('"disablePadding"',"disablePadding").replace('"label"',"label").replace('"width"',"width")
+            headCells.push(JSON.parse(JSON.stringify(headcell)))
+            console.log("column",headCells)
+           }
+
      if(datatable.length > 0){
+      
        datatable.map( item => {
            const reorder = {
-          'SET_OF_BOOKS_ID' :null,
-          'ACCOUNTING_DATE' :"", 
-          'CURRENCY' :"", 
-          'TRN_DATE' :"", 
-          'EXCHANGE_RATE' :null,
-          'DEBIT_AMOUNT' :null, 
-          'CREDIT_ACCOUNT' :null, 
-          'REF_NO_1' :null,
-          'REF_NO_2' :null,
-          'REF_NO_3' :null, 
-          'REF_NO_4' :null,
-          'PRIMARY_ACCOUNT' :null,
-          'PRIMARY_CURR_CODE' :"", 
-          'PRIMARY_DEBIT_AMT' :null, 
-          'PRIMARY_CREDIT_AMT' :null,
-
+            
            }
-                  
              let test = Object.assign(reorder,item);
              newTabledata.push(test); 
-         
+             console.log("tabledata",newTabledata)
+          
      })
-     return newTabledata;
+     return datatable;
    } 
    setLoading(true);
    }
-
+   
   useEffect(() => {
     if (inputValue) {
       const filteredTable = tabledata.filter(props => 
@@ -181,54 +147,52 @@ const CostChange = () => {
   }, [inputValue]);
 
   useEffect(() => {
-    if (FinanceInterfaceData.isError) {
-      //console.log("hello",FinanceInterfaceData["messgae"])
+    if (DailyViewData.isError) {
+      //console.log("hello",DailyViewData["messgae"])
 
       setIsError(true)
-    }else if(FinanceInterfaceData.isSuccess){
+    }else if(DailyViewData.isSuccess){
      
       setIsSuccess(true);
     }else {
-      //console.log("hello1",FinanceInterfaceData)
+      //console.log("hello1",DailyViewData)
       setIsError(false)
       setTabledata("")
     }
-  }, [FinanceInterfaceData])
+  }, [DailyViewData])
 
   useEffect(() => { 
     if(isSubmit){
       setTimeout(() => {
-       // console.log("194 SD", searchData)
-        dispatch(getFinanceInterfaceRequest()) 
+        // console.log("194 SD", searchData)
+        dispatch(getDailyViewRequest()) 
       },1000)
     }
 },[isSubmit]);
 
 useEffect(() => {
   if(isSearch){
-    dispatch(getFinanceInterfaceRequest()) 
+    dispatch(getDailyViewRequest()) 
   }
 },[isSearch])
 
-
-
   useEffect(() => {
-        if(FinanceInterfaceData?.data?.Data && Array.isArray(FinanceInterfaceData?.data?.Data)){
-          console.log("rtd",FinanceInterfaceData)
-          setTabledata(serializedata(FinanceInterfaceData?.data?.Data));
-          setAllData(serializedata(FinanceInterfaceData?.data?.Data));
+        if(DailyViewData?.data?.Data && Array.isArray(DailyViewData?.data?.Data)){
+          console.log("rtd",DailyViewData)
+          setTabledata(serializedata(DailyViewData?.data?.Data));
+          setAllData(serializedata(DailyViewData?.data?.Data));
           setLoading(false);
           setSubmit(false);
           setSearch(false);
-          console.log("rtd",FinanceInterfaceData)
+          console.log("rtd",DailyViewData)
           console.log("rt",allData)
         }
       
         else {
           setSearch(false)
         }
-        
-  },[FinanceInterfaceData?.data])
+        console.log(tabledata)
+  },[DailyViewData?.data])
 
 
 
@@ -249,7 +213,7 @@ useEffect(() => {
   };
 
 const handleSubmit = (event) => {
-
+  console.log(123)
   event.preventDefault();
     setSearch(true);
     setState({ ...state, 'right': open });
@@ -261,46 +225,22 @@ const handleMsgClose = () => {
   setIsSuccess(false)
 }
 
-const selectError = (event, value) => {
-  let selectedError = [];
-  if(value.length > 0){
-    value.map(
-      (item) => {
-          selectedError.push(item);
-      }
-    )
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        ERR_MSG : selectedError
-      };
-    });
-  }else{
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        ERR_MSG : []
-      };
-    });
-  }
-}
-
 
   return (
-    <Box className={FinanceInterfaceClasses.maindiv}>
+    <Box className={DailyViewClasses.maindiv}>
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid item xs={6}>
-          <Box className={FinanceInterfaceClasses.boxDiv}>
-            <div className={FinanceInterfaceClasses.uploaddiv}>
-              <h4>Finance Interface</h4>
+          <Box className={DailyViewClasses.boxDiv}>
+            <div className={DailyViewClasses.uploaddiv}>
+              <h4>Stock Ledger View</h4>
             </div>
           </Box>
         </Grid>
         <Grid item xs={6}>
         <Box display="flex"
               justifyContent="flex-end"
-              alignItems="flex-end" className={FinanceInterfaceClasses.boxDiv}>
-            <div className={FinanceInterfaceClasses.uploaddiv}>
+              alignItems="flex-end" className={DailyViewClasses.boxDiv}>
+            <div className={DailyViewClasses.uploaddiv}>
               
 
           <Button variant="contained" sx={{ marginTop: '15px', textAlign:'right' }} onClick={handleSubmit} startIcon={<SearchIcon />}>Search</Button>
@@ -328,27 +268,8 @@ const selectError = (event, value) => {
           allData={allData}
         />
       )}
-
-      <Stack spacing={2} sx={{ width: "100%" }}>
-        <Snackbar open={isError || isSuccess} autoHideDuration={3000} onClose={handleMsgClose} sx={{height: "100%"
-            }} anchorOrigin={{
-          vertical: "top",
-          horizontal: "center"          
-        }}>
-      
-          <Alert
-            onClose={handleMsgClose}
-            severity={FinanceInterfaceData?.isSuccess ? "success" : "error"}
-            sx={{ width: "100%" }}
-          >
-          { FinanceInterfaceData?.message}
-          </Alert>
-          </Snackbar>
-      </Stack>
-
-     
     </Box>
   );
 };
 
-export default CostChange;
+export default DailyView;

@@ -54,6 +54,9 @@ const CommonTable = ({
   pageName,
   setTabledata,
   allData,
+  handleSearchClick,
+  freeze,
+  handleCopyDown,
 }) => {
 
 
@@ -154,10 +157,14 @@ const CommonTable = ({
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               handleSearch={handleSearch}
+              handleSearchClick={handleSearchClick}
               searchText={searchText}
               headCells={headCells}
               editRows={editRows}
               checkEditrows={true}
+              freeze={freeze}
+              handleCopyDown={handleCopyDown}
+              pageName={pageName}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
@@ -218,6 +225,7 @@ const CommonTable = ({
                             editable = false;
                           if(key == 'QTY'){
                             editable = true;
+                            console.log("log:",editable);
                             }
                           if(key == 'UNIT_COST'){
                             editable = true;
@@ -225,7 +233,10 @@ const CommonTable = ({
                           if(key == 'UNIT_RETAIL'){
                             editable = true;
                           }}
-
+                        //   if(pageName == "cost_maintenance"){
+                        //   if(key == "UNIT_COST"){
+                        //     editable = true
+                        // }}
                             return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell}>
                               {(key == 'TRN_NAME' && pageName == 'error') ? (
                                     <Autocomplete
@@ -253,7 +264,7 @@ const CommonTable = ({
                               }
                             
                            </TableCell>
-                              }       
+                              }
                       )}
                       </> :           
                       <>
@@ -288,7 +299,6 @@ const CommonTable = ({
                       </> }
                       
                     </TableRow>
-
                   );
                 })}
 

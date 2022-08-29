@@ -1,6 +1,6 @@
 import { all, fork } from "redux-saga/effects";
 import StagingProcessing from "./stagingProcessingSaga";
-import {ErrorProcessing,updateErrorProcessing,getClassData, getLocationData,getTrnTypeData} from "./errorProcessingSaga";
+import {ErrorProcessing,updateErrorProcessing,getClassData, getLocationData} from "./errorProcessingSaga";
 import {updateSystemConfig, SystemConfig} from "./systemConfigSaga";
 import { DailyCountData,StageCountData,ErrorCountData } from "./dashBoardSaga";
 import { DailySkuRollupData,getLocationRecData,getDeptRecData  } from "./reconciliationSaga"; 
@@ -9,8 +9,8 @@ import {TransactionReversal,updateTransactionReversal,cancelTransactionReversal,
 import { CostChange, updateCostChange } from "./CostChangeSaga"; 
 import {GlAccount,updateGlAccount,GLcurrency} from "./glaccountSaga";
 import {GlAccountcreation} from "./glaccountSagacreation";
-import {FinanceInterface} from "./FinanceInterfaceSaga";
-import {TrnTypeData } from "./trnTypeSaga";
+import {FinanceInterface} from "./FinanceInterfaceSaga"
+import { DailyView } from "./DailyViewSaga";
 
 export function* rootSaga() {
   yield all([
@@ -19,7 +19,6 @@ export function* rootSaga() {
     fork(updateErrorProcessing),
     fork(getClassData),
     fork(getLocationData),
-    fork(getTrnTypeData),
     fork(SystemConfig),
     fork(updateSystemConfig),
     fork(DailyCountData),
@@ -41,6 +40,7 @@ export function* rootSaga() {
     fork(GLcurrency),
     fork(GlAccountcreation),
     fork(FinanceInterface),
-    fork(TrnTypeData),
+    fork(DailyView),
+
   ]);
 }

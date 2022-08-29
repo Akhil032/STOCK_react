@@ -87,7 +87,7 @@ console.log(dailyCountData,stageCountData,errorCountData);
         <Box sx={{ flexGrow: 1, marginTop: "20px" }}>
         <Grid container spacing={{ xs: 3, md: 4 }} columns={{ xs: 4, sm: 8, md: 12 }} sx={{ marginTop: "100px" }}>
              <Grid item  xs={2} sm={4} md={4}>    
-                <Item style={{background:"#ededb2",height:"210px"}}>
+                <Item style={{background:"#ededb2"}}>
                 <h3>Pending Count</h3>
                 {Object.entries(dailyCountData).map(([key,value])=>{
                      return <div>{key} : {value.toString()}</div>
@@ -96,7 +96,7 @@ console.log(dailyCountData,stageCountData,errorCountData);
                 </Item>
            </Grid>
          <Grid item  xs={2} sm={4} md={4}>
-                <Item style={{background:"#b2e3ed",height:"210px"}}>
+                <Item style={{background:"#b2e3ed"}}>
                 <h3>Stage Count</h3>
                 {Object.entries(stageCountData).map(([key,value])=>{
                      return <div>{key} : {value.toString()}</div>
@@ -105,7 +105,7 @@ console.log(dailyCountData,stageCountData,errorCountData);
                   </Item>
            </Grid>
            <Grid item  xs={2} sm={4} md={4}>
-                <Item style={{background:"#dab0eb",height:"210px"}}>
+                <Item style={{background:"#dab0eb"}}>
                 <h3>Tran Count</h3>
                 {Object.entries(errorCountData).map(([key,value])=>{
                      return <div>{key} : {value.toString()}</div>

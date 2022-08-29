@@ -7,18 +7,18 @@ export const headCells = [
     width: "100%",
   },
   {
-    id: "ITEM_DESC",
-    numeric: true,
-    disablePadding: false,
-    label: "ITEM DESC",
-    width: "150px",
-  },
-  {
     id: "ERR_MSG",
     numeric: false,
     disablePadding: false,
     label: "ERR MSG",
     width: "120px",
+  },
+  {
+    id: "ITEM_DESC",
+    numeric: true,
+    disablePadding: false,
+    label: "ITEM DESC",
+    width: "150px",
   },
   {
     id: "HIER1",

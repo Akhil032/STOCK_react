@@ -29,6 +29,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles'; 
 import Chip from '@mui/material/Chip';
 import swal from '@sweetalert/with-react';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 //import "./index.css";
 
@@ -76,6 +78,18 @@ const useStyles = makeStyles({
       }
   },
 });
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
+
 
 const initialsearch = {
   TRN_TYPE: [] ,
@@ -83,6 +97,7 @@ const initialsearch = {
 }
 
 const SystemConfig = () => {
+  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -94,6 +109,7 @@ const SystemConfig = () => {
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
+  const [freeze, setFreeze] = useState(false);
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -147,7 +163,7 @@ const SystemConfig = () => {
   }
 
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && freeze === false) {
       const filteredTable = tabledata.filter(props => 
         Object
           .entries(inputValue)
@@ -180,7 +196,7 @@ const SystemConfig = () => {
           </div>
         )  
         setSearch(false);
-    }else if(ConfigData.isSuccess ){
+    }else if(ConfigData.isSuccess && ConfigData.isupdate ){
       setIsSuccess(true);
       swal(
         <div>     
@@ -200,11 +216,17 @@ const SystemConfig = () => {
         dispatch(getSystemConfigRequest([searchData])) 
       },1000)
     }
-      return () => {
-        dispatch(resetSystemConfig());
-      }
+      // return () => {
+      //   dispatch(resetSystemConfig());
+      // }
 
 },[isSubmit]);
+
+useEffect(() => {
+          return () => {
+        dispatch(resetSystemConfig());
+      }
+},[''])
 
 useEffect(() => {
   if(isSearch){
@@ -233,7 +255,9 @@ useEffect(() => {
         ...prevState,
         [name]: value
     }));
+      if(freeze === false){
       setTabledata(allData);
+       }
     } else {
       setInputValue(prevState => ({
         ...prevState,
@@ -283,6 +307,57 @@ const handleSubmit = (event) => {
     setState({ ...state, 'right': open });
 }
 
+const handleSearchColumn = (e) => {
+  console.log("Handle Search Column",e);
+
+  console.log(inputValue);
+  setFreeze(true);
+
+}
+
+const handleCopyDown = (e) => {
+  console.log("Handle Copy Down",e);
+  console.log("EditR",editRows);
+  console.log("update",inputValue);
+
+  // Filter object by single key
+  // const test = Object.keys(inputValue).
+  // filter((key) => key.includes(e)).
+  // reduce((cur, key) => { return Object.assign(cur, { [key]: inputValue[key] })}, {});
+
+  for(const key in inputValue){
+      if(inputValue[key] === ''){
+        delete inputValue[key];
+        console.log("k",key);
+      }
+      if(inputValue.hasOwnProperty('TRN_NAME')){
+        delete inputValue['TRN_NAME'];
+      }
+  }
+  console.log("inVal",inputValue);
+  if(editRows.length > 0){
+  const editData = tabledata.filter((item) => {
+    return editRows.some((val) => {
+      return item.SR_NO === val;
+    }); 
+  });
+  console.log("tt",editData);
+
+  const copyUpdate = editData.map(item => {
+    Object.assign(item,inputValue);
+     return item;
+})
+console.log("updatedRecord",copyUpdate);
+setTabledata(copyUpdate);
+setUpdateRow(copyUpdate);
+seteditRows([]);
+setInputValue("");
+  setFreeze(false);
+}else{
+  setFreeze(false);
+}
+
+}
 
 // const handleMsgClose = () => {
 //   setIsError(false)
@@ -302,43 +377,91 @@ const onReset = (event) => {
 
       dispatch(resetSystemConfig());
 }
- const selectTrantype = (event, value) => {
-   console.log("t",value);
+//  const selectTrantype = (event, value) => {
+//    console.log("t",value);
 
 
+//   let selectedTrantype = [];
+//   let selectedAref = [];
+//   if(value.length > 0 && typeof value[0]['TRN_TYPE'] !== "undefined"){
+//     value.map(
+//       (item) => {
+//         selectedTrantype.push(item.TRN_TYPE);
+//         selectedAref.push(item.AREF)
+//       }
+//     )
+//     setSearchData((prev) => {
+//       return {
+//         ...prev,
+//         TRN_TYPE : selectedTrantype,
+//         AREF: selectedAref
+//       };
+//     });
+//   }else if(value.length > 0){
+//         console.log(value);
+//         swal(
+//           <div>     
+//             <p>{"Please Choose valid TRN TYPE"}</p>
+//           </div>
+//         )  
+//   }else {
+//     setSearchData((prev) => {
+//       return {
+//         ...prev,
+//         TRN_TYPE : [],
+//         AREF: []
+//       };
+//     });
+//   }
+//  }
+
+const handleTranType=(e,value) =>
+{
   let selectedTrantype = [];
   let selectedAref = [];
-  if(value.length > 0 && typeof value[0]['TRN_TYPE'] !== "undefined"){
-    value.map(
-      (item) => {
-        selectedTrantype.push(item.TRN_TYPE);
-        selectedAref.push(item.AREF)
+  console.log("420",value)
+  if (value.option) {
+    valTRN.push(value.option)
+  }else if (value.removedValue) {
+    
+    console.log("12343",value.removedValue.TRN_TYPE)
+    for(let i= 0; i< valTRN.length;i++)
+    {
+      if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
+        if(valTRN[i]["AREF"]===value.removedValue.AREF){
+          valTRN.splice(i,1);
       }
-    )
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        TRN_TYPE : selectedTrantype,
-        AREF: selectedAref
-      };
+      }
+    }
+  }else if(value.action="clear"){      
+    valTRN.splice(0,valTRN.length);
+  }
+  console.log("420",valTRN)
+ if (valTRN.length >0) {
+  valTRN.map((item) => {
+      selectedTrantype.push(item.TRN_TYPE);
+      selectedAref.push(item.AREF)
     });
-  }else if(value.length > 0){
-        console.log(value);
-        swal(
-          <div>     
-            <p>{"Please Choose valid TRN TYPE"}</p>
-          </div>
-        )  
-  }else {
+    
     setSearchData((prev) => {
+        return {
+          ...prev,
+          TRN_TYPE: selectedTrantype,
+          AREF:selectedAref
+
+        };
+      });    
+  }else {
+   
+      setSearchData((prev) => {
       return {
         ...prev,
         TRN_TYPE : [],
         AREF: []
       };
-    });
+      });
   }
- }
+}
 
 const searchPanel = () => (
   <Box
@@ -348,7 +471,7 @@ const searchPanel = () => (
     onSubmit={handleSubmit}
   > <Grid item xs={12} sx={{display:'flex', justifyContent:'center', marginTop: '15px'}}>
          <Stack spacing={2} sx={{ width: 250 }}>     
-            <Autocomplete
+            {/* <Autocomplete
               noOptionsText={'Please Choose valid TRN TYPE'}
               multiple
               disablePortal
@@ -359,7 +482,23 @@ const searchPanel = () => (
               getOptionLabel={(option) => option.TRN_NAME}
               sx={{ width: 250 }}
               renderInput={(params) => <TextField {...params} label="TRN TYPE" variant="standard" />}
-            />
+            /> */}
+        <Select 
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  option.TRN_NAME}
+                getOptionValue={option => option.TRN_NAME}
+                options={trnType}
+                isSearchable={true}
+                onChange={handleTranType}
+                placeholder={'TRN TYPE'}
+                styles={styleSelect}
+                components={animatedComponents} 
+                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}
+                isMulti 
+                />
 {/* 
 <Autocomplete
         value={value}
@@ -453,6 +592,8 @@ const searchPanel = () => (
         <Table
           tableData={tabledata}
           //handleDelete={handleDelete}
+          handleSearchClick={handleSearchColumn}
+          handleCopyDown={handleCopyDown}
           handleSearch={handleChange}
           searchText={inputValue}
           handleEdit={true}
@@ -462,6 +603,7 @@ const searchPanel = () => (
           headCells={headCells}
           setTabledata={setTabledata}
           allData={allData}
+          freeze={freeze}
           pageName="config"
         />
       )}

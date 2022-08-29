@@ -25,7 +25,7 @@ const ReconciliationReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: false,
+        isSuccess: true,
       };
 
     case actions.GET_DAILY_SKU_ROLLUPDATA_ERROR:

@@ -41,7 +41,7 @@ const glaccountReducers = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        isError: false,
+        isError: true,
         message: action.payload?.Data?.message,
         isSuccess: false,
       };

@@ -91,7 +91,7 @@ export const headCells = [
     width: "100px",
   },
   {
-    id: "TRN_TYPE",
+    id: "TRN_NAME",
     numeric: true,
     disablePadding: false,
     label: "TRN TYPE",

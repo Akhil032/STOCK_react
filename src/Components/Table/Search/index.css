@@ -1,12 +1,10 @@
 input[type="search"]:-ms-input-placeholder {
   /* Internet Explorer 10-11 */
   text-align: left;
-  
 }
 input[type="search"]::placeholder {
   /* Firefox, Chrome, Opera */
   text-align: left;
-  
 }
 .form-control{
   padding: 4px 0px;
@@ -15,19 +13,15 @@ input[type="search"]::placeholder {
   border-top: none;
   border-left: none;
   border-right: none;
-  
 }
-
 
 table,
 th,
 td {
-  border: px solid #e0e0e0;
-  
+  border: 1px solid #e0e0e0;
 }
-thead{ z-index: 15;}
 
+thead{ z-index: 15;}
 thead tr {
-  
   background-color: grey;
 }

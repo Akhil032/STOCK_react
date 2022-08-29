@@ -71,7 +71,7 @@ const AppBar = styled(MuiAppBar, {
   }),
   ...(open && {
     marginLeft: drawerWidth,
-    width: `calc(100% - 310px)`,
+    width: `calc(100% - 300px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -89,7 +89,7 @@ const Drawer = styled(MuiDrawer, {
   ...(open && {
     ...openedMixin(theme),
     "& .MuiDrawer-paper": {
-      width: "310px",
+      width: "300px",
       backgroundColor: "grey"
     },
   }),
@@ -159,7 +159,9 @@ export default function Index() {
     }
     if (routeName === "Finance Interface Data") {
       navigate("/Finance-Interface");
-  }
+  }if (routeName === "Stock Ledger View") {
+    navigate("/Stock-Ledger-View");
+}
     if (routeName === "Account maintenance") {
       navigate("/Account-maintenance");
     }
@@ -198,6 +200,10 @@ export default function Index() {
     navigate("/error-processing");
   };
 
+  const clickLogo = () => {
+    navigate("/dashboard");
+    handleDrawerClose()
+  }
   const Layoutclasses = useStyles();
 
   return (
@@ -219,9 +225,9 @@ export default function Index() {
               >
                 <MenuIcon sx={{color:"#66cdaa"}}/>
               </IconButton>
-              <Link to="/dashboard" >
+                <IconButton onClick={clickLogo} disableRipple sx={{padding:"0px"}}>
                   <img src={proxima360} className={Layoutclasses.ImageDiv} />
-              </Link>
+                  </IconButton>
             </div>
             <div>
               <UserProfile/>
@@ -239,7 +245,7 @@ export default function Index() {
             >
               <div>
                 {" "}
-                <Typography variant="h5">Stock Ledger</Typography>
+                <Typography variant="h5">Stock Ledger </Typography>
               </div>
 
               <IconButton onClick={handleDrawerClose} sx = {{bgcolor: "grey"}}>

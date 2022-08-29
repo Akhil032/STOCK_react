@@ -134,6 +134,19 @@ export const GetItems = () => {
             
         ],
       },
+      {
+        id: 10,
+        name: "Stock Ledger View",
+        icon: <ReceiptIcon sx={{color: "#66cdaa"}}/>,
+        subitems: [
+          {
+            id: 1,
+            name: "Stock Ledger View",
+            },
+
+            
+        ],
+      },
     ],
   };
   return json;

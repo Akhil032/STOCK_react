@@ -79,6 +79,7 @@ const StageProcessing = () => {
   const [allData, setAllData] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [deleteId, setDeleteId]= useState([]);
   const [open, setOpen] = useState(false);
   const [searched, setSearched] = useState();
   const [errmsg, setErrormsg] = useState("");
@@ -134,7 +135,7 @@ const StageProcessing = () => {
         ...prevState,
         [name]: value
     }));
-      setTabledata(allData);
+      setTabledata(tabledata);
     } else {
       setInputValue(prevState => ({
         ...prevState,
@@ -274,9 +275,10 @@ const StageProcessing = () => {
   }, [searched]);
 
   const resetFilter = () => {
+    console.log(deleteId);
     setSearched("");
     setInputValue("");
-    setTabledata(allData);
+    setTabledata(tabledata);
   }
 
   return (
@@ -343,6 +345,8 @@ const StageProcessing = () => {
           handleSearch={handleChange}
           searchText={inputValue}
           headCells={headCells}
+          setDeleteId={setDeleteId}
+          deleteId={deleteId}
           pageName = "stage"
         />
         </Grid>

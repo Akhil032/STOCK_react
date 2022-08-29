@@ -47,7 +47,7 @@ export default function EnhancedTableHead(props) {
     <>
       <TableHead className={headerclasses.TitleHead}>
         <TableRow>
-          <TableCell padding="checkbox" >
+          {/* <TableCell padding="checkbox" >
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -57,11 +57,10 @@ export default function EnhancedTableHead(props) {
                 "aria-label": "select all data",
               }}
               style={{
-                width:"10px",
                 color: "#fff",
               }}
             />
-          </TableCell>
+          </TableCell> */}
           {headCells.map((headCell) => (
             <>
               <TableCell
@@ -105,7 +104,7 @@ export default function EnhancedTableHead(props) {
         </TableRow>
       </TableHead>
       <TableHead className={headerclasses.SearchHead} >
-        <TableCell padding="checkbox" ></TableCell>
+        {/* <TableCell padding="checkbox" ></TableCell> */}
         {headCells.map((searchData, index) => (
           <>
             <TableCell className={headerclasses.TableCell}>
