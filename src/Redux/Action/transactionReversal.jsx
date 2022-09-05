@@ -46,3 +46,6 @@ actions.GET_LOCATIONDATA_SUCCESS
 export const getLocationDataError = createAction(
 actions.GET_LOCATIONDATA_ERROR
 );
+export const resetTransactionReversal = createAction(
+  actions.RESET_TRANSACTIONREVERSAL
+)

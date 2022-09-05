@@ -26,7 +26,7 @@ const StagingProcessingReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: true,
+        isSuccess: false,
       };
     case actions.RESET_STAGEPROCESSING:
       return {

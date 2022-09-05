@@ -21,5 +21,7 @@ export const API = {
   GETGLDATA:"/currency_gl/",
   INSERTGLDATA:"/GL_ACCOUNT_create/",
   FETCHSTGFIN:"/Retrieve_stg_fin/",
-  FETCHDAILYVIEW:"/Daily_view/"
+  FETCHTRNTYPE :"/trn_type_dtl/",
+  FETCHTRNTYPELIST: "/trn_type_dtl_list/",
+  FETCHDAILYVIEW:"/Daily_view/",
 };

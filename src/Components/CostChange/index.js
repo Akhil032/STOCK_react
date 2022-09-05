@@ -107,6 +107,12 @@ const initialItemData = {
   ITEM: ""
 }
 const CostChange = () => {
+  const [input, setInput] = useState("");
+  const [inputH2, setInputH2] = useState("");
+  const [inputH3, setInputH3] = useState("");
+  const [inputItem, setInputItem] = useState("");
+  const [inputLoc, setInputLoc] = useState("");
+  //inputval
   const [valLoc, setValLoc] = useState([]);
   const [valH1,setValH1]=useState([]);
   const [valH2,setValH2]=useState([]);
@@ -129,10 +135,11 @@ const CostChange = () => {
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
+  const [freeze, setFreeze] = useState(false);
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
+  const [load, setLoad] = useState(0);
 
   const [state, setState] = React.useState({
     top: false,
@@ -178,7 +185,7 @@ const CostChange = () => {
   }
 
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && freeze === false) {
       const filteredTable = tabledata.filter(props =>
         Object
           .entries(inputValue)
@@ -237,7 +244,7 @@ const CostChange = () => {
     if (isSearch) {
       console.log("278 SD", searchData)
       dispatch(getCostChangeRequest([searchData]))
-
+    
     }
   }, [isSearch])
 
@@ -250,11 +257,14 @@ const CostChange = () => {
 
   useEffect(() => {
     if (CostChangeData?.data?.Data && Array.isArray(CostChangeData?.data?.Data)) {
+     if (load===0){
       setTabledata(serializedata(CostChangeData?.data?.Data));
       setAllData(serializedata(CostChangeData?.data?.Data));
+     }
       setLoading(false);
       setSubmit(false);
       setSearch(false);
+      setLoad(0);
     } else if (CostChangeData?.data?.itemData && Array.isArray(CostChangeData?.data?.itemData)) {
       setItemData(CostChangeData?.data?.itemData);
       setOrigItemData(CostChangeData?.data?.itemData);
@@ -266,7 +276,7 @@ const CostChange = () => {
       setSearch(false)
     }
   }, [CostChangeData?.data])
-
+  console.log("tabledata",tabledata,load)
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value == "") {
@@ -304,15 +314,6 @@ const CostChange = () => {
       console.log("post:", sendRow);
       dispatch(postCostChangeRequest(sendRow));
       setLoading(true);
-      // initialsearch.HIER1 = [];
-      // initialsearch.HIER2 = [];
-      // initialsearch.HIER3 = [];
-      // initialsearch.ITEM = [];
-      // initialsearch.LOCATION = [];
-      // setSearchData(initialsearch);
-      // setFilterClass([]);
-      // setsubFilterClass([]);
-      // setFilterItem([]);
       setSubmit(true);
       seteditRows([]);
       setOpen(false)
@@ -322,21 +323,115 @@ const CostChange = () => {
 
   };
   const handleSubmit = (event) => {
-    console.log("search",searchData)
+  var check=0;
+  console.log(searchData,inputH3)
+  if( input.length>0){
+    for(var i = 0; i < UniqDept.length; i++) {
+      check=1
+      if ((UniqDept[i].HIER1).toUpperCase() === input.toUpperCase()) {
+          handleHier1(0,UniqDept[i])
+          setInput("");
+          check=2;
+          break;
+      }
+    } 
+  }if ( inputH2.length>0 && (check===0 || check===2)){
+    if(filterClass.length>0){      
+      for(var i = 0; i < filterClass.length; i++) {      
+        if ((filterClass[i].HIER2).toUpperCase() === inputH2.toUpperCase()) {
+            handleHier2(0,filterClass[i])
+            setInputH2("");
+            check=2;
+            break;
+        }
+        else{
+          check=1
+        }
+      }
+    }
+    else{
+      check=1
+    }
+  }if ( inputH3.length>0 && (check===0 || check===2)){
+    if(subfilterClass.length>0){      
+      for(var i = 0; i < subfilterClass.length; i++) {      
+        if ((subfilterClass[i].HIER3).toUpperCase() === inputH3.toUpperCase()) {
+            handleHier3(0,subfilterClass[i]);
+            setInputH3("");
+            check=2;
+            break;
+        }
+        else{
+          check=1;
+        }
+      }
+    }
+    else{
+      check=1
+    }
+  }if ( inputItem.length>0 && (check===0 || check===2)){
+    if(filterItem.length>0){      
+      for(var i = 0; i < filterItem.length; i++) {      
+        if ((filterItem[i].ITEM).toUpperCase() === inputItem.toUpperCase()) {
+            handleItem(0,filterItem[i]);
+            setInputItem("");
+            check=2;
+            break;
+        }
+        else{
+          check=1;
+        }
+      }
+    }
+    else{
+      check=1
+    }
+  }if ( inputLoc.length>0 && (check===0 || check===2)){
+    if(locationData.length>0){      
+      for(var i = 0; i < locationData.length; i++) {  
+        if (locationData[i].LOCATION=== parseInt(inputLoc)) {
+            selectLocation(0,locationData[i]);
+            setInputLoc("");
+            check=2;
+            break;
+        }else{
+          check=1; }
+      }
+    }
+    else{
+      check=1;
+    }
+  }
+if (check===1){
+  swal(
+    <div>     
+      <p>{"No Data Found"}</p>
+    </div>
+  )
+  event.preventDefault();
+  setState({ ...state, 'right': open });
+  setLoad(1)
+}else{ 
+    setLoad(0);
     event.preventDefault();
     setSearch(true);
     setState({ ...state, 'right': open });
   }
-
+}
+ 
   const onReset = (event) => {
+    setLoad(0);
+    setInput("");
+    setInputH2("");
+    setInputH3("");
+    setInputItem("");
+    setInputLoc("");
     initialsearch.HIER1 = [];
     initialsearch.HIER2 = [];
     initialsearch.HIER3 = [];
     initialsearch.ITEM = [];
     initialsearch.LOCATION = [];
-    console.log("Ini",initialsearch);
     setSearchData(initialsearch);
-    console.log("Sdata",searchData);
     setValH1([]);
     setValH2([]);
     setValH3([]);
@@ -347,10 +442,54 @@ const CostChange = () => {
     setTabledata("");
   }
 
+  const handleSearchColumn = (e) => {
+    console.log(inputValue);
+    setFreeze(true);
+  
+  }
+  
+  const handleCopyDown = (e) => {
+    //console.log("Handle Copy Down",e);
+    //console.log("EditR",editRows);
+    //console.log("update",inputValue);
+  
+    // Filter object by single key
+    // const test = Object.keys(inputValue).
+    // filter((key) => key.includes(e)).
+    // reduce((cur, key) => { return Object.assign(cur, { [key]: inputValue[key] })}, {});
+  
+    for(const key in inputValue){
+        if(inputValue[key] === ''){
+          delete inputValue[key];
+          console.log("k",key);
+        }
+        if(inputValue.hasOwnProperty('ITEM')){
+          delete inputValue['ITEM'];
+        }
+    }
+    if(editRows.length > 0){
+    const editData = tabledata.filter((item) => {
+      return editRows.some((val) => {
+        return item.SR_NO === val;
+      }); 
+    });
+    const copyUpdate = editData.map(item => {
+      Object.assign(item,inputValue);
+       return item;
+  })
+  setTabledata(copyUpdate);
+  setUpdateRow(copyUpdate);
+  seteditRows([]);
+  setInputValue("");
+    setFreeze(false);
+  }else{
+    setFreeze(false);
+  }
+  
+  }
+
   const handleHier1=(e,value) =>
   {
-      console.log("h1",value);
-      console.log("srch1",searchData);
     let selectedDept = [];
     if (value.option) {     
         valH1.push(value.option)
@@ -361,9 +500,11 @@ const CostChange = () => {
     }else if(value.action==="clear"){ 
         valH1.splice(0,valH1.length);
     }
-  console.log("V1",valH1);
-//Filtering HIER2 based on HIER1
-    if (valH1.length >0) {
+//manual input handle input and filter itemdata
+  if(e===0){
+    valH1.push(value);}
+  //Filtering HIER2 based on HIER1
+ if (valH1.length >0) {
       const filterClass = itemData.filter((item) => {      
         return (valH1).some((val) => {
           return item.HIER1 === val.HIER1;
@@ -397,7 +538,6 @@ const CostChange = () => {
       });
     }
 }
-
 const handleHier2=(e,value) =>
   {
     let selectedHier2 = [];
@@ -410,6 +550,10 @@ const handleHier2=(e,value) =>
     }else if(value.action==="clear"){      
       valH2.splice(0,valH2.length);
     }
+//manual input handle input and filter itemdata
+  if(e===0){
+    valH2.push(value);   
+  }
 //Filtering HIER2 based on HIER1
   if (valH2.length >0) {
     const filterSubClass = itemData.filter((item) => {      
@@ -445,10 +589,8 @@ const handleHier2=(e,value) =>
       });
   }
 }
-
-
 const handleHier3=(e,value) =>
-  {
+  { console.log(value)
     let selectedHier3 = [];
     if (value.option) {
       valH3.push(value.option)
@@ -459,6 +601,10 @@ const handleHier3=(e,value) =>
     }else if(value.action==="clear"){      
       valH3.splice(0,valH3.length);
     }
+//manual input handle input and filter itemdata
+if(e===0){
+  valH3.push(value)
+}
 //Filtering HIER3 based on HIER2
     if (valH3.length >0) {
       const filterItem = itemData.filter((item) => {      
@@ -493,11 +639,14 @@ const handleItem=(e,value) =>
       valItem.push(value.option)
   }else if (value.removedValue) {
       let index = valItem.indexOf(value.removedValue.ITEM);
-      valItem.splice(index,1);
-   
+      valItem.splice(index,1);   
   }else if(value.action==="clear"){      
     valItem.splice(0,valItem.length);
    }
+   //manual input handle input and filter itemdata
+  if(e===0){
+    valItem.push(value);
+  }
 //Filtering ITEM based on HIER3
 if (valItem.length >0) {
   
@@ -519,42 +668,48 @@ if (valItem.length >0) {
   });
 }
 }
-
-const handleLocation=(e,value) =>
-  {
-    let selectedLocation = [];
-    if (value.option) {
-      valLoc.push(value.option)
-      
+//console.log("searchData",searchData)
+const selectLocation = (event, value) => {
+  let selectedLocation = [];
+  if (value.option) {     
+        valLoc.push(value.option)
     }else if (value.removedValue) {
-       
-            let index = valLoc.indexOf(value.removedValue.LOCATION);
-            valLoc.splice(index,1);
-           
-    }else if(value.action="clear"){      
+        let index = valLoc.indexOf(value.removedValue.LOCATION);
+        valLoc.splice(index,1);
+    }else if(value.action==="clear"){ 
       valLoc.splice(0,valLoc.length);
     }
-console.log("Sdsdddf",valLoc)
-   if (valLoc.length >0) {
-      valLoc.map((item) => {
-        selectedLocation.push(item.LOCATION);
-      });
-      setSearchData((prev) => {
-          return {
-            ...prev,
-            LOCATION: selectedLocation,
-          };
-        });    
-    }else {
-        setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION: selectedLocation,
-        };
-        });
+    if(event===0){
+      valLoc.push(value)
     }
-}
-console.log("src",searchData);
+  if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
+    valLoc.map(
+      (item) => {
+        selectedLocation.push(item.LOCATION);
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        LOCATION : selectedLocation,
+      };
+    });
+  }else if(value.length > 0){
+        swal(
+          <div>     
+            <p>{"Please Choose valid LOCATION"}</p>
+          </div>
+        )  
+  }else {
+    initialsearch.LOCATION = "";
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        LOCATION : [],
+      };
+    });
+  }
+ }
   const searchPanel = () => (
     <Box
       sx={{ width: 350, marginTop: '80px' }}
@@ -572,6 +727,13 @@ console.log("src",searchData);
                 getOptionValue={option => option.HIER1}
                 options={UniqDept.length > 0 ? UniqDept : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  // only set the input when the action that caused the
+                  // change equals to "input-change" and ignore the other
+                  // ones like: "set-value", "input-blur", and "menu-close"
+                  if (action.action === "input-change") setInput(value); // <---
+                }}
+                inputValue={input}
                 onChange={handleHier1}
                 placeholder={"Choose HIER1"}
                 styles={styleSelect}
@@ -582,7 +744,6 @@ console.log("src",searchData);
                 />
 
         <Select 
-          
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -590,14 +751,17 @@ console.log("src",searchData);
                   `${option.HIER2.toString()}-${option.HIER2_DESC.toString()}`}
                 getOptionValue={option => option.HIER2}
                 options={(filterClass.length > 0) ? filterClass : []}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputH2(value);
+                }}
+                inputValue={inputH2}
                 isSearchable={true}
                 onChange={handleHier2}
                 placeholder={"Choose a HIER2"}
                 styles={styleSelect}
                 components={animatedComponents}  
                 isMulti 
-                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))} 
-                
+                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))}                 
                 />
 
         <Select 
@@ -608,6 +772,10 @@ console.log("src",searchData);
                   `${option.HIER3.toString()}-${option.HIER3_DESC.toString()}`}
                 getOptionValue={option => option.HIER2}
                 options={(subfilterClass.length > 0) ? subfilterClass : []}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputH3(value);
+                }}
+                inputValue={inputH3}
                 isSearchable={true}
                 onChange={handleHier3}
                 placeholder={"Choose a HIER3"}
@@ -626,6 +794,10 @@ console.log("src",searchData);
                   `${option.ITEM.toString()}`}
                 getOptionValue={option => option.ITEM}
                 options={(filterItem.length > 0) ? filterItem : []}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputItem(value);
+                }}
+                inputValue={inputItem}
                 isSearchable={true}
                 onChange={handleItem}
                 placeholder={"Choose a ITEM"}
@@ -641,11 +813,15 @@ console.log("src",searchData);
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
+                  `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
                 getOptionValue={option => option.LOCATION}
-                options={locationData}
+                options={locationData.length > 0 ? locationData : []}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputLoc(value);
+                }}
+                inputValue={inputLoc}
                 isSearchable={true}
-                onChange={handleLocation}
+                onChange={selectLocation}
                 placeholder={"Choose a Location"}
                 styles={styleSelect}
                 components={animatedComponents} 
@@ -660,7 +836,7 @@ console.log("src",searchData);
               sx={{ width: '120px' }}
               startIcon={<SearchIcon />}
             >
-              Search
+              Search1
             </Button>
             <Button
               variant="contained"
@@ -740,7 +916,7 @@ console.log("src",searchData);
               </div>
 
 
-              <Button variant="contained" sx={{ marginTop: '15px', textAlign: 'right' }} onClick={toggleDrawer('right', true)} startIcon={<SearchIcon />}>Search</Button>
+              <Button variant="contained" sx={{ marginTop: '15px', textAlign: 'right' }} onClick={toggleDrawer('right', true)} startIcon={<SearchIcon />}>Search1</Button>
               <Drawer
                 anchor={'right'}
                 open={state['right']}
@@ -761,6 +937,8 @@ console.log("src",searchData);
         <Table
           tableData={tabledata}
           //handleDelete={handleDelete}
+          handleSearchClick={handleSearchColumn}
+          handleCopyDown={handleCopyDown}
           handleSearch={handleChange}
           searchText={inputValue}
           handleEdit={true}
@@ -770,6 +948,7 @@ console.log("src",searchData);
           headCells={headCells}
           setTabledata={setTabledata}
           allData={allData}
+          freeze={freeze}
           pageName="cost_maintenance"
         />
       )}

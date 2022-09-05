@@ -17,8 +17,26 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import swal from '@sweetalert/with-react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+
+
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    margin: "10px 0px 0px 10px",
+    width:"310px",
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
+
+
 const useStyles = makeStyles({
     maindiv: {
         position: "relative",
@@ -70,17 +88,6 @@ const useStyles = makeStyles({
     //     padding: '20px 20px 20px 20px',
     //   }
 });
-const animatedComponents = makeAnimated();
-const styleSelect = {
-  control: base => ({
-    ...base,
-    border: 0,
-    //border: "5px solid black",
-    // This line disable the blue border
-    boxShadow: 'none',
-    borderBottom: "1px solid black",
-  })
-};
 
 const initialsearch = {
     CURRENCY: [],
@@ -108,8 +115,7 @@ console.log("valus:", sendGLData)
 const Forms = () => {
     // we're using react-hook-form library 
     //const { register, handleSubmit } = useForm();
-     const [valCurr, setValCurr] = useState([]);
-    const [itemData, setItemData] = useState([{}]);
+    const [itemData, setItemData] = useState(initialItemData);
     const [filterClass, setFilterClass] = useState([]);
     const [searchData, setSearchData] = useState(initialsearch);
     const [origItemData, setOrigItemData] = useState({});
@@ -120,6 +126,7 @@ const Forms = () => {
     const theme = useTheme();
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
+    const [valCurr,setValCurr]=useState([]);
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
     const GlAccountData = useSelector(
         (state) => state.glaccountReducers
@@ -221,64 +228,49 @@ const Forms = () => {
     //    // console.log(itemData)
     //      Alert("stop") 
     //   };
-    const selectCURRENCY = (event, value) => {
-        let selectedCURRENCY = [];
-        if (value.length > 0) {
-            console.log(itemData);
-            const filterClass = itemData.filter((item) => { return value.some((val) => { return item.CURRENCY === val.CURRENCY }) });
-            console.log(filterClass);
-            const classFilter = (filterClass.length > 0) ? [...new Set(filterClass.map(item => item.HIER2))] : [];
-            setFilterClass(filterClass);
+    const selectCurrency = (event, value) => {
 
-            value.map(
-                (item) => {
-                    selectedCURRENCY.push(item.CURRENCY);
-                }
-            )
-            setSearchData((prev) => {
-                return {
-                    ...prev,
-                    CURRENCY: selectedCURRENCY
-                };
-            });
-        }
-    }
-
-    const handleCURRENCY=(e,value) =>
-    {
-      console.log("HC",value)
-      let selectedCURRENCY= [];
-      if (value.option) {
-        valCurr.push(value.option)
-    
+    let selectedCurrency = [];
+    if (value.option) {     
+          valCurr.push(value.option)
       }else if (value.removedValue) {
-         
-              let index = valCurr.indexOf(value.removedValue.CURRENCY);
-              valCurr.splice(index,1);
-      
-      }else if(value.action="clear"){
+          let index = valCurr.indexOf(value.removedValue.CURRENCY);
+          valCurr.splice(index,1);
+      }else if(value.action==="clear"){ 
         valCurr.splice(0,valCurr.length);
       }
-    console.log("valCurr",valCurr)
-     if (valCurr.length >0) {
-      valCurr.map((item) => {
-        selectedCURRENCY.push(item.CURRENCY);
-        });
-        setSearchData((prev) => {
-            return {
-              ...prev,
-              CURRENCY: selectedCURRENCY,
-            };
-          });
-      }else {
-          setSearchData((prev) => {
-          return {
-            ...prev,
-            CURRENCY:[],
-          };
-          });
-      }
+   
+    if(valCurr.length > 0 && typeof valCurr[0]['CURRENCY'] !== "undefined"){
+      valCurr.map(
+        (item) => {
+          selectedCurrency.push(item.CURRENCY);
+        }
+      )
+      //console.log(value);
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          CURRENCY : selectedCurrency,
+        };
+      });
+    }else if(value.length > 0){
+          //console.log(value);
+          swal(
+            <div>     
+              <p>{"Please Choose valid CURRENCY"}</p>
+            </div>
+          )  
+    }else {
+      initialsearch.CURRENCY = "";
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          CURRENCY : [],
+        };
+      });
     }
+   }
+
     const handleCancel = () => {
         setOpen(false)
     }
@@ -426,53 +418,22 @@ const Forms = () => {
 
                             //   {...register('SEGMENT7', { required: false })}
                             />
-                            {/* <Autocomplete
-                                multiple
-                                size="small"
-                                id="combo-box-item"
-                                sx={{ width: 250 }}
-                                options={(itemData.length > 0) ? itemData : []}
-                                //value={searchData?.HIER1}
-                                isOptionEqualToValue={(option, value) => option.CURRENCY === value.CURRENCY}
-                                autoHighlight
-                                onChange={selectCURRENCY}
-                                getOptionLabel={(option) => `${option.CURRENCY.toString()}`}
-                                renderOption={(props, option) => (
-                                    <Box component="li" {...props}>
-                                        {option.CURRENCY}
-                                    </Box>
-                                )}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        value={searchData?.CURRENCY}
-                                        variant="standard"
-                                        label="CURRENCY"
-                                        inputProps={{
-                                            ...params.inputProps,
-                                            autoComplete: 'new-password', // disable autocomplete and autofill
-                                        }}
-                                    />
-                                )}
-                            /> */}
-                            <div style={{width: '300px'}}>
-                            <Select 
-                            closeMenuOnSelect={true}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            getOptionLabel={option =>
-                            `${option.CURRENCY.toString()}`}
-                            getOptionValue={option => option.CURRENCY}
-                            options={itemData}
-                            isSearchable={true}
-                            onChange={handleCURRENCY}
-                            placeholder={"CURRENCY"}
-                            styles={styleSelect}
-                            components={animatedComponents}
-                            value={itemData.filter(obj => searchData?.CURRENCY.includes(obj.CURRENCY))}
-                            isMulti
-                            />
-                            </div>
+            <Select 
+                closeMenuOnSelect={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                getOptionLabel={option =>
+                  `${option.CURRENCY.toString()}`}
+                getOptionValue={option => option.CURRENCY}
+                options={itemData}
+                isSearchable={true}
+                onChange={selectCurrency}
+                placeholder={"Choose a Currency"}
+                styles={styleSelect}
+                components={animatedComponents} 
+                //value={itemData.filter(obj => searchData?.CURRENCY.includes(obj.CURRENCY))}  
+                isMulti 
+                />
                             <Grid item xs={6}>
                                 <Box display="flex"
                                     justifyContent="flex-end"

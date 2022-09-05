@@ -9,7 +9,7 @@ import {TransactionReversal,updateTransactionReversal,cancelTransactionReversal,
 import { CostChange, updateCostChange } from "./CostChangeSaga"; 
 import {GlAccount,updateGlAccount,GLcurrency} from "./glaccountSaga";
 import {GlAccountcreation} from "./glaccountSagacreation";
-import {FinanceInterface} from "./FinanceInterfaceSaga"
+import {FinanceInterface} from "./FinanceInterfaceSaga";
 import { DailyView } from "./DailyViewSaga";
 
 export function* rootSaga() {
@@ -41,6 +41,5 @@ export function* rootSaga() {
     fork(GlAccountcreation),
     fork(FinanceInterface),
     fork(DailyView),
-
   ]);
 }

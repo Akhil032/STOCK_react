@@ -6,10 +6,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Button from "@mui/material/Button";
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+  let c,d;
+  if(orderBy == "LOCATION_NAME"){
+      c = b[orderBy].replace('STORE-','');
+       d = a[orderBy].replace('STORE-','');
+       c = isNaN(c)?c:parseInt(c);
+       d = isNaN(d)?d:parseInt(d);
+      
+  }else {
+     c = isNaN(b[orderBy])?b[orderBy]:parseInt(b[orderBy]);
+     d = isNaN(a[orderBy])?a[orderBy]:parseInt(a[orderBy]);
+  }  
+  if (c < d) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (c > d) {
     return 1;
   }
   return 0;
@@ -49,6 +60,10 @@ export default function EnhancedTable({
   handleClickOpen,
   valueSelect,
   setValueSelect,
+  handleSearchClick,
+  freeze,
+  handleCopyDown,
+  setDeleteId,
 }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("");
@@ -107,10 +122,11 @@ export default function EnhancedTable({
     const id = selected;
     const data = [...tableData];
     const updatedTable = data.filter((val) => {
-      return !id.includes(val.SR_NO);
+      return !id.includes(val.TRAN_SEQ_NO);
     });
     setTabledata(updatedTable);
     setSelected([]);
+    setDeleteId(id);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -135,6 +151,9 @@ export default function EnhancedTable({
       <Box sx={{ width: "100%", marginTop: "8px" }}>
         <CommonTableRev
           handleClick={handleClick}
+          handleSearchClick={handleSearchClick}
+          freeze={freeze}
+          handleCopyDown={handleCopyDown}
           handleSelectAllClick={handleSelectAllClick}
           handleRequestSort={handleRequestSort}
           handleChangePage={handleChangePage}

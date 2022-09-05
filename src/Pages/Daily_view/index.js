@@ -3,24 +3,23 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
-import Table from "../../Components/Table/indexDV";
-import Stack from "@mui/material/Stack";
-import Snackbar from "@mui/material/Snackbar";
+import Table from "../../Components/Table/indexFI";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { makeStyles } from "@mui/styles";
 import {getDailyViewRequest} from "../../Redux/Action/DailyView"
-//import { getFinanceInterfaceRequest } from "../../Redux/Action/financeInterface";
 import CircularProgress from "@mui/material/CircularProgress";
 //import { headCells } from "./tableHead";
 import SearchIcon from '@mui/icons-material/Search';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import swal from '@sweetalert/with-react';
 
 //import "./index.css";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
 const useStyles = makeStyles({
   maindiv: {
     position: "relative",
@@ -77,6 +76,7 @@ const DailyView = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
   const [open, setOpen] = useState(false);
+  const [freeze, setFreeze] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -95,12 +95,10 @@ const DailyView = () => {
   // console.log("128",DailyViewData);
   const dispatch = useDispatch();
 
-
-
   const serializedata = (datatable) => {
-     console.log("dt",datatable)
+     //console.log("dt",datatable)
      headColumns=Object.keys(datatable[0])
-     console.log("columns",headColumns)
+     //console.log("columns",headColumns)
      let newTabledata = [];
      var headcell={id: '', 
            numeric: true, disablePadding: false, label: '', 
@@ -133,7 +131,7 @@ const DailyView = () => {
    }
    
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue  && freeze === false) {
       const filteredTable = tabledata.filter(props => 
         Object
           .entries(inputValue)
@@ -150,10 +148,20 @@ const DailyView = () => {
     if (DailyViewData.isError) {
       //console.log("hello",DailyViewData["messgae"])
 
-      setIsError(true)
+      setIsError(true);
+      swal(
+        <div>     
+          <p>{DailyViewClasses["message"]}</p>
+        </div>
+      )
     }else if(DailyViewData.isSuccess){
      
       setIsSuccess(true);
+      swal(
+        <div>     
+          <p>{DailyViewClasses["message"]}</p>
+        </div>
+      )
     }else {
       //console.log("hello1",DailyViewData)
       setIsError(false)
@@ -178,20 +186,20 @@ useEffect(() => {
 
   useEffect(() => {
         if(DailyViewData?.data?.Data && Array.isArray(DailyViewData?.data?.Data)){
-          console.log("rtd",DailyViewData)
+          //console.log("rtd",DailyViewData)
           setTabledata(serializedata(DailyViewData?.data?.Data));
           setAllData(serializedata(DailyViewData?.data?.Data));
           setLoading(false);
           setSubmit(false);
           setSearch(false);
-          console.log("rtd",DailyViewData)
-          console.log("rt",allData)
+          //console.log("rtd",DailyViewData)
+          //console.log("rt",allData)
         }
       
         else {
           setSearch(false)
         }
-        console.log(tabledata)
+        //console.log(tabledata)
   },[DailyViewData?.data])
 
 
@@ -223,6 +231,13 @@ const handleSubmit = (event) => {
 const handleMsgClose = () => {
   setIsError(false)
   setIsSuccess(false)
+}
+const handleSearchColumn = (e) => {
+  //console.log("Handle Search Column",e);
+
+  console.log(inputValue);
+  setFreeze(true);
+
 }
 
 
@@ -257,6 +272,7 @@ const handleMsgClose = () => {
         <Table
           tableData={tabledata}
           //handleDelete={handleDelete}
+          handleSearchClick={handleSearchColumn}
           handleSearch={handleChange}
           searchText={inputValue}
           handleEdit={true}
@@ -266,6 +282,7 @@ const handleMsgClose = () => {
           headCells={headCells}
           setTabledata={setTabledata}
           allData={allData}
+          freeze={freeze}
         />
       )}
     </Box>

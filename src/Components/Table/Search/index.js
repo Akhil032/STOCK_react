@@ -18,6 +18,7 @@ const SearchTableData = ({
   colEnabled,
   pageName,
 }) => {
+
   return (
     <div className="form-group">
       <div style={{display:'flex'}}>

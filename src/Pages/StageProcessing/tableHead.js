@@ -56,6 +56,21 @@ export const headCells = [
     width: "100%",
   },
   {
+    id: "TOTAL_COST",
+    numeric: true,
+    disablePadding: false,
+    label: "TOTAL COST",
+    width: "100%",
+  },
+  {
+    id: "TOTAL_RETAIL",
+    numeric: true,
+    disablePadding: false,
+    label: "TOTAL RETAIL",
+    width: "100%",
+  },
+    
+  {
     id: "REF_NO1",
     numeric: false,
     disablePadding: false,

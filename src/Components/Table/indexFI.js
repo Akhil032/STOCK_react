@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import CommonTable from "./commonTable/indexFIC";
-import TableToolbar from "../Table/Toolbar/index";
+import TableToolbar from "./Toolbar/index";
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from "@mui/material/Button";
 
@@ -44,7 +44,7 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
-
+console.log("cost",CommonTable)
 export default function EnhancedTable({
   tableData,
   handleSearch,
@@ -56,11 +56,8 @@ export default function EnhancedTable({
   headCells,
   setTabledata,
   pageName,
-  allData,
   handleSearchClick,
   freeze,
-  handleCopyDown,
-  setDeleteId,
 }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("");
@@ -69,7 +66,6 @@ export default function EnhancedTable({
   const [rowsPerPage, setRowsPerPage] = React.useState(30);
 
   const handleRequestSort = (event, property) => {
-    console.log("order",property);
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
@@ -79,35 +75,15 @@ export default function EnhancedTable({
     let stageData = [...tableData];
     if (event.target.checked) {
       const newSelecteds = stageData?.map((value) => {
-        return value['SR_NO']?value['SR_NO']:value['TRAN_SEQ_NO'];
+        return value['UNIT COST']?value['LOCATION']:value['ITEM'];
       });
-      
-
-      // const newSelecteds = stableSort(stageData, getComparator(order, orderBy))
-      // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      // .map((value) => {  return value['SR_NO']?value['SR_NO']:value['TRAN_SEQ_NO'];});
       setSelected(newSelecteds);
-      //seteditRows(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
- // const handleSelectAllClick = (event) => {
-  //   if (event.target.checked) {
-  //     const newSelecteds = stableSort(tableData, getComparator(order, orderBy))
-  //       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  //       .map((value) => {  return value['SR_NO']?value['SR_NO']:value['TRAN_SEQ_NO'];});
-
-  //     setSelected(newSelecteds);
-  //     return;
-  //   }else{
-  //     console.log(selected);
-  //   setSelected([]);
-  //   }
-  // };
-
-  const handleClick = (event, name) => {
+  const handleClick = (event, name,mode= 'delete') => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
 
@@ -123,24 +99,24 @@ export default function EnhancedTable({
         selected.slice(selectedIndex + 1)
       );
     }
-    //console.log(editRows);
-    //console.log(newSelected);
-
+    // console.log(editRows);
+    // console.log(newSelected);
+    if(mode == 'delete'){
     setSelected(newSelected);
-    seteditRows(newSelected);
-      //seteditRows(newSelected);     
-  
+    }else{
+      seteditRows(newSelected);     
+    }
   };
 
   const handleDelete = () => {
     const id = selected;
     const data = [...tableData];
+    console.log("data",data);
     const updatedTable = data.filter((val) => {
       return !id.includes(val.SR_NO);
     });
     setTabledata(updatedTable);
     setSelected([]);
-    setDeleteId(id);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -167,7 +143,6 @@ export default function EnhancedTable({
           handleClick={handleClick}
           handleSearchClick={handleSearchClick}
           freeze={freeze}
-          handleCopyDown={handleCopyDown}
           handleSelectAllClick={handleSelectAllClick}
           handleRequestSort={handleRequestSort}
           handleChangePage={handleChangePage}
@@ -191,8 +166,6 @@ export default function EnhancedTable({
           emptyRows={emptyRows}
           handleChangeRowsPerPage={handleChangeRowsPerPage}
           pageName={pageName}
-          setTabledata={setTabledata}
-          allData={allData}
         />
       </Box>
     </>

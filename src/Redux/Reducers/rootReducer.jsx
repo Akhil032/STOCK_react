@@ -25,7 +25,6 @@ const rootReducer = combineReducers({
   glcreationReducers,
   FinanceInterfaceReducers,
   DailyViewReducers,
-
 });
 
 export default rootReducer;

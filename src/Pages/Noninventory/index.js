@@ -40,10 +40,10 @@ const useStyles = makeStyles({
     width: "calc(95vw - 64px)",
     '& table':{
         '& tr':{
-              '& td:nth-child(14)':{
+              '& td:nth-child(17)':{
                     display: 'none'
               },
-              '& td:nth-child(15)':{
+              '& td:nth-child(18)':{
                 display: 'none'
           }
         }
@@ -72,6 +72,7 @@ const NonInventory = () => {
   const [tabledata, setTabledata] = useState("");
   const [filterData, setFilterData] = useState("");
   const [isValidExcel, setIsValidExcel] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
   const [isError, setIsError] = useState(false);
@@ -79,6 +80,7 @@ const NonInventory = () => {
   const [open, setOpen] = useState(false);
   const [searched, setSearched] = useState();
   const [errmsg, setErrormsg] = useState("");
+  const [freeze, setFreeze] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const StageProceesClasses = useStyles();
@@ -89,7 +91,7 @@ const NonInventory = () => {
   const dispatch = useDispatch();
     // Column Filter of table
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && freeze === false) {
       console.log(inputValue);
       // const filteredTable = tabledata.filter((val) => Object.keys().map((item) => {
       //     if(val[item] !== undefined && inputValue[item] !== undefined){
@@ -161,10 +163,12 @@ const NonInventory = () => {
             item['SR_NO']= count;
             item['UNIT_COST'] = item.UNIT_COST;
             item['UNIT_RETAIL'] = item.UNIT_RETAIL;
+            item['TOTAL_COST'] = (item['QTY'] * item['UNIT_COST']).toFixed(4);
+            item['TOTAL_RETAIL'] = (item['QTY'] * item['UNIT_RETAIL']).toFixed(4);
             count++;
         })
-        setTabledata(formatData);
-        setAllData(formatData);
+        setTabledata(serializedata(formatData));
+        setAllData(serializedata(formatData));
       } else {
         setIsValidExcel(false);
       }
@@ -201,6 +205,14 @@ const NonInventory = () => {
         setIsError(true);
         setErrormsg("UNIT_RETAIL data length should not more then 20");
         return false;
+      } if (item['TOTAL_COST']?.length > 20) {
+        setIsError(true);
+        setErrormsg("TOTAL_COST data length should not more then 20");
+       return false;
+        } if (item['TOTAL_RETAIL']?.length > 20) {
+       setIsError(true);
+       setErrormsg("TOTAL_RETAIL data length should not more then 20");
+       return false;
       } if(item['REF_NO1']?.length > 10){
         setIsError(true);
         setErrormsg("REF_NO1 data length should not more then 10");
@@ -232,6 +244,7 @@ const NonInventory = () => {
             
     });
     dispatch(getStageProcessingRequest(JSON.stringify(tabledata)));
+    setLoading(() => window.location.reload(), 500)
     setOpen(false)
   }
 
@@ -272,6 +285,49 @@ console.log("tableData",allData);
     setInputValue("");
     setTabledata(allData);
   }
+
+  const handleSearchColumn = (e) => {
+    //console.log("Handle Search Column",e);
+  
+    console.log(inputValue);
+    setFreeze(true);
+  
+  }
+
+  const serializedata = (tabledata) => {
+    let newTabledata = [];
+    if (tabledata.length > 0) {
+      tabledata.map((item) => {
+        const reorder = {
+          ITEM: null,
+          LOC_TYPE: null,
+          LOC: null,
+          TRN_DATE: "",
+          TRN_TYPE: "",
+          QTY: "",
+          UNIT_COST: "",
+          UNIT_RETAIL: "",
+          TOTAL_COST: "",
+          TOTAL_RETAIL: "",
+          REF_NO1: "",
+          REF_NO2: "",
+          REF_NO3: "",
+          REF_NO4: "",
+          // CREATE_DATETIME:"",
+          // CREATE_ID:"",
+        };
+        // parseFloat(item.tabledata?.toFixed(1));
+        // delete item?.CREATE_DATETIME;
+        // delete item?.CREATE_ID;
+        //item['CREATE_ID'] = JSON.parse(localStorage.getItem("userData"))?.username;
+        //parseInt(item?.HIER1);   
+        //item?.CREATE_ID: JSON.parse(localStorage.getItem("userData"))?.username;  
+        let test = Object.assign(reorder, item);
+        newTabledata.push(test);
+      });
+      return newTabledata;
+    }
+  };
 
   return (
     <Box className={StageProceesClasses.stagemaindiv}>
@@ -337,6 +393,8 @@ console.log("tableData",allData);
           handleSearch={handleChange}
           searchText={inputValue}
           headCells={headCells}
+          handleSearchClick={handleSearchColumn}
+          freeze={freeze}
           pageName = "stage"
         />
         </Grid>

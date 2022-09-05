@@ -58,6 +58,9 @@ const CommonTableRev = ({
   handleClickOpen,
   valueSelect,
   setValueSelect,
+  handleSearchClick,
+  freeze,
+  handleCopyDown,
 }) => {
 
 
@@ -151,9 +154,13 @@ const CommonTableRev = ({
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               handleSearch={handleSearch}
+              handleSearchClick={handleSearchClick}
               searchText={searchText}
               headCells={headCells}
               editRows={editRows}
+              freeze={freeze}
+              handleCopyDown={handleCopyDown}
+              pageName={pageName}
               checkEditrows={true}
             
             />
@@ -212,7 +219,7 @@ const CommonTableRev = ({
                   );
                 })}
               
-              {emptyRows > 0 && (
+              {/* {emptyRows > 0 && (
                 <TableRow
                   style={{
                     height: 33 * emptyRows,
@@ -220,7 +227,7 @@ const CommonTableRev = ({
                 >
                   <TableCell colSpan={6} />
                 </TableRow>
-              )}
+              )} */}
             </TableBody>
           </Table>
         </TableContainer>

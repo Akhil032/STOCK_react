@@ -73,7 +73,7 @@ export const headCells = [
     id: "CREATE_ID",
     numeric: true,
     disablePadding: true,
-    label: "CREATE_ID",
+    label: "USER",
     width: "100%",
   },
   {

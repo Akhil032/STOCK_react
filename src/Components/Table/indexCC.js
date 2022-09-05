@@ -57,6 +57,10 @@ export default function EnhancedTable({
   setTabledata,
   pageName,
   allData,
+  handleSearchClick,
+  freeze,
+  handleCopyDown,
+  setDeleteId,
 }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("");
@@ -136,6 +140,7 @@ export default function EnhancedTable({
     });
     setTabledata(updatedTable);
     setSelected([]);
+    setDeleteId(id);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -160,6 +165,9 @@ export default function EnhancedTable({
      <Box sx={{ width: "100%", marginTop: "8px" }}>
         <CommonTable
           handleClick={handleClick}
+          handleSearchClick={handleSearchClick}
+          freeze={freeze}
+          handleCopyDown={handleCopyDown}
           handleSelectAllClick={handleSelectAllClick}
           handleRequestSort={handleRequestSort}
           handleChangePage={handleChangePage}

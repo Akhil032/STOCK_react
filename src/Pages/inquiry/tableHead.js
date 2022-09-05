@@ -7,18 +7,18 @@ export const headCells = [
     width: "100%",
   },
   {
-    id: "ERR_MSG",
-    numeric: false,
-    disablePadding: false,
-    label: "ERR MSG",
-    width: "120px",
-  },
-  {
     id: "ITEM_DESC",
     numeric: true,
     disablePadding: false,
     label: "ITEM DESC",
     width: "150px",
+  },
+  {
+    id: "ERR_MSG",
+    numeric: false,
+    disablePadding: false,
+    label: "ERR MSG",
+    width: "120px",
   },
   {
     id: "HIER1",
@@ -83,18 +83,18 @@ export const headCells = [
     label: "LOC NAME",
     width: "100px",
   },
-  // {
-  //   id: "TRN_DATE",
-  //   numeric: false,
-  //   disablePadding: false,
-  //   label: "TRN DATE",
-  //   width: "100px",
-  // },
   {
     id: "TRN_NAME",
     numeric: true,
     disablePadding: false,
     label: "TRN TYPE",
+    width: "100px",
+  },
+  {
+    id: "TRN_DATE",
+    numeric: false,
+    disablePadding: false,
+    label: "TRN DATE",
     width: "100px",
   },
   {
@@ -165,6 +165,13 @@ export const headCells = [
     numeric: true,
     disablePadding: false,
     label: "CURRENCY",
+    width: "90px",
+  },
+  {
+    id: "CREATE_ID",
+    numeric: true,
+    disablePadding: false,
+    label: "USER",
     width: "90px",
   },
   {

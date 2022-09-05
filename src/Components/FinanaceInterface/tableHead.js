@@ -46,10 +46,10 @@ export const headCells = [
     
   },
   {
-    id: "CREDIT_ACCOUNT",
+    id: "CREDIT_AMOUNT",
     numeric: true,
     disablePadding: false,
-    label: "CREDIT_ACCOUNT",
+    label: "CREDIT_AMOUNT",
     width: "100%",
     
   },

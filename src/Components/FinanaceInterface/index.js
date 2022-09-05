@@ -3,15 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
-import Table from "../../Components/Table/indexFI";
-import Stack from "@mui/material/Stack";
-import Snackbar from "@mui/material/Snackbar";
-import TextField from "@mui/material/TextField";
-import Modal from '@mui/material/Modal';
-import Autocomplete from '@mui/material/Autocomplete';
-import IconButton from "@mui/material/IconButton";
-import FormControl from "@mui/material/FormControl";
-import Typography from '@mui/material/Typography';
+import Table from "../../Components/Table/index";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Drawer from "@mui/material/Drawer";
 import { makeStyles } from "@mui/styles";
@@ -19,15 +11,9 @@ import { getFinanceInterfaceRequest } from "../../Redux/Action/financeInterface"
 import CircularProgress from "@mui/material/CircularProgress";
 import { headCells } from "./tableHead";
 import SearchIcon from '@mui/icons-material/Search';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import SendIcon from '@mui/icons-material/Send';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import swal from '@sweetalert/with-react';
 
 //import "./index.css";
 
@@ -77,20 +63,20 @@ const useStyles = makeStyles({
  
 });
 
-const initialsearch = {
-  HIER1: [],
-  HIER2: [],
-  HIER3: [],
-  ITEM: [],
-  LOCATION: [],
-}
+// const initialsearch = {
+//   HIER1: [],
+//   HIER2: [],
+//   HIER3: [],
+//   ITEM: [],
+//   LOCATION: [],
+// }
 
-const initialItemData = {
-  HIER1: "",
-  HIER2: "",
-  HIER3: "",
-  ITEM: ""
-}
+// const initialItemData = {
+//   HIER1: "",
+//   HIER2: "",
+//   HIER3: "",
+//   ITEM: ""
+// }
 
 
 const CostChange = () => {
@@ -99,18 +85,12 @@ const CostChange = () => {
   const [allData, setAllData] = useState("");
   const [editRows, seteditRows] = useState([]);
   const [updateRow, setUpdateRow] =  useState([]);
-  const [itemData, setItemData] = useState(initialItemData);
-  const [origItemData, setOrigItemData ] = useState({});
-  const [filterClass, setFilterClass] = useState([]);
-  const [subfilterClass, setsubFilterClass] = useState([]);
-  const [filterItem, setFilterItem] = useState([]);
-  const [locationData, setLocationData] = useState([{}]);
   const [loading, setLoading] = useState(false);
   const [isSearch, setSearch] = useState(false);
-  const [searchData, setSearchData] = useState(initialsearch);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
+  const [freeze, setFreeze] = useState(false);
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -132,7 +112,7 @@ const CostChange = () => {
 
 
   const serializedata = (datatable) => {
-     console.log("dt",datatable)
+     //console.log("dt",datatable)
      //console.log("ad",allData)
     
      let newTabledata = [];
@@ -145,7 +125,7 @@ const CostChange = () => {
           'TRN_DATE' :"", 
           'EXCHANGE_RATE' :null,
           'DEBIT_AMOUNT' :null, 
-          'CREDIT_ACCOUNT' :null, 
+          'CREDIT_AMOUNT' :null, 
           'REF_NO_1' :null,
           'REF_NO_2' :null,
           'REF_NO_3' :null, 
@@ -167,7 +147,7 @@ const CostChange = () => {
    }
 
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && freeze === false) {
       const filteredTable = tabledata.filter(props => 
         Object
           .entries(inputValue)
@@ -184,10 +164,20 @@ const CostChange = () => {
     if (FinanceInterfaceData.isError) {
       //console.log("hello",FinanceInterfaceData["messgae"])
 
-      setIsError(true)
+      setIsError(true);
+      swal(
+        <div>     
+          <p>{FinanceInterfaceClasses["messgae"]}</p>
+        </div>
+      )
     }else if(FinanceInterfaceData.isSuccess){
      
       setIsSuccess(true);
+      swal(
+        <div>     
+           <p>{FinanceInterfaceClasses["messgae"]}</p>
+        </div>
+      )
     }else {
       //console.log("hello1",FinanceInterfaceData)
       setIsError(false)
@@ -214,14 +204,14 @@ useEffect(() => {
 
   useEffect(() => {
         if(FinanceInterfaceData?.data?.Data && Array.isArray(FinanceInterfaceData?.data?.Data)){
-          console.log("rtd",FinanceInterfaceData)
+          //console.log("rtd",FinanceInterfaceData)
           setTabledata(serializedata(FinanceInterfaceData?.data?.Data));
           setAllData(serializedata(FinanceInterfaceData?.data?.Data));
           setLoading(false);
           setSubmit(false);
           setSearch(false);
-          console.log("rtd",FinanceInterfaceData)
-          console.log("rt",allData)
+          //console.log("rtd",FinanceInterfaceData)
+          //console.log("rt",allData)
         }
       
         else {
@@ -230,10 +220,11 @@ useEffect(() => {
         
   },[FinanceInterfaceData?.data])
 
-
-
+  console.log("infilter:",inputValue)
+  console.log("tabledata:",tabledata)
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("filter:",value)
     if (value == "") {
       setInputValue(prevState => ({
         ...prevState,
@@ -260,30 +251,36 @@ const handleMsgClose = () => {
   setIsError(false)
   setIsSuccess(false)
 }
+const handleSearchColumn = (e) => {
+  //console.log("Handle Search Column",e);
 
-const selectError = (event, value) => {
-  let selectedError = [];
-  if(value.length > 0){
-    value.map(
-      (item) => {
-          selectedError.push(item);
-      }
-    )
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        ERR_MSG : selectedError
-      };
-    });
-  }else{
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        ERR_MSG : []
-      };
-    });
-  }
+  console.log(inputValue);
+  setFreeze(true);
+
 }
+// const selectError = (event, value) => {
+//   let selectedError = [];
+//   if(value.length > 0){
+//     value.map(
+//       (item) => {
+//           selectedError.push(item);
+//       }
+//     )
+//     setSearchData((prev) => {
+//       return {
+//         ...prev,
+//         ERR_MSG : selectedError
+//       };
+//     });
+//   }else{
+//     setSearchData((prev) => {
+//       return {
+//         ...prev,
+//         ERR_MSG : []
+//       };
+//     });
+//   }
+// }
 
 
   return (
@@ -317,6 +314,9 @@ const selectError = (event, value) => {
         <Table
           tableData={tabledata}
           //handleDelete={handleDelete}
+          handleSearchClick={handleSearchColumn}
+          //handleCopyDown={handleCopyDown}
+          freeze={freeze}
           handleSearch={handleChange}
           searchText={inputValue}
           handleEdit={true}
@@ -329,7 +329,7 @@ const selectError = (event, value) => {
         />
       )}
 
-      <Stack spacing={2} sx={{ width: "100%" }}>
+      {/* <Stack spacing={2} sx={{ width: "100%" }}>
         <Snackbar open={isError || isSuccess} autoHideDuration={3000} onClose={handleMsgClose} sx={{height: "100%"
             }} anchorOrigin={{
           vertical: "top",
@@ -344,9 +344,7 @@ const selectError = (event, value) => {
           { FinanceInterfaceData?.message}
           </Alert>
           </Snackbar>
-      </Stack>
-
-     
+      </Stack> */}
     </Box>
   );
 };

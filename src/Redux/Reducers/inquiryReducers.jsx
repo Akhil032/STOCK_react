@@ -26,7 +26,7 @@ const InquiryReducers = (state = initialState, action) => {
         data: action.payload,
         isError: false,
         messgae: action.payload?.Data?.message,
-        isSuccess: true,
+        isSuccess: false,
       };
 
     case actions.GET_INQUIRYDATA_ERROR:

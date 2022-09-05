@@ -18,9 +18,11 @@ const useStyles = makeStyles({
   },
   SearchHead: {
     position: "sticky",
-    top: 0,
+    top: "33px",
+    background:'#fff',
   },
   TitleHead: {
+    height: "25px",
     position: "sticky",
     top: 0,
   }
@@ -37,6 +39,10 @@ export default function EnhancedTableHead(props) {
     handleSearch,
     searchText,
     headCells,
+    handleSearchClick,
+    freeze,
+    handleCopyDown,
+    pageName,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -47,7 +53,8 @@ export default function EnhancedTableHead(props) {
     <>
       <TableHead className={headerclasses.TitleHead}>
         <TableRow>
-          <TableCell padding="checkbox">
+          <TableCell padding="checkbox" style={{
+                whiteSpace: "nowrap"}}>
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -68,6 +75,9 @@ export default function EnhancedTableHead(props) {
                 className={headerclasses.TableCell}
                 size="small"
                 sortDirection={orderBy === headCell.id ? order : false}
+                style={{
+                  whiteSpace: "nowrap"
+                }}
               >
                 <TableSortLabel
                   active={orderBy === headCell.id}
@@ -119,6 +129,11 @@ export default function EnhancedTableHead(props) {
                 }
                 width={searchData.width}
                 onChange={handleSearch}
+                onClick={handleSearchClick}
+                freeze={freeze}
+                onCopy={handleCopyDown}
+                colEnabled={searchText}
+                pageName={pageName}
               />
             </TableCell>
           </>

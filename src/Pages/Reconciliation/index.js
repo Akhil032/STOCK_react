@@ -22,19 +22,34 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { headCells } from "./tableHead";
 import SearchIcon from "@mui/icons-material/Search";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { trnType } from "../../Components/ErrorProcessing/transType";
+//import { trnType } from "../../Components/ErrorProcessing/transType";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 //import Select from "@mui/material/Select";
 import { CSVLink } from "react-csv";
 import swal from '@sweetalert/with-react';
+import TrnTypeList from "../../Components/TRNTYPE";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
+
 const useStyles = makeStyles({
   maindiv: {
     position: "relative",
@@ -94,17 +109,6 @@ const useStyles = makeStyles({
     padding: "20px 20px 20px 20px",
   },
 });
-const animatedComponents = makeAnimated();
-const styleSelect = {
-  control: base => ({
-    ...base,
-    border: 0,
-    //border: "5px solid black",
-    // This line disable the blue border
-    boxShadow: 'none',
-    borderBottom: "1px solid black"
-  })
-};
 
 const initialsearch = {
   HIER1: [],
@@ -121,10 +125,11 @@ const initialItemData = {
   ITEM: "",
 };
 
+const initialTRName={
+  TRN_NAME:[]
+}
+
 const Reconciliation = () => {
-  const [valLoc, setValLoc] = useState([]);
-  const [valH1,setValH1]=useState([]);
-  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -139,26 +144,33 @@ const Reconciliation = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [sort, setSort] = useState(1);
   const [open, setOpen] = useState(false);
+  const [valH1,setValH1]=useState([]);
+  const [valLoc,setValLoc]=useState([]);
+  const [freeze, setFreeze] = useState(false);
+  const [valTrnType,setValTrnType]=useState([]);
   const [state, setState] = React.useState({
     top: false,
     left: false,
     bottom: false,
     right: false,
   });
-  const sortValue=[
-    {value:"All"},
-    {value:"All Matched"},
-    {value:"All Unmatched"},
-  ]
   const ErrorProceesClasses = useStyles();
   const DailySkuRollupData = useSelector(
     (state) => state.ReconciliationReducers
   );
 
+  const sortValue=[
+    {value:"All"},
+    {value:"All Matched"},
+    {value:"All Unmatched"},
+  ]
+
   const SearchItemData = useSelector((state) => state.ErrorProcessingReducers);
 
   console.log(SearchItemData, DailySkuRollupData);
   const dispatch = useDispatch();
+
+  var trnTypeValue = TrnTypeList();
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -209,7 +221,7 @@ const Reconciliation = () => {
   };
 
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && freeze === false) {
       const filteredTable = tabledata.filter((props) =>
         Object.entries(inputValue).every(
           ([key, val]) =>
@@ -346,6 +358,25 @@ const Reconciliation = () => {
     setIsSuccess(false);
   };
 
+  const handleSearchColumn = (e) => {
+    //console.log("Handle Search Column",e);
+  
+    console.log(inputValue);
+    setFreeze(true);
+  
+  }
+  const currentDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    return yyyy + '-' + mm + '-' + dd;
+  }
+
   const onReset = (event) => {
     initialsearch.HIER1 = [];
     initialsearch.LOCATION = [];
@@ -355,91 +386,224 @@ const Reconciliation = () => {
     setSearchData(initialsearch);
     setSearch(false);
     setSort(1);
+    setValH1([]);
+    setValLoc([]);
+    setValTrnType([]);
+    initialTRName.TRN_NAME=[];
     setTabledata("");
     setInputValue("");
     setAllData("");
   };
 
-  const selectDept = (event, value) => {
-    let selectedDept = [];
-    if (value.length > 0) {
-      const filterClass = itemData.filter((item) => {
-        return value.some((val) => {
-          return item.HIER1 === val.HIER1;
+  const handleSortV=(sortV) =>
+  {
+  console.log(sortV)
+  var Sdata=0
+  if (sortV.value==="All"){
+    Sdata=1;
+  }else if(sortV.value==="All Matched"){
+    Sdata=2;
+  }
+  else{
+    Sdata=3;
+  }
+  
+    let sortval =Sdata
+    let sortData = [];
+    if (allData.length > 0) {
+      if (sortval == 2) {
+        sortData = allData.filter((item) => {
+          return (
+            item.QTY_MATCHED == "Y" &&
+            item.COST_MATCHED == "Y" &&
+            item.RETAIL_MATCHED == "Y"
+          );
         });
-      });
-
-      console.log(filterClass);
-
-      value.map((item) => {
-        selectedDept.push(item.HIER1);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER1: selectedDept,
-        };
-      });
-    } else {
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER1: [],
-        };
-      });
+        console.log("matched", sortData);
+        setTabledata(sortData);
+        setSort(sortval);
+      } else if (sortval == 3) {
+        sortData = allData.filter((item) => {
+          return (
+            item.QTY_MATCHED == "N" ||
+            item.COST_MATCHED == "N" ||
+            item.RETAIL_MATCHED == "N"
+          );
+        });
+        setTabledata(sortData);
+        setSort(sortval);
+      } else {
+        console.log("Test");
+        setTabledata(allData);
+        setSort(1);
+      }
     }
   };
 
-  const selectLocation = (event, value) => {
-    console.log(value);
-    let selectedLocation = [];
-    if (value.length > 0) {
-      value.map((item) => {
-        selectedLocation.push(item.LOCATION);
+
+  const handleHier1=(e,value) =>
+  {
+    let selectedDept = [];
+    if (value.option) {     
+        valH1.push(value.option)
+    }else if (value.removedValue) {
+        let index = valH1.indexOf(value.removedValue.HIER1);
+        valH1.splice(index,1);
+    //}
+    }else if(value.action==="clear"){ 
+        valH1.splice(0,valH1.length);
+    }
+  //console.log("V1",valH1);
+//Filtering HIER2 based on HIER1
+    if (valH1.length >0) {
+      const filterClass = itemData.filter((item) => {      
+        return (valH1).some((val) => {
+          return item.HIER1 === val.HIER1;
+        });     
       });
+      // let UniqClass =
+      //     filterClass.length > 0
+      //       ? [
+      //           ...new Map(
+      //             filterClass.map((item) => [item["HIER2"], item])
+      //           ).values(),
+      //         ]
+      //       : []; 
+      //       setFilterClass(UniqClass);
+            valH1.map((item) => {
+              selectedDept.push(item.HIER1);
+            });
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                HIER1: selectedDept,
+              };
+            });          
+    }else {
+      //setFilterClass([])
       setSearchData((prev) => {
         return {
           ...prev,
-          LOCATION: selectedLocation,
+          HIER1: []
         };
       });
-    } else {
+    }
+}
+  // const selectDept = (event, value) => {
+  //   let selectedDept = [];
+  //   if (value.length > 0) {
+  //     const filterClass = itemData.filter((item) => {
+  //       return value.some((val) => {
+  //         return item.HIER1 === val.HIER1;
+  //       });
+  //     });
+
+  //     console.log(filterClass);
+
+  //     value.map((item) => {
+  //       selectedDept.push(item.HIER1);
+  //     });
+  //     setSearchData((prev) => {
+  //       return {
+  //         ...prev,
+  //         HIER1: selectedDept,
+  //       };
+  //     });
+  //   } else {
+  //     setSearchData((prev) => {
+  //       return {
+  //         ...prev,
+  //         HIER1: [],
+  //       };
+  //     });
+  //   }
+  // };
+  const selectLocation = (event, value) => {
+
+    let selectedLocation = [];
+    if (value.option) {     
+          valLoc.push(value.option)
+      }else if (value.removedValue) {
+          let index = valLoc.indexOf(value.removedValue.LOCATION);
+          valLoc.splice(index,1);
+      }else if(value.action==="clear"){ 
+        valLoc.splice(0,valLoc.length);
+      }
+   
+    if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
+      valLoc.map(
+        (item) => {
+          selectedLocation.push(item.LOCATION);
+        }
+      )
+      //console.log(value);
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          LOCATION : selectedLocation,
+        };
+      });
+    }else if(value.length > 0){
+          //console.log(value);
+          swal(
+            <div>     
+              <p>{"Please Choose valid LOCATION"}</p>
+            </div>
+          )  
+    }else {
       initialsearch.LOCATION = "";
       setSearchData((prev) => {
         return {
           ...prev,
-          LOCATION: [],
+          LOCATION : [],
         };
       });
     }
-  };
-
-  const selectTrantype = (event, value) => {
-    console.log(value);
+   }
+   const selectTrantype=(e,value) =>{
     let selectedTrantype = [];
     let selectedAref = [];
-    if (value.length > 0) {
-      value.map((item) => {
-        selectedTrantype.push(item.TRN_TYPE);
-        selectedAref.push(item.AREF);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: selectedTrantype,
-          AREF: selectedAref,
-        };
-      });
-    } else {
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: [],
-          AREF: [],
-        };
-      });
+    let selectedTranName=[]
+    if (value.option) {
+      valTrnType.push(value.option)
+    }else if (value.removedValue) {
+      let index=0;      
+      for(var i=0;i<valTrnType.length;i++) {
+        if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
+          index=i;        
+          break;
+        }
+      }
+      valTrnType.splice(index,1);
+    }else if(value.action="clear"){
+      valTrnType.splice(0,valTrnType.length);
     }
-  };
+    if (valTrnType.length >0) {
+      valTrnType.map((item) => {
+        selectedTrantype.push(item.TRN_TYPE);
+        selectedAref.push(item.AREF)
+        selectedTranName.push(item.TRN_NAME)
+      });
+      initialTRName.TRN_NAME=(selectedTranName);
+      setSearchData((prev) => {
+          return {
+            ...prev,
+            TRN_TYPE: selectedTrantype,
+            AREF:selectedAref
+          };
+        });
+    }else {
+        initialTRName.TRN_NAME=[];
+        setSearchData((prev) => {
+        return {
+          ...prev,
+          TRN_TYPE : [],
+          AREF: []
+        };
+        });
+    }
+  }
+
   let UniqDept =
     itemData.length > 0
       ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]
@@ -470,213 +634,39 @@ const Reconciliation = () => {
     filename: "ReconciliationReport.csv",
   };
 
-  
-  const handleHier1=(e,value) =>
-  {
-      console.log("h1",value);
-      console.log("srch1",searchData);
-    let selectedDept = [];
-    if (value.option) {
-        valH1.push(value.option)
-    }else if (value.removedValue) {
-        let index = valH1.indexOf(value.removedValue.HIER1);
-        valH1.splice(index,1);
-    //}
-    }else if(value.action==="clear"){
-        valH1.splice(0,valH1.length);
-    }
-  console.log("V1",valH1);
-//Filtering HIER2 based on HIER1
-    if (valH1.length >0) {
-      // const filterClass = itemData.filter((item) => {
-      //   return (valH1).some((val) => {
-      //     return item.HIER1 === val.HIER1;
-      //   });
-      // });
-      // let UniqClass =
-      //     filterClass.length > 0
-      //       ? [
-      //           ...new Map(
-      //             filterClass.map((item) => [item["HIER2"], item])
-      //           ).values(),
-      //         ]
-      //       : [];
-      //       setFilterClass(UniqClass);
-      //       valH1.map((item) => {
-      //         selectedDept.push(item.HIER1);
-      //       });
-            setSearchData((prev) => {
-              return {
-                ...prev,
-                HIER1: selectedDept,
-              };
-            });
-    }else {
-      //setFilterClass([])
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER1: []
-        };
-      });
-    }
-}
-
-const handleLocation=(e,value) =>
-  {
-    let selectedLocation = [];
-    if (value.option) {
-      valLoc.push(value.option)
-
-    }else if (value.removedValue) {
-            let index = valLoc.indexOf(value.removedValue.LOCATION);
-            valLoc.splice(index,1);
-    }else if(value.action="clear"){
-      valLoc.splice(0,valLoc.length);
-    }
-
-   if (valLoc.length >0) {
-      valLoc.map((item) => {
-        selectedLocation.push(item.LOCATION);
-      });
-      setSearchData((prev) => {
-          return {
-            ...prev,
-            LOCATION: selectedLocation,
-          };
+  const handleSort = (event) => {
+    setSort(event.target.value);
+    let sortval = event.target.value;
+    let sortData = [];
+    if (allData.length > 0) {
+      if (sortval == 2) {
+        sortData = allData.filter((item) => {
+          return (
+            item.QTY_MATCHED == "Y" &&
+            item.COST_MATCHED == "Y" &&
+            item.RETAIL_MATCHED == "Y"
+          );
         });
-    }else {
-        setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION: selectedLocation,
-        };
+        console.log("matched", sortData);
+        setTabledata(sortData);
+        setSort(sortval);
+      } else if (sortval == 3) {
+        sortData = allData.filter((item) => {
+          return (
+            item.QTY_MATCHED == "N" ||
+            item.COST_MATCHED == "N" ||
+            item.RETAIL_MATCHED == "N"
+          );
         });
-    }
-}
-
-const handleTranType=(e,value) =>
-{
-  let selectedTrantype = [];
-  let selectedAref = [];
-  if (value.option) {
-    valTRN.push(value.option)
-  }else if (value.removedValue) {
-
-    for(let i= 0; i< valTRN.length;i++)
-    {
-      if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
-        if(valTRN[i]["AREF"]===value.removedValue.AREF){
-          valTRN.splice(i,1);
-      }
+        setTabledata(sortData);
+        setSort(sortval);
+      } else {
+        console.log("Test");
+        setTabledata(allData);
+        setSort(1);
       }
     }
-  }else if(value.action="clear"){
-    valTRN.splice(0,valTRN.length);
-  }
-  if (valTRN.length >0) {
-  valTRN.map((item) => {
-      selectedTrantype.push(item.TRN_TYPE);
-      selectedAref.push(item.AREF)
-    });
-    setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: selectedTrantype,
-          AREF:selectedAref
-
-        };
-      });
-  }else {
-      setSearchData((prev) => {
-      return {
-        ...prev,
-        TRN_TYPE : [],
-        AREF: []
-      };
-      });
-  }
-}
-const handleSortV=(sortV) =>
-{
-console.log(sortV)
-var Sdata=0
-if (sortV.value==="All"){
-  Sdata=1;
-}else if(sortV.value==="All Matched"){
-  Sdata=2;
-}
-else{
-  Sdata=3;
-}
-
-  let sortval =Sdata
-  let sortData = [];
-  if (allData.length > 0) {
-    if (sortval == 2) {
-      sortData = allData.filter((item) => {
-        return (
-          item.QTY_MATCHED == "Y" &&
-          item.COST_MATCHED == "Y" &&
-          item.RETAIL_MATCHED == "Y"
-        );
-      });
-      console.log("matched", sortData);
-      setTabledata(sortData);
-      setSort(sortval);
-    } else if (sortval == 3) {
-      sortData = allData.filter((item) => {
-        return (
-          item.QTY_MATCHED == "N" ||
-          item.COST_MATCHED == "N" ||
-          item.RETAIL_MATCHED == "N"
-        );
-      });
-      setTabledata(sortData);
-      setSort(sortval);
-    } else {
-      console.log("Test");
-      setTabledata(allData);
-      setSort(1);
-    }
-  }
-};
-const handleSort = (event) => {
-  console.log("event.target.value",event.target.value)
-  setSort(event.target.value);
-  let sortval = event.target.value;
-  let sortData = [];
-  if (allData.length > 0) {
-    if (sortval == 2) {
-      sortData = allData.filter((item) => {
-        return (
-          item.QTY_MATCHED == "Y" &&
-          item.COST_MATCHED == "Y" &&
-          item.RETAIL_MATCHED == "Y"
-        );
-      });
-      console.log("matched", sortData);
-      setTabledata(sortData);
-      setSort(sortval);
-    } else if (sortval == 3) {
-      sortData = allData.filter((item) => {
-        return (
-          item.QTY_MATCHED == "N" ||
-          item.COST_MATCHED == "N" ||
-          item.RETAIL_MATCHED == "N"
-        );
-      });
-      setTabledata(sortData);
-      setSort(sortval);
-    } else {
-      console.log("Test");
-      setTabledata(allData);
-      setSort(1);
-    }
-  }
-};
-
-
+  };
 
   const searchPanel = () => (
     <Box
@@ -692,7 +682,7 @@ const handleSort = (event) => {
         sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
       >
         <Stack spacing={2} sx={{ width: 250 }}>
-         <Select
+        <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -704,126 +694,45 @@ const handleSort = (event) => {
                 onChange={handleHier1}
                 placeholder={"Choose HIER1"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
+                components={animatedComponents}  
+                isMulti 
                 isClearable={true}
-               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))}
-                /> 
-
-           {/* <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-item"
-            sx={{ width: 250 }}
-            options={UniqDept.length > 0 ? UniqDept : []}
-            //value={searchData?.HIER1}
-            isOptionEqualToValue={(option, value) =>
-              option.HIER1 === value.HIER1
-            }
-            autoHighlight
-            onChange={selectDept}
-            getOptionLabel={(option) =>
-              `${option.HIER1.toString()}-${option.HIER1_DESC.toString()}`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.HIER1}-{option.HIER1_DESC}
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                value={searchData?.ITEM}
-                variant="standard"
-                label="Choose a HIER1"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-
-          <Autocomplete
-            multiple
-            size="small"
-            id="combo-box-location"
-            sx={{ width: 250 }}
-            options={locationData.length > 0 ? locationData : []}
-            // value={searchData.LOCATION}
-            autoHighlight
-            isOptionEqualToValue={(option, value) =>
-              option.LOCATION === value.LOCATION
-            }
-            onChange={selectLocation}
-            getOptionLabel={(option) =>
-              `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.LOCATION} ({option.LOCATION_NAME})
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Choose a Location"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />  */}
-          <Select
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))} 
+                />
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
+                  `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
                 getOptionValue={option => option.LOCATION}
-                options={locationData}
+                options={locationData.length > 0 ? locationData : []}
                 isSearchable={true}
-                onChange={handleLocation}
+                onChange={selectLocation}
                 placeholder={"Choose a Location"}
                 styles={styleSelect}
-                components={animatedComponents}
-                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION))}
-                isMulti
+                components={animatedComponents} 
+                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION))}  
+                isMulti 
                 />
 
-          <Select
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                  option.TRN_NAME}
+                `${option.TRN_NAME.toString()}`}
                 getOptionValue={option => option.TRN_NAME}
-                options={trnType}
+                options={trnTypeValue}
                 isSearchable={true}
-                onChange={handleTranType}
-                placeholder={'TRN TYPE'}
+                onChange={selectTrantype}
+                placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
-                components={animatedComponents}
-                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}
-                isMulti
+                components={animatedComponents} 
+                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}
+                isMulti 
                 />
 
-            {/* <Autocomplete
-            multiple
-            disablePortal
-            size="small"
-            id="combo-box-trn-type"
-            // value={(searchData?.TRN_TYPE.length > 0)?searchData?.TRN_TYPE:[]}
-            onChange={selectTrantype}
-            options={trnType}
-            getOptionLabel={(option) => option.TRN_NAME}
-            sx={{ width: 250 }}
-            renderInput={(params) => (
-              <TextField {...params} label="TRN TYPE" variant="standard" />
-            )}
-          />   */}
 
           <TextField
             className={ErrorProceesClasses.dateField}
@@ -833,7 +742,7 @@ const handleSort = (event) => {
             name="TRN_POST_DATE"
             label="TRN POST DATE"
             type="date"
-            inputProps={{ max: "2022-07-31" }}
+            inputProps={{ max: currentDate() }}
             value={searchData.TRN_POST_DATE}
             onChange={onChange}
             sx={{ width: 250 }}
@@ -908,8 +817,8 @@ const handleSort = (event) => {
                         style={{ width: "100px" }}
                       >
                         Sort
-                      </InputLabel> 
-                       <Select
+                      </InputLabel>
+                      <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={sort}
@@ -934,12 +843,15 @@ const handleSort = (event) => {
                         isSearchable={true}
                         onChange={handleSortV}
                         placeholder={'Sort'}
+                        styles={{
+                          // Fixes the overlapping problem of the component
+                          menu: provided => ({ ...provided, zIndex: 9999 })
+                        }}
                         // styles={styleSelect}
                         // components={animatedComponents}
                         //value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE))}
                         //isMulti
                       /></div>
-
                     </FormControl>
                   </div>
                 </>
@@ -976,6 +888,8 @@ const handleSort = (event) => {
           <Table
             tableData={tabledata}
             //handleDelete={handleDelete}
+            handleSearchClick={handleSearchColumn}
+            freeze={freeze}
             handleSearch={handleChange}
             searchText={inputValue}
             handleEdit={true}

@@ -18,13 +18,29 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { headCells } from "./tableHead";
 import SearchIcon from "@mui/icons-material/Search";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { trnType } from "../../Components/ErrorProcessing/transType.js";
+//import { trnType } from "../../Components/ErrorProcessing/transType.js";
 import swal from '@sweetalert/with-react';
+import TrnTypeList from "../../Components/TRNTYPE";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
+
+
 const useStyles = makeStyles({
   maindiv: {
     position: "relative",
@@ -83,17 +99,6 @@ const useStyles = makeStyles({
     padding: "20px 20px 20px 20px",
   },
 });
-const animatedComponents = makeAnimated();
-const styleSelect = {
-  control: base => ({
-    ...base,
-    border: 0,
-    //border: "5px solid black",
-    // This line disable the blue border
-    boxShadow: 'none',
-    borderBottom: "1px solid black"
-  })
-};
 
 const initialsearch = {
   HIER1: [],
@@ -113,12 +118,11 @@ const initialItemData = {
   ITEM: "",
 };
 
+const initialTRName={
+  TRN_NAME:[]
+}
+
 const InquryScreen = () => {
-  const [valH1,setValH1]=useState([]);
-  const [valH2,setValH2]=useState([]);
-  const [valH3,setValH3]=useState([]);
-  const [valItem,setValItem]=useState([]);
-  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -135,6 +139,12 @@ const InquryScreen = () => {
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [open, setOpen] = useState(false);
+  const [valH1,setValH1]=useState([]);
+  const [valH2,setValH2]=useState([]);
+  const [valH3,setValH3]=useState([]);
+  const [valItem,setValItem]=useState([]);
+  const [valTrnType,setValTrnType]=useState([]);
+  const [freeze, setFreeze] = useState(false);
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -144,9 +154,9 @@ const InquryScreen = () => {
   const ErrorProceesClasses = useStyles();
   const InquiryData = useSelector((state) => state.InquiryReducers);
   //console.log(ErrorProcessingData);
-
-  console.log("Inq", InquiryData);
   const dispatch = useDispatch();
+
+  var trnTypeValue = TrnTypeList();
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -176,6 +186,7 @@ const InquryScreen = () => {
           LOCATION: null,
           LOCATION_NAME: "",
           TRN_NAME: "",
+          TRN_DATE: "",
           QTY: "",
           UNIT_COST: "",
           UNIT_RETAIL: "",
@@ -186,19 +197,20 @@ const InquryScreen = () => {
           REF_NO3: "",
           REF_NO4: "",
           CURRENCY: "",
+          CREATE_ID: "",
           ERR_SEQ_NO: null,
           TRAN_SEQ_NO: null,
         };
         delete item?.PROCESS_IND;
         delete item?.SELLING_UOM;
         delete item?.TRN_POST_DATE;
-        delete item?.TRN_DATE;
+        //delete item?.TRN_DATE;
         delete item?.REF_ITEM;
         delete item?.REF_ITEM_TYPE;
         delete item?.PACK_QTY;
         delete item?.PACK_COST;
         delete item?.PACK_RETAIL;
-        delete item?.CREATE_ID;
+        //delete item?.CREATE_ID;
         delete item?.CREATE_DATETIME;
         delete item?.REV_NO;
         delete item?.REV_TRN_NO;
@@ -212,7 +224,7 @@ const InquryScreen = () => {
   };
 
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && freeze === false) {
       const filteredTable = tabledata.filter((props) =>
         Object.entries(inputValue).every(
           ([key, val]) =>
@@ -279,6 +291,7 @@ const InquryScreen = () => {
     if (InquiryData?.data?.Data && Array.isArray(InquiryData?.data?.Data)) {
       setTabledata(serializedata(InquiryData?.data?.Data));
       setAllData(serializedata(InquiryData?.data?.Data));
+      
       setLoading(false);
       setSearch(false);
     } if (InquiryData?.data?.itemData && Array.isArray(InquiryData?.data?.itemData)) {
@@ -326,404 +339,262 @@ const InquryScreen = () => {
     setIsSuccess(false);
   };
 
+  const currentDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    return yyyy + '-' + mm + '-' + dd;
+  }
+
   const onReset = (event) => {
     initialsearch.USER = "";
     initialsearch.DATE = "";
 
     setSearchData(initialsearch);
     setSearch(false);
+    setValH1([]);
+    setValH2([]);
+    setValH3([]);
+    setValTrnType([]);
+    initialTRName.TRN_NAME=[];
     setTabledata("");
     setInputValue("");
     setAllData("");
     dispatch(resetInquiry());
   };
 
-  const selectDept = (event, value) => {
-    let selectedDept = [];
-    if (value.length > 0) {
-      console.log(itemData);
-      const filterClass = itemData.filter((item) => {
-        return value.some((val) => {
-          return item.HIER1 === val.HIER1;
-        });
-      });
-      console.log(filterClass);
-      let UniqClass =
-        filterClass.length > 0
-          ? [
-              ...new Map(
-                filterClass.map((item) => [item["HIER2"], item])
-              ).values(),
-            ]
-          : [];
-      //const classFilter = (filterClass.length > 0 )?[...new Set(filterClass.map(item => item.HIER2))]:[];
-      setFilterClass(UniqClass);
+  const handleSearchColumn = (e) => {
+    //console.log("Handle Search Column",e);
+  
+    console.log(inputValue);
+    setFreeze(true);
+  
+  }
 
-      value.map((item) => {
-        selectedDept.push(item.HIER1);
+  const handleHier1=(e,value) =>
+  {
+    let selectedDept = [];
+    if (value.option) {     
+        valH1.push(value.option)
+    }else if (value.removedValue) {
+        let index = valH1.indexOf(value.removedValue.HIER1);
+        valH1.splice(index,1);
+    //}
+    }else if(value.action==="clear"){ 
+        valH1.splice(0,valH1.length);
+    }
+  //console.log("V1",valH1);
+//Filtering HIER2 based on HIER1
+    if (valH1.length >0) {
+      const filterClass = itemData.filter((item) => {      
+        return (valH1).some((val) => {
+          return item.HIER1 === val.HIER1;
+        });     
       });
+      let UniqClass =
+          filterClass.length > 0
+            ? [
+                ...new Map(
+                  filterClass.map((item) => [item["HIER2"], item])
+                ).values(),
+              ]
+            : []; 
+            setFilterClass(UniqClass);
+            valH1.map((item) => {
+              selectedDept.push(item.HIER1);
+            });
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                HIER1: selectedDept,
+              };
+            });          
+    }else {
+      setFilterClass([])
       setSearchData((prev) => {
         return {
           ...prev,
-          HIER1: selectedDept,
-        };
-      });
-    } else {
-      setFilterClass([]);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER1: [],
+          HIER1: []
         };
       });
     }
-  };
+}
 
-
-  const selectClass = (event, value) => {
-    console.log(value);
-    let selectedClass = [];
-    if (value.length > 0) {
-      //const subclassFilter = (filterSubClass.length > 0 )?[...new Set(filterSubClass.map(item => item.HIER3))]:[];
-      const filterSubClass = itemData.filter((item) => {
-        return value.some((val) => {
-          return item.HIER2 === val.HIER2;
-        });
-      });
-      let UniqSubClass =
-        filterSubClass.length > 0
+const handleHier2=(e,value) =>
+  {
+    let selectedHier2 = [];
+    if (value.option) {
+      valH2.push(value.option)
+    }else if (value.removedValue) {
+        let index = valH2.indexOf(value.removedValue.HIER2);
+        valH2.splice(index,1);
+   
+    }else if(value.action==="clear"){      
+      valH2.splice(0,valH2.length);
+    }
+//Filtering HIER2 based on HIER1
+  if (valH2.length >0) {
+    const filterSubClass = itemData.filter((item) => {      
+      return (valH2).some((val) => {
+        return item.HIER2 === val.HIER2;
+      });     
+    });
+    let UniqClass =
+    filterSubClass.length > 0
           ? [
               ...new Map(
                 filterSubClass.map((item) => [item["HIER3"], item])
               ).values(),
             ]
-          : [];
-
-      console.log(UniqSubClass);
-      setsubFilterClass(UniqSubClass);
-      value.map((item) => {
-        selectedClass.push(item.HIER2);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER2: selectedClass,
-        };
-      });
-    } else {
+          : []; 
+          setsubFilterClass(UniqClass);
+          valH2.map((item) => {
+            selectedHier2.push(item.HIER2);
+          });
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              HIER2: selectedHier2,
+            };
+          });          
+    }else {
       setsubFilterClass([]);
       setSearchData((prev) => {
         return {
           ...prev,
-          HIER2: [],
+          HIER2: []
         };
       });
+  }
+}
+
+
+const handleHier3=(e,value) =>
+  {
+    let selectedHier3 = [];
+    if (value.option) {
+      valH3.push(value.option)
+    }else if (value.removedValue) {
+        let index = valH3.indexOf(value.removedValue.HIER3);
+        valH3.splice(index,1);
+    
+    }else if(value.action==="clear"){      
+      valH3.splice(0,valH3.length);
     }
-  };
-  const selectSubClass = (event, value) => {
-    let selectedSubclass = [];
-    if (value.length > 0) {
-      //const itemFilter = (filterItem.length > 0 )?[...new Set(filterItem.map(item => item.ITEM))]:[];
-      // console.log(itemFilter);
-      const filterItem = itemData.filter((item) => {
-        return value.some((val) => {
+//Filtering HIER3 based on HIER2
+    if (valH3.length >0) {
+      const filterItem = itemData.filter((item) => {      
+        return (valH3).some((val) => {
           return item.HIER3 === val.HIER3;
-        });
-      });
+        });     
+      }); 
       setFilterItem(filterItem);
-      value.map((item) => {
-        selectedSubclass.push(item.HIER3);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER3: selectedSubclass,
-        };
-      });
-    } else {
-      setFilterItem([]);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          HIER3: [],
-        };
-      });
-    }
-  };
-
-  const selectItem = (event, value) => {
+            valH3.map((item) => {
+              selectedHier3.push(item.HIER3);
+            });
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                HIER3: selectedHier3,
+              };
+            });            
+      }else {
+        setFilterItem([]);
+        setSearchData((prev) => {
+          return {
+            ...prev,
+            HIER3: []
+          };
+        });
+      }
+}
+const handleItem=(e,value) =>
+  {
     let selectedItem = [];
-    if (value.length > 0) {
-      value.map((item) => {
-        selectedItem.push(item.ITEM);
-      });
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          ITEM: selectedItem,
-        };
-      });
-    } else {
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          ITEM: selectedItem,
-        };
-      });
-    }
-  };
+    if (value.option) {
+      valItem.push(value.option)
+  }else if (value.removedValue) {
+      let index = valItem.indexOf(value.removedValue.ITEM);
+      valItem.splice(index,1);
+   
+  }else if(value.action==="clear"){      
+    valItem.splice(0,valItem.length);
+   }
+//Filtering ITEM based on HIER3
+if (valItem.length >0) {
+  
+        valItem.map((item) => {
+          selectedItem.push(item.ITEM);
+        });
+        setSearchData((prev) => {
+          return {
+            ...prev,
+            ITEM: selectedItem,
+          };
+        });        
+}else {
+  setSearchData((prev) => {
+    return {
+      ...prev,
+      ITEM: selectedItem,
+    };
+  });
+}
+}
 
-  const selectTrantype = (event, value) => {
-    console.log(value);
-    let selectedTrantype = [];
-    let selectedAref = [];
-    if (value.length > 0) {
-      value.map((item) => {
-        selectedTrantype.push(item.TRN_TYPE);
-        selectedAref.push(item.AREF);
-      });
-      setSearchData((prev) => {
+const selectTrantype=(e,value) =>{
+  let selectedTrantype = [];
+  let selectedAref = [];
+  let selectedTranName=[]
+  if (value.option) {
+    valTrnType.push(value.option)
+  }else if (value.removedValue) {
+    let index=0;      
+    for(var i=0;i<valTrnType.length;i++) {
+      if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
+        index=i;        
+        break;
+      }
+    }
+    valTrnType.splice(index,1);
+  }else if(value.action="clear"){
+    valTrnType.splice(0,valTrnType.length);
+  }
+  if (valTrnType.length >0) {
+    valTrnType.map((item) => {
+      selectedTrantype.push(item.TRN_TYPE);
+      selectedAref.push(item.AREF)
+      selectedTranName.push(item.TRN_NAME)
+    });
+    initialTRName.TRN_NAME=(selectedTranName);
+    setSearchData((prev) => {
         return {
           ...prev,
           TRN_TYPE: selectedTrantype,
-          AREF: selectedAref,
+          AREF:selectedAref
         };
       });
-    } else {
+  }else {
+      initialTRName.TRN_NAME=[];
       setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: [],
-          AREF: [],
-        };
+      return {
+        ...prev,
+        TRN_TYPE : [],
+        AREF: []
+      };
       });
-    }
-  };
+  }
+}
 
   let UniqDept =
     itemData.length > 0
       ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]
       : [];
-
-
-
-      const handleHier1=(e,value) =>
-      {
-          console.log("h1",value);
-          console.log("srch1",searchData);
-        let selectedDept = [];
-        if (value.option) {
-            valH1.push(value.option)
-        }else if (value.removedValue) {
-            let index = valH1.indexOf(value.removedValue.HIER1);
-            valH1.splice(index,1);
-        //}
-        }else if(value.action==="clear"){
-            valH1.splice(0,valH1.length);
-        }
-      console.log("V1",valH1);
-    //Filtering HIER2 based on HIER1
-        if (valH1.length >0) {
-          const filterClass = itemData.filter((item) => {
-            return (valH1).some((val) => {
-              return item.HIER1 === val.HIER1;
-            });
-          });
-          let UniqClass =
-              filterClass.length > 0
-                ? [
-                    ...new Map(
-                      filterClass.map((item) => [item["HIER2"], item])
-                    ).values(),
-                  ]
-                : [];
-                setFilterClass(UniqClass);
-                valH1.map((item) => {
-                  selectedDept.push(item.HIER1);
-                });
-                setSearchData((prev) => {
-                  return {
-                    ...prev,
-                    HIER1: selectedDept,
-                  };
-                });
-        }else {
-          setFilterClass([])
-          setSearchData((prev) => {
-            return {
-              ...prev,
-              HIER1: []
-            };
-          });
-        }
-    }
-    
-    const handleHier2=(e,value) =>
-      {
-        let selectedHier2 = [];
-        if (value.option) {
-          valH2.push(value.option)
-        }else if (value.removedValue) {
-            let index = valH2.indexOf(value.removedValue.HIER2);
-            valH2.splice(index,1);
-    
-        }else if(value.action==="clear"){
-          valH2.splice(0,valH2.length);
-        }
-    //Filtering HIER2 based on HIER1
-      if (valH2.length >0) {
-        const filterSubClass = itemData.filter((item) => {
-          return (valH2).some((val) => {
-            return item.HIER2 === val.HIER2;
-          });
-        });
-        let UniqClass =
-        filterSubClass.length > 0
-              ? [
-                  ...new Map(
-                    filterSubClass.map((item) => [item["HIER3"], item])
-                  ).values(),
-                ]
-              : [];
-              setsubFilterClass(UniqClass);
-              valH2.map((item) => {
-                selectedHier2.push(item.HIER2);
-              });
-              setSearchData((prev) => {
-                return {
-                  ...prev,
-                  HIER2: selectedHier2,
-                };
-              });
-        }else {
-          setsubFilterClass([]);
-          setSearchData((prev) => {
-            return {
-              ...prev,
-              HIER2: []
-            };
-          });
-      }
-    }
-    
-    
-    const handleHier3=(e,value) =>
-      {
-        let selectedHier3 = [];
-        if (value.option) {
-          valH3.push(value.option)
-        }else if (value.removedValue) {
-            let index = valH3.indexOf(value.removedValue.HIER3);
-            valH3.splice(index,1);
-    
-        }else if(value.action==="clear"){
-          valH3.splice(0,valH3.length);
-        }
-    //Filtering HIER3 based on HIER2
-        if (valH3.length >0) {
-          const filterItem = itemData.filter((item) => {
-            return (valH3).some((val) => {
-              return item.HIER3 === val.HIER3;
-            });
-          });
-          setFilterItem(filterItem);
-                valH3.map((item) => {
-                  selectedHier3.push(item.HIER3);
-                });
-                setSearchData((prev) => {
-                  return {
-                    ...prev,
-                    HIER3: selectedHier3,
-                  };
-                });
-          }else {
-            setFilterItem([]);
-            setSearchData((prev) => {
-              return {
-                ...prev,
-                HIER3: []
-              };
-            });
-          }
-    }
-    const handleItem=(e,value) =>
-      {
-        let selectedItem = [];
-        if (value.option) {
-          valItem.push(value.option)
-      }else if (value.removedValue) {
-          let index = valItem.indexOf(value.removedValue.ITEM);
-          valItem.splice(index,1);
-    
-      }else if(value.action==="clear"){
-        valItem.splice(0,valItem.length);
-       }
-    //Filtering ITEM based on HIER3
-    if (valItem.length >0) {
-    
-            valItem.map((item) => {
-              selectedItem.push(item.ITEM);
-            });
-            setSearchData((prev) => {
-              return {
-                ...prev,
-                ITEM: selectedItem,
-              };
-            });
-    }else {
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          ITEM: selectedItem,
-        };
-      });
-    }
-    }
-    
-   
-    
-    const handleTranType=(e,value) =>
-    {
-      let selectedTrantype = [];
-      let selectedAref = [];
-      if (value.option) {
-        valTRN.push(value.option)
-      }else if (value.removedValue) {
-    
-        for(let i= 0; i< valTRN.length;i++)
-        {
-          if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
-            if(valTRN[i]["AREF"]===value.removedValue.AREF){
-              valTRN.splice(i,1);
-          }
-          }
-        }
-      }else if(value.action="clear"){
-        valTRN.splice(0,valTRN.length);
-      }
-      if (valTRN.length >0) {
-      valTRN.map((item) => {
-          selectedTrantype.push(item.TRN_TYPE);
-          selectedAref.push(item.AREF)
-        });
-        setSearchData((prev) => {
-            return {
-              ...prev,
-              TRN_TYPE: selectedTrantype,
-              AREF:selectedAref
-    
-            };
-          });
-      }else {
-          setSearchData((prev) => {
-          return {
-            ...prev,
-            TRN_TYPE : [],
-            AREF: []
-          };
-          });
-      }
-    }
   console.log(searchData);
   const searchPanel = () => (
     <Box
@@ -739,7 +610,7 @@ const InquryScreen = () => {
         sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
       >
         <Stack spacing={2} sx={{ width: 250 }}>
-        <Select
+        <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -751,14 +622,14 @@ const InquryScreen = () => {
                 onChange={handleHier1}
                 placeholder={"Choose HIER1"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
+                components={animatedComponents}  
+                isMulti 
                 isClearable={true}
-               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))}
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))} 
                 />
 
-        <Select
-
+        <Select 
+          
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -770,13 +641,13 @@ const InquryScreen = () => {
                 onChange={handleHier2}
                 placeholder={"Choose a HIER2"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
-                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))}
-
+                components={animatedComponents}  
+                isMulti 
+                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))} 
+                
                 />
 
-        <Select
+        <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -788,12 +659,12 @@ const InquryScreen = () => {
                 onChange={handleHier3}
                 placeholder={"Choose a HIER3"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
-                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))}
+                components={animatedComponents}  
+                isMulti 
+                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))} 
                 />
-
-          <Select
+              
+          <Select 
                //disabled={filterItem.length > 0 ?false:true}
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
@@ -806,30 +677,28 @@ const InquryScreen = () => {
                 onChange={handleItem}
                 placeholder={"Choose a ITEM"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
-                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))}
+                components={animatedComponents}  
+                isMulti 
+                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))} 
                 isDisabled={filterItem.length > 0 ?false:true}
                 />
 
-
-          <Select
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                  option.TRN_NAME}
+                `${option.TRN_NAME.toString()}`}
                 getOptionValue={option => option.TRN_NAME}
-                options={trnType}
+                options={trnTypeValue}
                 isSearchable={true}
-                onChange={handleTranType}
-                placeholder={'TRN TYPE'}
+                onChange={selectTrantype}
+                placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
-                components={animatedComponents}
-                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}        
-                isMulti
+                components={animatedComponents} 
+                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}  
+                isMulti 
                 />
-
 
           <TextField
             className={ErrorProceesClasses.textField}
@@ -837,7 +706,7 @@ const InquryScreen = () => {
             size="small"
             variant="standard"
             name="USER"
-            label="User"
+            label="USER"
             type="text"
             onChange={onChange}
             value={searchData.USER}
@@ -851,7 +720,7 @@ const InquryScreen = () => {
             name="DATE"
             label="DATE"
             type="date"
-            inputProps={{ max: "2022-08-01" }}
+            inputProps={{ max: currentDate()  }}
             value={searchData.DATE}
             onChange={onChange}
             sx={{ width: 250 }}
@@ -933,6 +802,8 @@ const InquryScreen = () => {
           <Table
             tableData={tabledata}
             //handleDelete={handleDelete}
+            handleSearchClick={handleSearchColumn}
+            freeze={freeze}
             handleSearch={handleChange}
             searchText={inputValue}
             handleEdit={true}

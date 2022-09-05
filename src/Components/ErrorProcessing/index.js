@@ -26,7 +26,7 @@ import { headCells } from "./tableHead";
 import SearchIcon from "@mui/icons-material/Search";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import SendIcon from "@mui/icons-material/Send";
-import { trnType } from "./transType.js";
+//import { trnType } from "./transType.js";
 import { errorList } from "./errorType.js";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -36,25 +36,40 @@ import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import swal from '@sweetalert/with-react';
+import TrnTypeList from "../TRNTYPE";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+//import "./index.css";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
+
 const useStyles = makeStyles({
   maindiv: {
     position: "relative",
     width: "calc(95vw - 0px)",
     "& table": {
       "& tr": {
-        "& td:nth-child(28)": {
-          display: "none",
-        },
         "& td:nth-child(29)": {
           display: "none",
         },
         "& td:nth-child(30)": {
+          display: "none",
+        },
+        "& td:nth-child(31)": {
           display: "none",
         },
       },
@@ -96,20 +111,6 @@ const useStyles = makeStyles({
   },
 });
 
-const animatedComponents = makeAnimated();
-const styleSelect = {
-  control: base => ({
-    ...base,
-    border: 0,
-    //border: "5px solid black",
-    // This line disable the blue border
-    boxShadow: 'none',
-    borderBottom: "1px solid black"
-  })
-};
-
-
-
 const initialsearch = {
   HIER1: [],
   HIER2: [],
@@ -130,14 +131,11 @@ const initialItemData = {
   ITEM: "",
 };
 
+const initialTRName={
+  TRN_NAME:[]
+}
+
 const ErrorProcessing = () => {
-  const [valLoc, setValLoc] = useState([]);
-  const [valH1,setValH1]=useState([]);
-  const [valH2,setValH2]=useState([]);
-  const [valH3,setValH3]=useState([]);
-  const [valItem,setValItem]=useState([]);
-  const [valTRN, setValTRN] = useState([]);
-  const [valErr, setValErr] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -157,6 +155,13 @@ const ErrorProcessing = () => {
   const [freeze, setFreeze] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
   const [open, setOpen] = useState(false);
+  const [valH1,setValH1]=useState([]);
+  const [valH2,setValH2]=useState([]);
+  const [valH3,setValH3]=useState([]);
+  const [valItem,setValItem]=useState([]);
+  const [valLoc,setValLoc]=useState([]);
+  const [valTrnType,setValTrnType]=useState([]);
+  const [valErr, setValErr] = useState([]);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [state, setState] = React.useState({
@@ -169,8 +174,10 @@ const ErrorProcessing = () => {
   const ErrorProcessingData = useSelector(
     (state) => state.ErrorProcessingReducers
   );
-  console.log(ErrorProcessingData?.data?.Data);
+  //console.log(ErrorProcessingData?.data?.Data);
   const dispatch = useDispatch();
+
+  var trnTypeValue = TrnTypeList();
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -211,6 +218,7 @@ const ErrorProcessing = () => {
           REF_NO3: "",
           REF_NO4: "",
           CURRENCY: "",
+          CREATE_ID: "",
           ERR_SEQ_NO: null,
           TRAN_SEQ_NO: null,
           TRN_TYPE: "",
@@ -225,7 +233,7 @@ const ErrorProcessing = () => {
         delete item?.PACK_QTY;
         delete item?.PACK_COST;
         delete item?.PACK_RETAIL;
-        delete item?.CREATE_ID;
+        //delete item?.CREATE_ID;
         delete item?.CREATE_DATETIME;
         delete item?.REV_NO;
         delete item?.REV_TRN_NO;
@@ -267,14 +275,14 @@ const ErrorProcessing = () => {
     if (ErrorProcessingData.isError) {
         setIsError(true)
         swal(
-          <div>
+          <div>     
             <p>{ErrorProcessingData["messgae"]}</p>
           </div>
-        )
+        )  
     }else if(ErrorProcessingData.isSuccess && ErrorProcessingData.isupdate ){
       setIsSuccess(true);
       swal(
-        <div>
+        <div>     
            <p>{ErrorProcessingData["messgae"]}</p>
         </div>
       )
@@ -298,7 +306,7 @@ const ErrorProcessing = () => {
       dispatch(getErrorProcessingRequest([searchData]));
     }
   }, [isSearch]);
-console.log("searchData",searchData)
+
   useEffect(() => {
     setLoading(true);
     dispatch(getClassDataRequest([{}]));
@@ -345,13 +353,13 @@ console.log("searchData",searchData)
       }));
     }
   };
-console.log("test",tabledata)
+//console.log("test",tabledata)
   const confirmSubmit = () => {
     setOpen(true);
   };
 
   const SubmitList = () => {
-    console.log(updateRow);
+    //console.log(updateRow);
     if (Object.keys(updateRow).length > 0) {
       let sendRow = Object.values(updateRow);
       sendRow.map((item) => {
@@ -364,7 +372,7 @@ console.log("test",tabledata)
         delete item?.undefined;
         item['CREATE_ID'] = JSON.parse(localStorage.getItem("userData"))?.username;
       });
-      console.log("admin",sendRow);
+      //console.log("admin",sendRow);
       setLoading(true);
       dispatch(postErrorProcessingRequest(sendRow));
       initialsearch.HIER1 = [];
@@ -402,15 +410,15 @@ console.log("test",tabledata)
   };
 
   const handleSearchColumn = (e) => {
-       console.log("Handle Search Column",e)
-       console.log(inputValue);
+       //console.log("Handle Search Column",e)
+       //console.log(inputValue);
        setFreeze(true);
 
   }
 
   const handleCopyDown = (e) => {
-       console.log("Handle Copy Down",e);
-       console.log("EditR",editRows);
+       //console.log("Handle Copy Down",e);
+       //console.log("EditR",editRows);
        setFreeze(false);
   }
 
@@ -418,6 +426,17 @@ console.log("test",tabledata)
     setOpen(false);
   };
 
+  const currentDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    return yyyy + '-' + mm + '-' + dd;
+  }
   // const handleMsgClose = () => {
   //   setIsError(false);
   //   setIsSuccess(false);
@@ -434,60 +453,50 @@ console.log("test",tabledata)
     initialsearch.AREF = [];
     initialsearch.ERR_MSG = [];
     initialsearch.CREATE_ID = [];
-    console.log("datainitial", initialsearch);
+    //console.log("datainitial", initialsearch);
     setSearchData(initialsearch);
+    setValH1([]);
+    setValH2([]);
+    setValH3([]);
+    setValLoc([]);
+    setValTrnType([]);
+    setValErr([]);
+    initialTRName.TRN_NAME=[];
     setFilterClass([]);
     setsubFilterClass([]);
     setFilterItem([]);
 
-    console.log("data", searchData);
+    //console.log("data", searchData);
     setSearch(false);
     setTabledata("");
   };
 
-  // const selectError = (event, value) => {
-  //   let selectedError = [];
-  //   if (value.length > 0) {
-  //     value.map((item) => {
-  //       selectedError.push(item);
-  //     });
-  //     setSearchData((prev) => {
-  //       return {
-  //         ...prev,
-  //         ERR_MSG: selectedError,
-  //       };
-  //     });
-  //   } else {
-  //     setSearchData((prev) => {
-  //       return {
-  //         ...prev,
-  //         ERR_MSG: [],
-  //       };
-  //     });
-  //   }
-  // };
-
   const handleHier1=(e,value) =>
   {
-      console.log("h1",value);
-      console.log("srch1",searchData);
     let selectedDept = [];
-    if (value.option) {
+    if (value.option) {     
         valH1.push(value.option)
     }else if (value.removedValue) {
-        let index = valH1.indexOf(value.removedValue.HIER1);
-        valH1.splice(index,1);
+      let index=0        
+      for(var i=0;i<valH1.length;i++)
+      {
+        if(valH1[i]["HIER1"]===value.removedValue.HIER1){
+          index=i;
+          break;
+        }
+      }
+     valH1.splice(index,1);
     //}
-    }else if(value.action==="clear"){
+    }else if(value.action==="clear"){ 
         valH1.splice(0,valH1.length);
     }
-  console.log("V1",valH1);
+  //console.log("V1",valH1);
 //Filtering HIER2 based on HIER1
     if (valH1.length >0) {
-      const filterClass = itemData.filter((item) => {
+      const filterClass = itemData.filter((item) => {      
         return (valH1).some((val) => {
           return item.HIER1 === val.HIER1;
-        });
+        });     
       });
       let UniqClass =
           filterClass.length > 0
@@ -496,7 +505,7 @@ console.log("test",tabledata)
                   filterClass.map((item) => [item["HIER2"], item])
                 ).values(),
               ]
-            : [];
+            : []; 
             setFilterClass(UniqClass);
             valH1.map((item) => {
               selectedDept.push(item.HIER1);
@@ -506,7 +515,7 @@ console.log("test",tabledata)
                 ...prev,
                 HIER1: selectedDept,
               };
-            });
+            });          
     }else {
       setFilterClass([])
       setSearchData((prev) => {
@@ -524,18 +533,25 @@ const handleHier2=(e,value) =>
     if (value.option) {
       valH2.push(value.option)
     }else if (value.removedValue) {
-        let index = valH2.indexOf(value.removedValue.HIER2);
-        valH2.splice(index,1);
-
-    }else if(value.action==="clear"){
+      let index=0        
+      for(var i=0;i<valH2.length;i++)
+      {
+        if(valH2[i]["HIER2"]===value.removedValue.HIER2){
+          index=i;
+          break;
+        }
+      }
+     valH2.splice(index,1);
+   
+    }else if(value.action==="clear"){      
       valH2.splice(0,valH2.length);
     }
 //Filtering HIER2 based on HIER1
   if (valH2.length >0) {
-    const filterSubClass = itemData.filter((item) => {
+    const filterSubClass = itemData.filter((item) => {      
       return (valH2).some((val) => {
         return item.HIER2 === val.HIER2;
-      });
+      });     
     });
     let UniqClass =
     filterSubClass.length > 0
@@ -544,7 +560,7 @@ const handleHier2=(e,value) =>
                 filterSubClass.map((item) => [item["HIER3"], item])
               ).values(),
             ]
-          : [];
+          : []; 
           setsubFilterClass(UniqClass);
           valH2.map((item) => {
             selectedHier2.push(item.HIER2);
@@ -554,7 +570,7 @@ const handleHier2=(e,value) =>
               ...prev,
               HIER2: selectedHier2,
             };
-          });
+          });          
     }else {
       setsubFilterClass([]);
       setSearchData((prev) => {
@@ -573,19 +589,26 @@ const handleHier3=(e,value) =>
     if (value.option) {
       valH3.push(value.option)
     }else if (value.removedValue) {
-        let index = valH3.indexOf(value.removedValue.HIER3);
-        valH3.splice(index,1);
-
-    }else if(value.action==="clear"){
+      let index=0        
+      for(var i=0;i<valH3.length;i++)
+      {
+        if(valH3[i]["HIER3"]===value.removedValue.HIER3){
+          index=i;
+          break;
+        }
+      }
+      valH3.splice(index,1);
+    
+    }else if(value.action==="clear"){      
       valH3.splice(0,valH3.length);
     }
 //Filtering HIER3 based on HIER2
     if (valH3.length >0) {
-      const filterItem = itemData.filter((item) => {
+      const filterItem = itemData.filter((item) => {      
         return (valH3).some((val) => {
           return item.HIER3 === val.HIER3;
-        });
-      });
+        });     
+      }); 
       setFilterItem(filterItem);
             valH3.map((item) => {
               selectedHier3.push(item.HIER3);
@@ -595,7 +618,7 @@ const handleHier3=(e,value) =>
                 ...prev,
                 HIER3: selectedHier3,
               };
-            });
+            });            
       }else {
         setFilterItem([]);
         setSearchData((prev) => {
@@ -612,15 +635,22 @@ const handleItem=(e,value) =>
     if (value.option) {
       valItem.push(value.option)
   }else if (value.removedValue) {
-      let index = valItem.indexOf(value.removedValue.ITEM);
-      valItem.splice(index,1);
-
-  }else if(value.action==="clear"){
+    let index=0        
+    for(var i=0;i<valItem.length;i++)
+    {
+      if(valItem[i]["ITEM"]===value.removedValue.ITEM){
+        index=i;
+        break;
+      }
+    }
+    valItem.splice(index,1);
+   
+  }else if(value.action==="clear"){      
     valItem.splice(0,valItem.length);
    }
 //Filtering ITEM based on HIER3
 if (valItem.length >0) {
-
+  
         valItem.map((item) => {
           selectedItem.push(item.ITEM);
         });
@@ -629,7 +659,7 @@ if (valItem.length >0) {
             ...prev,
             ITEM: selectedItem,
           };
-        });
+        });        
 }else {
   setSearchData((prev) => {
     return {
@@ -640,119 +670,145 @@ if (valItem.length >0) {
 }
 }
 
-const handleLocation=(e,value) =>
-  {
+  const selectLocation = (event, value) => {
+
     let selectedLocation = [];
-    if (value.option) {
-      valLoc.push(value.option)
-
-    }else if (value.removedValue) {
-        
-            let index = valLoc.indexOf(value.removedValue.LOCATION);
-            valLoc.splice(index,1);
-    }else if(value.action="clear"){
-      valLoc.splice(0,valLoc.length);
-    }
-
-   if (valLoc.length >0) {
-      valLoc.map((item) => {
-        selectedLocation.push(item.LOCATION);
+    if (value.option) {     
+          valLoc.push(value.option)
+      }else if (value.removedValue) {
+        let index=0        
+        for(var i=0;i<valLoc.length;i++)
+        {
+          if(valLoc[i]["LOCATION"]===value.removedValue.LOCATION){
+            index=i;
+            break;
+          }
+        }
+        valLoc.splice(index,1);
+      }else if(value.action==="clear"){ 
+        valLoc.splice(0,valLoc.length);
+      }
+   
+    if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
+      valLoc.map(
+        (item) => {
+          selectedLocation.push(item.LOCATION);
+        }
+      )
+      //console.log(value);
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          LOCATION : selectedLocation,
+        };
       });
+    }else if(value.length > 0){
+          console.log(value);
+          swal(
+            <div>     
+              <p>{"Please Choose valid LOCATION"}</p>
+            </div>
+          )  
+    }else {
+      initialsearch.LOCATION = "";
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          LOCATION : [],
+        };
+      });
+    }
+   }
+
+   const selectError = (event, value) => {
+    let selectedError = [];
+    //console.log(value)
+    if (value.option) {
+      valErr.push(value.option.value)
+  
+    }else if (value.removedValue) {
+        if (valErr.includes(value.removedValue.value)){
+          let index=0;      
+    for(var i=0;i<valErr.length;i++)
+    {
+      if(valErr[i]===value.removedValue.value ){
+        index=i;        
+        break;
+      }
+    }
+    valErr.splice(index,1);
+            }
+    }else if(value.action="clear"){
+      valErr.splice(0,valErr.length);
+    }
+  
+    //console.log(valErr)
+  
+  
+    if (valErr.length > 0) {
+      valErr.map((item) => {
+        selectedError.push(item);
+      });
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          ERR_MSG: selectedError,
+        };
+      });
+    } else {
+      setSearchData((prev) => {
+        return {
+          ...prev,
+          ERR_MSG: [],
+        };
+      });
+    }
+  };
+
+  const selectTrantype=(e,value) =>{
+    let selectedTrantype = [];
+    let selectedAref = [];
+    let selectedTranName=[]
+    if (value.option) {
+      valTrnType.push(value.option)
+    }else if (value.removedValue) {
+      let index=0;      
+      for(var i=0;i<valTrnType.length;i++) {
+        if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
+          index=i;        
+          break;
+        }
+      }
+      valTrnType.splice(index,1);
+    }else if(value.action="clear"){
+      valTrnType.splice(0,valTrnType.length);
+    }
+    if (valTrnType.length >0) {
+      valTrnType.map((item) => {
+        selectedTrantype.push(item.TRN_TYPE);
+        selectedAref.push(item.AREF)
+        selectedTranName.push(item.TRN_NAME)
+      });
+      initialTRName.TRN_NAME=(selectedTranName);
       setSearchData((prev) => {
           return {
             ...prev,
-            LOCATION: selectedLocation,
+            TRN_TYPE: selectedTrantype,
+            AREF:selectedAref
           };
         });
     }else {
+        initialTRName.TRN_NAME=[];
         setSearchData((prev) => {
         return {
           ...prev,
-          LOCATION: selectedLocation,
+          TRN_TYPE : [],
+          AREF: []
         };
         });
     }
-}
-
-const handleTranType=(e,value) =>
-{ console.log("TRN_NAME",value)
-  let selectedTrantype = [];
-  let selectedAref = [];
-  if (value.option) {
-    valTRN.push(value.option)
-  }else if (value.removedValue) {
-
-    for(let i= 0; i< valTRN.length;i++)
-    {
-      if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
-        if(valTRN[i]["AREF"]===value.removedValue.AREF){
-          valTRN.splice(i,1);
-      }
-      }
-    }
-  }else if(value.action="clear"){
-    valTRN.splice(0,valTRN.length);
-  }
-  if (valTRN.length >0) {
-  valTRN.map((item) => {
-      selectedTrantype.push(item.TRN_TYPE);
-      selectedAref.push(item.AREF)
-    });
-    setSearchData((prev) => {
-        return {
-          ...prev,
-          TRN_TYPE: selectedTrantype,
-          AREF:selectedAref
-
-        };
-      });
-  }else {
-      setSearchData((prev) => {
-      return {
-        ...prev,
-        TRN_TYPE : [],
-        AREF: []
-      };
-      });
-  }
-}
-const selectError = (event, evalue) => {
-  let selectedError = [];
-  console.log(evalue)
-  if (evalue.option) {
-    valErr.push(evalue.option.value)
-
-  }else if (evalue.removedValue) {
-      if (valErr.includes(evalue.removedValue.value)){
-          let index = valErr.indexOf(evalue.removedValue.value);
-          valErr.splice(index,1);
-          }
-  }else if(evalue.action="clear"){
-    valErr.splice(0,valErr.length);
   }
 
-  console.log(valErr)
-
-
-  if (valErr.length > 0) {
-    valErr.map((item) => {
-      selectedError.push(item);
-    });
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        ERR_MSG: selectedError,
-      };
-    });
-  } else {
-    setSearchData((prev) => {
-      return {
-        ...prev,
-        ERR_MSG: [],
-      };
-    });
-  }
-};
 
   let UniqDept =
     itemData.length > 0
@@ -763,21 +819,6 @@ const selectError = (event, evalue) => {
     setOpen(false);
   };
 
- // const handleTRN_NAME=() => {
- 
-   const abc= trnType.filter(function(item) {
-      for (var key in searchData) {
-        console.log("sddfg",searchData["TRN_TYPE"])
-        if (item["TRN_TYPE"] === searchData["TRN_TYPE"] && item["AREF"] === searchData["AREF"])
-          return true;
-      }
-      return false;
-    });
-    
-    console.log("abc",abc)
-
- // }
-  //handleTRN_NAME()
   const searchPanel = () => (
     <Box
       sx={{ width: 350, marginTop: "80px" }}
@@ -792,7 +833,39 @@ const selectError = (event, evalue) => {
         sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
       >
         <Stack spacing={2} sx={{ width: 250 }}>
-        <Select
+          {/* <Autocomplete
+              multiple
+              size="small"
+              id="combo-box-dept"
+              options={itemData}
+              //value={(searchData?.HIER1.length > 0)?searchData?.HIER1:[]}
+              sx={{ width: 250 }}
+              onChange={selectDept} 
+              renderInput={(params) => <TextField {...params} label="HIER1" variant="standard" />}
+            />
+           
+            <Autocomplete
+              multiple
+              size="small"
+              id="combo-box-class"
+              options={(filterClass.length > 0)?filterClass:[]}
+             // value={(searchData?.HIER2.length > 0)?searchData?.HIER2:[]}
+              sx={{ width: 250 }}
+              onChange={selectClass} 
+              renderInput={(params) => <TextField {...params} label="HIER2" variant="standard" />}
+            />
+         
+            <Autocomplete
+              multiple
+              size="small"
+              id="combo-box-subclass"
+              options={(subfilterClass.length > 0)?subfilterClass:[]}
+             // value={(searchData?.HIER3.length > 0)?searchData?.HIER3:[]}
+              sx={{ width: 250 }}
+              onChange={selectSubClass} 
+              renderInput={(params) => <TextField {...params} label="HIER3" variant="standard" />}
+            /> */}
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -804,14 +877,14 @@ const selectError = (event, evalue) => {
                 onChange={handleHier1}
                 placeholder={"Choose HIER1"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
+                components={animatedComponents}  
+                isMulti 
                 isClearable={true}
-               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))}
+               value={UniqDept.filter(obj => searchData?.HIER1.includes(obj.HIER1))} 
                 />
 
-        <Select
-
+        <Select 
+          
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -823,13 +896,13 @@ const selectError = (event, evalue) => {
                 onChange={handleHier2}
                 placeholder={"Choose a HIER2"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
-                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))}
-
+                components={animatedComponents}  
+                isMulti 
+                value={filterClass.filter(obj => searchData?.HIER2.includes(obj.HIER2))} 
+                
                 />
 
-        <Select
+        <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -841,12 +914,12 @@ const selectError = (event, evalue) => {
                 onChange={handleHier3}
                 placeholder={"Choose a HIER3"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
-                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))}
+                components={animatedComponents}  
+                isMulti 
+                value={subfilterClass.filter(obj => searchData?.HIER3.includes(obj.HIER3))} 
                 />
-
-          <Select
+              
+          <Select 
                //disabled={filterItem.length > 0 ?false:true}
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
@@ -859,86 +932,75 @@ const selectError = (event, evalue) => {
                 onChange={handleItem}
                 placeholder={"Choose a ITEM"}
                 styles={styleSelect}
-                components={animatedComponents}
-                isMulti
-                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))}
+                components={animatedComponents}  
+                isMulti 
+                value={filterItem.filter(obj => searchData?.ITEM.includes(obj.ITEM))} 
                 isDisabled={filterItem.length > 0 ?false:true}
                 />
-
-          <Select
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
+                  `${option.LOCATION.toString()}-(${option.LOCATION_NAME.toString()})`}
                 getOptionValue={option => option.LOCATION}
-                options={locationData}
+                options={locationData.length > 0 ? locationData : []}
                 isSearchable={true}
-                onChange={handleLocation}
+                onChange={selectLocation}
                 placeholder={"Choose a Location"}
                 styles={styleSelect}
-                components={animatedComponents}
-                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION))}
-                isMulti
+                components={animatedComponents} 
+                value={locationData.filter(obj => searchData?.LOCATION.includes(obj.LOCATION)) || searchData.LOCATION}  
+                isMulti 
                 />
 
-          <Select
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                  option.TRN_NAME}
+                `${option.TRN_NAME.toString()}`}
                 getOptionValue={option => option.TRN_NAME}
-                options={trnType}
+                options={trnTypeValue}
                 isSearchable={true}
-                onChange={handleTranType}
-                placeholder={'TRN TYPE'}
+                onChange={selectTrantype}
+                placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
-                components={animatedComponents}
-                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}        
-                isMulti
+                components={animatedComponents} 
+                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}
+                isMulti 
                 />
-
-          {/* <Autocomplete
-            multiple
-            disablePortal
-            size="small"
-            id="combo-box-err-type"
-            //  value={(searchData?.ERR_MSG.length > 0)?searchData?.ERR_MSG:[]}
-            options={errorList.length > 0 ? errorList : []}
-            sx={{ width: 250 }}
-            onChange={selectError}
-            renderInput={(params) => (
-              <TextField {...params} label="ERR MESSAGE" variant="standard" />
-            )}
-          /> */}
-          <Select
+          <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
-                 getOptionLabel={option =>
-                  option.value}
+                // getOptionLabel={option =>
+                // `${option.ERR_MSG.toString()}`}
+                getOptionLabel={option => option.value}
                 getOptionValue={option => option.value}
                 options={errorList}
                 isSearchable={true}
                 onChange={selectError}
-                placeholder={'ERR MESSAGE'}
+                placeholder={"Choose a Error Message"}
                 styles={styleSelect}
-                components={animatedComponents}
-                //value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE))}
-                isMulti
+                components={animatedComponents} 
+                value={errorList.filter(obj => searchData?.ERR_MSG.includes(obj.value))}
+                isMulti 
                 />
+
           <TextField
             className={ErrorProceesClasses.textField}
-            disabled
+            //disabled
             margin="normal"
             size="small"
             variant="standard"
             name="CREATE_ID"
-            label="CREATE ID"
+            label="USER"
             type="text"
             sx={{ width: 250 }}
-            value={JSON.parse(localStorage.getItem("userData"))?.username}
+            onChange={onChange}
+            value={searchData.USER}
+            //default_user={JSON.parse(localStorage.getItem("userData"))?.username}
           />
           <TextField
             className={ErrorProceesClasses.dateField}
@@ -948,7 +1010,7 @@ const selectError = (event, evalue) => {
             name="TRN_DATE"
             label="TRN DATE"
             type="date"
-            inputProps={{ max: "2022-07-27" }}
+            inputProps={{ max: currentDate() }}
             value={searchData.TRN_DATE}
             onChange={onChange}
             sx={{ width: 250 }}
@@ -1076,7 +1138,7 @@ const selectError = (event, evalue) => {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-
+              
             </DialogContentText>
           </DialogContent>
           <DialogActions>

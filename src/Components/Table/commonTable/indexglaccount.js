@@ -54,6 +54,9 @@ const CommonTable = ({
   pageName,
   setTabledata,
   allData,
+  handleSearchClick,
+  freeze,
+  handleCopyDown,
 }) => {
 
 
@@ -151,6 +154,9 @@ const CommonTable = ({
               headCells={headCells}
               editRows={editRows}
               checkEditrows={true}
+              freeze={freeze}
+              handleCopyDown={handleCopyDown}
+              pageName={pageName}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))

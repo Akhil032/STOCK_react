@@ -39,6 +39,7 @@ const openedMixin = (theme) => ({
   overflowX: "hidden",
 });
 
+//Menu side panel when it is closed//
 const closedMixin = (theme) => ({
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
@@ -52,6 +53,7 @@ const closedMixin = (theme) => ({
   },
 });
 
+//Top of stock_ledger name when it is opened//
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -71,7 +73,7 @@ const AppBar = styled(MuiAppBar, {
   }),
   ...(open && {
     marginLeft: drawerWidth,
-    width: `calc(100% - 300px)`,
+    width: `calc(100% - 310px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -79,6 +81,7 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
+//Menu when it is opened//
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -89,7 +92,7 @@ const Drawer = styled(MuiDrawer, {
   ...(open && {
     ...openedMixin(theme),
     "& .MuiDrawer-paper": {
-      width: "300px",
+      width: "310px",
       backgroundColor: "grey"
     },
   }),
@@ -98,6 +101,8 @@ const Drawer = styled(MuiDrawer, {
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
 }));
+
+//Top bar in the screen//
 const useStyles = makeStyles({
   LayoutDiv: {
     display: "flex",
@@ -110,6 +115,8 @@ const useStyles = makeStyles({
     width: "55px",
   },
 });
+
+
 const items = GetItems();
 
 export default function Index() {
@@ -159,9 +166,10 @@ export default function Index() {
     }
     if (routeName === "Finance Interface Data") {
       navigate("/Finance-Interface");
-  }if (routeName === "Stock Ledger View") {
-    navigate("/Stock-Ledger-View");
-}
+  }
+    if (routeName === "Stock Ledger View") {
+      navigate("/Stock-Ledger-View");
+    }
     if (routeName === "Account maintenance") {
       navigate("/Account-maintenance");
     }

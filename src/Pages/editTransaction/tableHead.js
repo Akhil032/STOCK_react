@@ -168,6 +168,13 @@ export const headCells = [
     width: "90px",
   },
   {
+    id: "CREATE_ID",
+    numeric: true,
+    disablePadding: false,
+    label: "USER",
+    width: "90px",
+  },
+  {
     id: "TRAN_SEQ_NO",
     numeric: false,
     disablePadding: true,

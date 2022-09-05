@@ -55,11 +55,68 @@ const CommonTable = ({
   pageName,
   setTabledata,
   allData,
+  handleSearchClick,
+  freeze,
+  handleCopyDown,
 }) => {
 
 
     const [updateData, setupdateData] = useState({});  
-    const rowClasses = useStyles(); 
+    const rowClasses = useStyles();  
+
+  // const onBlur = (event, value , row) => {
+  //   console.log("test", event.target.value, value, row);
+  //   row[event.target.name] = event.target.value;
+    
+  //   if(event.target.name == 'QTY') {
+  //     row['TOTAL_COST'] = parseInt(event.target.value) * parseInt(row['UNIT_COST']);
+  //   }
+    
+  //   var finalData = updateData;
+  //   if(updateData.length === 0) {
+  //     finalData.push(row);
+  //   }
+  //   else {
+  //     var t = finalData.findIndex(x => x.TRAN_SEQ_NO === row['TRAN_SEQ_NO']);
+  //     if(t === -1) {
+  //       finalData.push(row);
+  //     }
+  //     else {
+  //       finalData[t] = row;
+  //     }
+  //   }
+  //   setupdateData(finalData);
+  //   setUpdateRow(finalData);
+  //   console.log("testafter", row, updateData);
+  //     sessionStorage.setItem('updateColume',JSON.stringify(finalData));
+  //   // return;
+  //   // let temp = JSON.stringify(updateData);
+  //   // temp = JSON.parse(temp);
+  //   // console.log(temp);
+  //   //   //let oldrow = rows.filter((item) => item?.TRAN_SEQ_NO.includes(editRows) );
+  //   // if(temp.findIndex(x => x.TRAN_SEQ_NO === row['TRAN_SEQ_NO']) == -1 ){
+  //   // temp[row?.TRAN_SEQ_NO] = row;
+  //   // temp[row?.TRAN_SEQ_NO][event.target.name] = event.target.value; 
+  //   // if(event.target.name == 'QTY'){
+  //   //   temp[row?.TRAN_SEQ_NO]['TOTAL_COST'] = event.target.value * row['UNIT_COST']; 
+  //   // }
+  //   // //let updaterow = Object.values(temp);
+    
+  //   // console.log(temp);
+  //   // setupdateData(temp)
+  //   // }
+  // }
+
+
+
+  // useEffect(() => {
+  //   console.log("testafter1", updateData);
+    
+  //   setUpdateRow(updateData);
+    
+  // },[updateData])
+
+
   const onBlur = (event, value , row) => {
     let temp = {...updateData};
     console.log(temp);
@@ -73,7 +130,6 @@ const CommonTable = ({
     setUpdateRow(updateData);
     }
   },[updateData])
-  console.log("ct",orderBy);
   return (
     <>
       <Paper sx={{ maxWidth: "100%", maxHeight: "fit-content", mb: 2 }}>
@@ -98,6 +154,9 @@ const CommonTable = ({
               headCells={headCells}
               editRows={editRows}
               checkEditrows={true}
+              freeze={freeze}
+              handleCopyDown={handleCopyDown}
+              pageName={pageName}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
@@ -138,7 +197,7 @@ const CommonTable = ({
                             }
                           }
 
-                            return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell} >
+                            return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell}>
                               {
                                 <TextField 
                             disabled={!editable}

@@ -15,7 +15,8 @@ import CostChange from "./Components/CostChange";
 import GlAccount from "./Components/GLAccount";
 import GLCreation from "./Components/GLCreation";
 import FinanceInterface from "./Components/FinanaceInterface"
-import DailyView from "./Components/DailyView"
+import DailyView from "./Pages/Daily_view"
+
 function Routing() {
   return (
     <Routes>
@@ -35,7 +36,6 @@ function Routing() {
         <Route path="/Account-maintenance" element={<GlAccount />} />  
         <Route path="/ACCOUNT-CREATION" element={<GLCreation />} /> 
         <Route path="/Finance-Interface" element={<FinanceInterface />} />
-        <Route path="/Stock-Ledger-View" element={<DailyView />} />
         <Route path="/Stock-Ledger-View" element={<DailyView />} />
       </Route>
     </Routes>

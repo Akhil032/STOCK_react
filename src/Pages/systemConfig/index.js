@@ -19,7 +19,7 @@ import { headCells } from "./tableHead";
 import SearchIcon from '@mui/icons-material/Search';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SendIcon from '@mui/icons-material/Send';
-import { trnType } from "../../Components/ErrorProcessing/transType.js";
+//import { trnType } from "../../Components/ErrorProcessing/transType.js";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -29,14 +29,28 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles'; 
 import Chip from '@mui/material/Chip';
 import swal from '@sweetalert/with-react';
+import TrnTypeList from "../../Components/TRNTYPE";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { useNavigate, Outlet } from "react-router-dom";
 
-//import "./index.css";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const animatedComponents = makeAnimated();
+const styleSelect = {
+  control: base => ({
+    ...base,
+    border: 0,
+    //border: "5px solid black",
+    // This line disable the blue border
+    boxShadow: 'none',
+    borderBottom: "1px solid black"
+  })
+};
+
 const useStyles = makeStyles({
   maindiv: {
     position: "relative",
@@ -78,26 +92,17 @@ const useStyles = makeStyles({
       }
   },
 });
-const animatedComponents = makeAnimated();
-const styleSelect = {
-  control: base => ({
-    ...base,
-    border: 0,
-    //border: "5px solid black",
-    // This line disable the blue border
-    boxShadow: 'none',
-    borderBottom: "1px solid black"
-  })
-};
-
 
 const initialsearch = {
   TRN_TYPE: [] ,
   AREF: [],
 }
 
+const initialTRName={
+  TRN_NAME:[]
+}
+
 const SystemConfig = () => {
-  const [valTRN, setValTRN] = useState([]);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -111,6 +116,7 @@ const SystemConfig = () => {
   const [isSubmit, setSubmit] = useState(false);
   const [freeze, setFreeze] = useState(false);
   const [open, setOpen] = useState(false);
+  const [valTrnType,setValTrnType]=useState([]);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [state, setState] = React.useState({
@@ -123,8 +129,10 @@ const SystemConfig = () => {
   let ConfigData = useSelector(
     (state) => state.SystemConfigReducers
   );
-  console.log("tes",ConfigData);
+  //console.log("tes",ConfigData);
   const dispatch = useDispatch();
+
+  var trnTypeValue = TrnTypeList();
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -278,7 +286,7 @@ const confirmSubmit = () => {
 }
   
   const SubmitList = () => {
-    console.log(updateRow);
+    //console.log(updateRow);
     if(Object.keys(updateRow).length > 0){
       let sendRow = Object.values(updateRow);
       sendRow.map((item)=> {
@@ -289,7 +297,7 @@ const confirmSubmit = () => {
             item['ACCT_REFERENCE']= "";
           }
       })
-      console.log("updateRow",sendRow);
+      //console.log("updateRow",sendRow);
     setLoading(true);
     dispatch(postSystemConfigRequest(sendRow));
     // initialsearch.TRN_TYPE= [] || "";
@@ -308,7 +316,7 @@ const handleSubmit = (event) => {
 }
 
 const handleSearchColumn = (e) => {
-  console.log("Handle Search Column",e);
+  //console.log("Handle Search Column",e);
 
   console.log(inputValue);
   setFreeze(true);
@@ -316,9 +324,9 @@ const handleSearchColumn = (e) => {
 }
 
 const handleCopyDown = (e) => {
-  console.log("Handle Copy Down",e);
-  console.log("EditR",editRows);
-  console.log("update",inputValue);
+  //console.log("Handle Copy Down",e);
+  //console.log("EditR",editRows);
+  //console.log("update",inputValue);
 
   // Filter object by single key
   // const test = Object.keys(inputValue).
@@ -334,20 +342,20 @@ const handleCopyDown = (e) => {
         delete inputValue['TRN_NAME'];
       }
   }
-  console.log("inVal",inputValue);
+  //console.log("inVal",inputValue);
   if(editRows.length > 0){
   const editData = tabledata.filter((item) => {
     return editRows.some((val) => {
       return item.SR_NO === val;
     }); 
   });
-  console.log("tt",editData);
+  //console.log("tt",editData);
 
   const copyUpdate = editData.map(item => {
     Object.assign(item,inputValue);
      return item;
 })
-console.log("updatedRecord",copyUpdate);
+//console.log("updatedRecord",copyUpdate);
 setTabledata(copyUpdate);
 setUpdateRow(copyUpdate);
 seteditRows([]);
@@ -358,101 +366,67 @@ setInputValue("");
 }
 
 }
-
-// const handleMsgClose = () => {
-//   setIsError(false)
-//   setIsSuccess(false)
-// }
+const navigate = useNavigate();
+const [isOpen, setIsOpen] = useState(false);
+const handleDrawerClose = () => {
+  setOpen(false);
+  setIsOpen(false);
+};
+const closeMenuBar = () => {
+  console.log("g8ggvigdi")
+  navigate("/system-config");
+  handleDrawerClose()
+}
 
 const onReset = (event) => {
 
     initialsearch.TRN_TYPE= [];
     initialsearch.AREF = [];
-    console.log('datainitial',initialsearch);
+    //console.log('datainitial',initialsearch);
       setSearchData(initialsearch)
-      console.log('data',searchData);
+      //console.log('data',searchData);
       setSearch(false);
       setTabledata("");
       setInputValue("");
-
+      setValTrnType([]);
+      initialTRName.TRN_NAME=[];
       dispatch(resetSystemConfig());
 }
-//  const selectTrantype = (event, value) => {
-//    console.log("t",value);
-
-
-//   let selectedTrantype = [];
-//   let selectedAref = [];
-//   if(value.length > 0 && typeof value[0]['TRN_TYPE'] !== "undefined"){
-//     value.map(
-//       (item) => {
-//         selectedTrantype.push(item.TRN_TYPE);
-//         selectedAref.push(item.AREF)
-//       }
-//     )
-//     setSearchData((prev) => {
-//       return {
-//         ...prev,
-//         TRN_TYPE : selectedTrantype,
-//         AREF: selectedAref
-//       };
-//     });
-//   }else if(value.length > 0){
-//         console.log(value);
-//         swal(
-//           <div>     
-//             <p>{"Please Choose valid TRN TYPE"}</p>
-//           </div>
-//         )  
-//   }else {
-//     setSearchData((prev) => {
-//       return {
-//         ...prev,
-//         TRN_TYPE : [],
-//         AREF: []
-//       };
-//     });
-//   }
-//  }
-
-const handleTranType=(e,value) =>
-{
+//console.log("ASSDCDFGFD",searchData)
+const selectTrantype=(e,value) =>{
   let selectedTrantype = [];
   let selectedAref = [];
-  console.log("420",value)
+  let selectedTranName=[]
   if (value.option) {
-    valTRN.push(value.option)
+    valTrnType.push(value.option)
   }else if (value.removedValue) {
-    
-    console.log("12343",value.removedValue.TRN_TYPE)
-    for(let i= 0; i< valTRN.length;i++)
-    {
-      if (valTRN[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE){
-        if(valTRN[i]["AREF"]===value.removedValue.AREF){
-          valTRN.splice(i,1);
-      }
+    let index=0;      
+    for(var i=0;i<valTrnType.length;i++) {
+      if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
+        index=i;        
+        break;
       }
     }
-  }else if(value.action="clear"){      
-    valTRN.splice(0,valTRN.length);
+    valTrnType.splice(index,1);
+  }else if(value.action="clear"){
+    valTrnType.splice(0,valTrnType.length);
   }
-  console.log("420",valTRN)
- if (valTRN.length >0) {
-  valTRN.map((item) => {
+  if (valTrnType.length >0) {
+    valTrnType.map((item) => {
       selectedTrantype.push(item.TRN_TYPE);
       selectedAref.push(item.AREF)
+      selectedTranName.push(item.TRN_NAME)
     });
-    
+    initialTRName.TRN_NAME=(selectedTranName);
     setSearchData((prev) => {
         return {
           ...prev,
           TRN_TYPE: selectedTrantype,
           AREF:selectedAref
-
         };
-      });    
+      });
   }else {
-   
+      initialTRName.TRN_NAME=[];
       setSearchData((prev) => {
       return {
         ...prev,
@@ -463,6 +437,19 @@ const handleTranType=(e,value) =>
   }
 }
 
+//console.log("trn_type",trnType)
+ const TrnTypeValues = (trnType)=>{
+  var valueList=[]
+  for(let i=0;i<trnType.length;i++)
+  {
+    if(searchData["TRN_TYPE"][i]===trnType[i]["TRN_TYPE"] && searchData["AREF"][i]===trnType[i]["AREF"] ){
+      valueList.push(trnType[i]["TRN_NAME"])
+    }
+
+  }
+  console.log("valueList",valueList)
+ // return valueList
+  }
 const searchPanel = () => (
   <Box
     sx={{ width: 350, marginTop: '80px'}}
@@ -483,56 +470,29 @@ const searchPanel = () => (
               sx={{ width: 250 }}
               renderInput={(params) => <TextField {...params} label="TRN TYPE" variant="standard" />}
             /> */}
-        <Select 
+            <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 getOptionLabel={option =>
-                  option.TRN_NAME}
+                `${option.TRN_NAME.toString()}`}
                 getOptionValue={option => option.TRN_NAME}
-                options={trnType}
+                options={trnTypeValue}
                 isSearchable={true}
-                onChange={handleTranType}
-                placeholder={'TRN TYPE'}
+                onChange={selectTrantype}
+                placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
                 components={animatedComponents} 
-                value={trnType.filter(obj => searchData?.TRN_TYPE.includes(obj.TRN_TYPE) && searchData?.AREF.includes(obj.AREF))}
+                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}  
                 isMulti 
                 />
-{/* 
-<Autocomplete
-        value={value}
-        onChange={(event, newValue) => {
-          console.log(newValue);
-          setValue(newValue);
-        }}
-        multiple
-        id="tags-filled"
-        options={trnType.map((option) => option.TRN_NAME)}
-        renderTags={(value, getTagProps) =>
-          value.map((option,index) => (
-            <Chip
-              variant="filled"
-              label={option}
-              {...getTagProps({ index })}
-            />
-          ))
-        }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label="TRN_TYPE"
-          />
-        )}
-      /> */}
             <div>
             <Button
               className={ErrorProceesClasses.textField}
               type="submit"
               variant="contained"
               sx={{ width:'120px'}}
-              startIcon={<SearchIcon />}
+              startIcon={<SearchIcon  onClick={closeMenuBar} disableRipple sx={{padding:"0px"}}/>}
             >
               Search
             </Button>
@@ -551,10 +511,10 @@ const searchPanel = () => (
 );
 
   return (
-    <Box className={ErrorProceesClasses.maindiv}>
+    <Box className={ErrorProceesClasses.maindiv} >
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid item xs={6}>
-          <Box className={ErrorProceesClasses.boxDiv}>
+          <Box className={ErrorProceesClasses.boxDiv} >
             <div className={ErrorProceesClasses.uploaddiv}>
               <h4>System Config</h4>
             </div>

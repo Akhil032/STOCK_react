@@ -35,6 +35,10 @@ export default function EnhancedTableHead(props) {
     headCells,
     editRows = [],
     checkEditrows = false,
+    handleSearchClick,
+    freeze,
+    handleCopyDown,
+    pageName,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -120,6 +124,11 @@ export default function EnhancedTableHead(props) {
                 onChange={handleSearch}
                 editRows={editRows}
                 checkEditrows={true}
+                onClick={handleSearchClick}
+                freeze={freeze}
+                onCopy={handleCopyDown}
+                colEnabled={searchText}
+                pageName={pageName}
               />
             </TableCell>
           </>

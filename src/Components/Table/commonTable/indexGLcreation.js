@@ -114,7 +114,7 @@ const CommonTable = ({
   const onBlur = (event, value , row) => {
     let temp = {...updateData};
     console.log("test: ",temp);
-    temp[row?.PEIMARY_ACCOUNT] = row;
+    temp[row?.PRIMARY_ACCOUNT] = row;
     temp[row?.PRIMARY_ACCOUNT][event.target.name] = event.target.value; 
     if(event.target.name == 'QTY') {
            temp[row?.PRIMARY_ACCOUNT]['TOTAL_COST'] = parseInt(event.target.value) * parseInt(row['UNIT_COST']); 

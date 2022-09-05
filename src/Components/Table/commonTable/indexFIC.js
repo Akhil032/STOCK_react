@@ -6,7 +6,6 @@ import { makeStyles } from "@mui/styles";
 import TableToolbar from "../Toolbar/index";
 import { trnType } from "../../ErrorProcessing/transType";
 import "../index.css";
-import { bgcolor } from "@mui/system";
 
 const useStyles = makeStyles({
   tabCell: {
@@ -56,7 +55,6 @@ const CommonTable = ({
   allData,
   handleSearchClick,
   freeze,
-  handleCopyDown,
 }) => {
 
 
@@ -119,15 +117,15 @@ const CommonTable = ({
   const onBlur = (event, value , row) => {
     let temp = {...updateData};
     console.log(temp);
-    temp[(row?.TRAN_SEQ_NO)?row?.TRAN_SEQ_NO:row?.SR_NO] = row;
-    temp[(row?.TRAN_SEQ_NO)?row?.TRAN_SEQ_NO:row?.SR_NO][event.target.name] = event.target.value; 
+    temp[row?.TRAN_SEQ_NO] = row;
+    temp[row?.TRAN_SEQ_NO][event.target.name] = event.target.value; 
     if(event.target.name == 'QTY') {
            temp[row?.TRAN_SEQ_NO]['TOTAL_COST'] = parseInt(event.target.value) * parseInt(row['UNIT_COST']); 
          }
       if(value){
-        temp[(row?.TRAN_SEQ_NO)?row?.TRAN_SEQ_NO:row?.SR_NO]['TRN_TYPE'] = value['TRN_TYPE'];
-        temp[(row?.TRAN_SEQ_NO)?row?.TRAN_SEQ_NO:row?.SR_NO]['AREF'] = value['AREF']; 
+        temp[row?.TRAN_SEQ_NO]['TRN_TYPE'] = value['TRN_TYPE']; 
       }   
+      console.log(temp);
     setupdateData(temp)
   }
 
@@ -136,16 +134,16 @@ const CommonTable = ({
     setUpdateRow(updateData);
     }
   },[updateData])
-  console.log("ct",orderBy);
+
   return (
     <>
-      <Paper sx={{ maxWidth: "100%", maxHeight: "fit-content", mb: 2 }}>
-      {(pageName != "stage" && pageName != 'reconciliation' && pageName != 'inquiry') &&
+      <Paper sx={{ maxWidth: "fit-content", maxHeight: "fit-content", mb: 2 }}>
+      {(pageName != "stage") &&
         <TableToolbar selected={selected} handledelete={handleDelete} edithandle={handleEdit} seteditRows={seteditRows} setUpdateRow={setUpdateRow} setSelected={setSelected} editRows={editRows} setupdateData={setupdateData} setTabledata={setTabledata} allData={allData}/>
         } 
         <TableContainer sx={{ overflowX: "scroll", overflowY: "scroll",height: "fit-content", maxHeight: "70vh" }}>
           <Table
-            sx={{ maxWidth: "100%" }}
+            sx={{ minWidth: 750, maxWidth: "fit-content" }}
             aria-labelledby="tableTitle"
             size="small"
           >
@@ -157,14 +155,12 @@ const CommonTable = ({
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               handleSearch={handleSearch}
-              handleSearchClick={handleSearchClick}
               searchText={searchText}
               headCells={headCells}
               editRows={editRows}
               checkEditrows={true}
               freeze={freeze}
-              handleCopyDown={handleCopyDown}
-              pageName={pageName}
+              handleSearchClick={handleSearchClick}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
@@ -195,37 +191,59 @@ const CommonTable = ({
                          // disabled={editRows && editRows.length > 0}
                         />
                       </TableCell> */}
-                      { editRows?.includes((row?.TRAN_SEQ_NO)?row?.TRAN_SEQ_NO:row?.SR_NO) ? <>
-                       
+                      { editRows?.includes(row?.TRAN_SEQ_NO) ? <>
+                        {Object.entries(row).map(([key, value]) => {
+                          
+                            let editable = false;
+                            if(key == "ITEM"){
+                                editable = row["ERR_MSG"] === "ITEM IS NULL" || row["ERR_MSG"] == "INVALID ITEM";
+                            }if(key == "LOCATION"){
+                              editable = row["ERR_MSG"] == "LOCATION is null" || row["ERR_MSG"] == "Invalid Location" || row['ERR_MSG'] === "invalid location currency combination";
+                            }if(key == "TRN_NAME"){
+                              editable = row["ERR_MSG"] === "invalid trn_type" || row["ERR_MSG"] === "TRN_TYPE AREF COMBINATION invalid";
+                            }if(key == "QTY"){
+                              editable = row["ERR_MSG"] === "QTY is null";
+                            }if(key == "CURRENCY"){
+                              editable = row["ERR_MSG"] === "invalid currency" || row['ERR_MSG'] === "invalid location currency combination";
+                            }if(key == 'TRAN_DATE'){
+                              editable = row['ERR_MSG'] === "trn_date cannot be in future";
+                            }
+
+
+
+                            return <TableCell padding="none" align="left" key={key} className={rowClasses.tabCell}>
+                              {(key == 'TRN_NAME') ? (
+                                    <Autocomplete
+                                    disabled={!editable}
+                                    disablePortal
+                                    size="small"
+                                    id="combo-box-trn-type"
+                                    onChange={ (event, value) => onBlur(event, value, row)}
+                                    options={trnType}
+                                    getOptionLabel={(option) => option.TRN_NAME}
+                                    sx={{ width: 200 }}
+                                    renderInput={(params) => <TextField {...params} variant="standard" />}
+                                  />
+                              ) : (
+                                <TextField 
+                            disabled={!editable}
+                            size="small"
+                            variant="standard"
+                            className={rowClasses.input}
+                            defaultValue={value} name={key} onChange={ (event, value) => onBlur(event,value,row)} />
+                              )
+                              
+                              }
+                            
+                           </TableCell>
+                              }
+                      )}
                       </> :           
                       <>
-                      {Object.entries(row).map(([key, value])=> {
-                          let colorcode = "";
-                          if(pageName == "reconciliation"){
-                            if(key == "QTY"){
-                                colorcode = (row['QTY_MATCHED'] == 'N')?"lightyellow":"";
-                            } 
-                            if(key == "ROLLED_QTY"){
-                              colorcode = (row['QTY_MATCHED'] == 'N')?"lightyellow":"";
-                            }
-                            if(key == "COST"){
-                              colorcode = (row['COST_MATCHED'] == 'N')?"lightyellow":"";
-                             } 
-                           if(key == "ROLLED_COST"){
-                            colorcode = (row['COST_MATCHED'] == 'N')?"lightyellow":"";
-                            }
-                            if(key == "RETAIL"){
-                            colorcode = (row['RETAIL_MATCHED'] == 'N')?"lightyellow":"";
-                            } 
-                            if(key == "ROLLED_RETAIL"){
-                            colorcode = (row['RETAIL_MATCHED'] == 'N')?"lightyellow":"";
-                            } 
-                          }
-                          return (<TableCell align="left" key={key} className={rowClasses.tabCell} sx={((key == 'SR_NO')?'display:none':'')} 
-                          style={{color:((colorcode)?`Red`:``)}}>
-                              {(value == "NULL")?"":value }
-                          </TableCell> )
-                      }
+                      {Object.entries(row).map(([key, value])=> 
+                          <TableCell align="left" key={key} className={rowClasses.tabCell} sx={((key == 'SR_NO')?'display:none':'')}>
+                              {value || "" }
+                          </TableCell>
                       )}
                       </> }
                       
@@ -233,7 +251,7 @@ const CommonTable = ({
                   );
                 })}
 
-              {/* {emptyRows > 0 && (
+              {emptyRows > 0 && (
                 <TableRow
                   style={{
                     height: 33 * emptyRows,
@@ -241,7 +259,7 @@ const CommonTable = ({
                 >
                   <TableCell colSpan={6} />
                 </TableRow>
-              )} */}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
