@@ -211,7 +211,7 @@ const CommonTableRev = ({
                       <>
                       {Object.entries(row).map(([key, value])=> 
                           <TableCell align="left" key={key} className={rowClasses.tabCell} sx={((key == 'SR_NO')?'display:none':'')}>
-                              {value || "" }
+                              {(value == "NULL")?"":value }
                           </TableCell>
                       )}
                       </>     }             

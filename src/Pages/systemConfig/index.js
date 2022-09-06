@@ -102,6 +102,7 @@ const initialTRName={
   TRN_NAME:[]
 }
 
+ 
 const SystemConfig = () => {
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
@@ -135,6 +136,7 @@ const SystemConfig = () => {
   var trnTypeValue = TrnTypeList();
 
   const toggleDrawer = (anchor, open) => (event) => {
+   
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
@@ -255,7 +257,7 @@ useEffect(() => {
         
   },[ConfigData?.data])
 
-
+console.log("asdasds",searchData)
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value == "") {
@@ -284,7 +286,7 @@ const handleClose = () => {
 const confirmSubmit = () => {
   setOpen(true);
 }
-  
+
   const SubmitList = () => {
     //console.log(updateRow);
     if(Object.keys(updateRow).length > 0){
@@ -392,8 +394,9 @@ const onReset = (event) => {
       initialTRName.TRN_NAME=[];
       dispatch(resetSystemConfig());
 }
-//console.log("ASSDCDFGFD",searchData)
+console.log("ASSDCDFGFD",initialTRName)
 const selectTrantype=(e,value) =>{
+  
   let selectedTrantype = [];
   let selectedAref = [];
   let selectedTranName=[]

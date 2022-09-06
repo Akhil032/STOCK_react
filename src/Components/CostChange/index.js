@@ -233,7 +233,7 @@ const CostChange = () => {
   useEffect(() => {
     if (isSubmit) {
       setTimeout(() => {
-         console.log("194 SD", searchData)
+         //console.log("194 SD", searchData)
         
         dispatch(getCostChangeRequest([searchData]))
       }, 1000)
@@ -242,7 +242,6 @@ const CostChange = () => {
 
   useEffect(() => {
     if (isSearch) {
-      console.log("278 SD", searchData)
       dispatch(getCostChangeRequest([searchData]))
     
     }
@@ -435,6 +434,8 @@ if (check===1){
     setValH1([]);
     setValH2([]);
     setValH3([]);
+    setValItem([]);
+    setValLoc([]);
     setFilterClass([]);
     setsubFilterClass([]);
     setFilterItem([]);
@@ -493,10 +494,22 @@ if (check===1){
     let selectedDept = [];
     if (value.option) {     
         valH1.push(value.option)
+        // if (value.option.HIER1===input){ 
+        //   setInput("");
+        // }
+        if ((value.option.HIER1).includes(input)){
+          setInput("");
+        } 
     }else if (value.removedValue) {
-        let index = valH1.indexOf(value.removedValue.HIER1);
-        valH1.splice(index,1);
-    //}
+      let index=0        
+      for(var i=0;i<valH1.length;i++)
+      {
+        if(valH1[i]["HIER1"]===value.removedValue.HIER1){
+          index=i;
+          break;
+        }
+      }
+     valH1.splice(index,1);
     }else if(value.action==="clear"){ 
         valH1.splice(0,valH1.length);
     }
@@ -527,9 +540,15 @@ if (check===1){
                 ...prev,
                 HIER1: selectedDept,
               };
-            });          
+              
+            });     
+      if(value.removedValue){
+        handleHier2("Filter",UniqClass)
+      }
     }else {
       setFilterClass([])
+      setsubFilterClass([]);
+      setFilterItem([]);
       setSearchData((prev) => {
         return {
           ...prev,
@@ -540,22 +559,41 @@ if (check===1){
 }
 const handleHier2=(e,value) =>
   {
+    if (e==="Filter"){
+       valH2.splice(0,valH2.length);
+       valH2.push(...value);
+    }
     let selectedHier2 = [];
-    if (value.option) {
-      valH2.push(value.option)
-    }else if (value.removedValue) {
-        let index = valH2.indexOf(value.removedValue.HIER2);
-        valH2.splice(index,1);
-   
-    }else if(value.action==="clear"){      
-      valH2.splice(0,valH2.length);
+    if (value){
+      if (value.option) {
+        valH2.push(value.option)
+        if ((value.option.HIER2).includes(inputH2)){
+          setInputH2("");
+        } 
+      }else if (value.removedValue) {
+        let index=0        
+        for(var i=0;i<valH2.length;i++)
+        {
+          if(valH2[i]["HIER2"]===value.removedValue.HIER2){
+            index=i;
+            break;
+          }
+        }
+       valH2.splice(index,1);
+     
+    
+      }else if(value.action==="clear"){      
+        valH2.splice(0,valH2.length);
+      }
     }
 //manual input handle input and filter itemdata
   if(e===0){
     valH2.push(value);   
   }
+  console.log("filter",valH2)
 //Filtering HIER2 based on HIER1
   if (valH2.length >0) {
+    console.log(1232)
     const filterSubClass = itemData.filter((item) => {      
       return (valH2).some((val) => {
         return item.HIER2 === val.HIER2;
@@ -578,9 +616,13 @@ const handleHier2=(e,value) =>
               ...prev,
               HIER2: selectedHier2,
             };
-          });          
+          });    
+          if(e==="Filter" ||value.removedValue) {
+            handleHier3("Filter",UniqClass)
+          }    
     }else {
       setsubFilterClass([]);
+      setFilterItem([]);
       setSearchData((prev) => {
         return {
           ...prev,
@@ -590,13 +632,28 @@ const handleHier2=(e,value) =>
   }
 }
 const handleHier3=(e,value) =>
-  { console.log(value)
+  {
+    if (e==="Filter"){
+      valH3.splice(0,valH3.length);
+      valH3.push(...value);
+   }
+
     let selectedHier3 = [];
     if (value.option) {
       valH3.push(value.option)
+      if ((value.option.HIER3).includes(inputH3)){
+        setInputH3("");
+      } 
     }else if (value.removedValue) {
-        let index = valH3.indexOf(value.removedValue.HIER3);
-        valH3.splice(index,1);
+      let index=0        
+      for(var i=0;i<valH3.length;i++)
+      {
+        if(valH3[i]["HIER3"]===value.removedValue.HIER3){
+          index=i;
+          break;
+        }
+      }
+      valH3.splice(index,1);
     
     }else if(value.action==="clear"){      
       valH3.splice(0,valH3.length);
@@ -637,9 +694,20 @@ const handleItem=(e,value) =>
     let selectedItem = [];
     if (value.option) {
       valItem.push(value.option)
+      if ((value.option.ITEM).includes(inputItem)){
+        setInputItem("");
+      } 
   }else if (value.removedValue) {
-      let index = valItem.indexOf(value.removedValue.ITEM);
-      valItem.splice(index,1);   
+    let index=0        
+    for(var i=0;i<valItem.length;i++)
+    {
+      if(valItem[i]["ITEM"]===value.removedValue.ITEM){
+        index=i;
+        break;
+      }
+    }
+    valItem.splice(index,1);
+   
   }else if(value.action==="clear"){      
     valItem.splice(0,valItem.length);
    }
@@ -672,10 +740,24 @@ if (valItem.length >0) {
 const selectLocation = (event, value) => {
   let selectedLocation = [];
   if (value.option) {     
-        valLoc.push(value.option)
+        valLoc.push(value.option);
+        // if (value.option.LOCATION===parseInt(inputLoc)){ 
+        //   console.log(1234)
+        //   setInputLoc("");
+        // }
+        if (String(value.option.LOCATION).includes(inputLoc)){
+          setInputLoc("");
+        } 
     }else if (value.removedValue) {
-        let index = valLoc.indexOf(value.removedValue.LOCATION);
-        valLoc.splice(index,1);
+      let index=0        
+      for(var i=0;i<valLoc.length;i++)
+      {
+        if(valLoc[i]["LOCATION"]===value.removedValue.LOCATION){
+          index=i;
+          break;
+        }
+      }
+      valLoc.splice(index,1);
     }else if(value.action==="clear"){ 
       valLoc.splice(0,valLoc.length);
     }
