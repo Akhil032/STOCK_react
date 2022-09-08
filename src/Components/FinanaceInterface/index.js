@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
-import Table from "../../Components/Table/index";
+import Table from "../../Components/Table/indexFI";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Drawer from "@mui/material/Drawer";
 import { makeStyles } from "@mui/styles";
 import { getFinanceInterfaceRequest } from "../../Redux/Action/financeInterface";
 import CircularProgress from "@mui/material/CircularProgress";
 import { headCells } from "./tableHead";
-import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import swal from '@sweetalert/with-react';
@@ -300,7 +300,7 @@ const handleSearchColumn = (e) => {
             <div className={FinanceInterfaceClasses.uploaddiv}>
               
 
-          <Button variant="contained" sx={{ marginTop: '15px', textAlign:'right' }} onClick={handleSubmit} startIcon={<SearchIcon />}>Search</Button>
+          <Button variant="contained" sx={{ marginTop: '15px', textAlign:'right' }} onClick={handleSubmit} startIcon={<RefreshIcon />}>Refresh</Button>
           
        </div>
           </Box>

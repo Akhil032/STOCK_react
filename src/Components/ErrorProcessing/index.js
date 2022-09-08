@@ -309,10 +309,11 @@ const ErrorProcessing = () => {
       }, 500);
     }
   }, [isSubmit]);
-
+ 
   useEffect(() => {
     if (isSearch) {
       dispatch(getErrorProcessingRequest([searchData]));
+      setSearch(false)
     }
   }, [isSearch]);
 
@@ -325,9 +326,11 @@ const ErrorProcessing = () => {
   useEffect(() => {
     if (ErrorProcessingData?.data?.Data && Array.isArray(ErrorProcessingData?.data?.Data)) {
       if (load===0){
+        
       setTabledata(serializedata(ErrorProcessingData?.data?.Data));
       setAllData(serializedata(ErrorProcessingData?.data?.Data));
       }
+      
       setLoading(false);
       setSubmit(false);
       setSearch(false);
@@ -535,6 +538,7 @@ const handleSubmit = (event) => {
     setState({ ...state, 'right': open });
     setLoad(1)
   }else{ 
+    console.log("hadnlesu else")
       setLoad(0);
       event.preventDefault();
       setSearch(true);
@@ -1031,7 +1035,7 @@ const selectLocation = (event, value) => {
     }
    
   }
-  console.log("searchData",searchData)
+  //console.log("searchData",searchData)
   let UniqDept =
     itemData.length > 0
       ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]

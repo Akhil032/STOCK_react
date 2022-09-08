@@ -276,6 +276,8 @@ const Reconciliation = () => {
   useEffect(() => {
     if (isSearch) {
       dispatch(getDailySkuRollupDataRequest([searchData]));
+      setSearch(false)
+
     }
   }, [isSearch]);
 

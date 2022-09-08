@@ -240,6 +240,7 @@ useEffect(() => {
 useEffect(() => {
   if(isSearch){
     dispatch(getSystemConfigRequest([searchData])) 
+    setSearch(false)
   }
 },[isSearch])
 

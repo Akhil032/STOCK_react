@@ -314,6 +314,7 @@ const TransactionReversal = () => {
   useEffect(() => {
     if (isSearch) {
       dispatch(getTransactionReversalRequest([searchData]));
+      setSearch(false)
     }
   }, [isSearch]);
 

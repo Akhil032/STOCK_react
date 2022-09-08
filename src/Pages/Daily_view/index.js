@@ -9,7 +9,7 @@ import { makeStyles } from "@mui/styles";
 import {getDailyViewRequest} from "../../Redux/Action/DailyView"
 import CircularProgress from "@mui/material/CircularProgress";
 //import { headCells } from "./tableHead";
-import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import swal from '@sweetalert/with-react';
@@ -258,7 +258,7 @@ const handleSearchColumn = (e) => {
             <div className={DailyViewClasses.uploaddiv}>
               
 
-          <Button variant="contained" sx={{ marginTop: '15px', textAlign:'right' }} onClick={handleSubmit} startIcon={<SearchIcon />}>Search</Button>
+          <Button variant="contained" sx={{ marginTop: '15px', textAlign:'right' }} onClick={handleSubmit} startIcon={<RefreshIcon />}>Refresh</Button>
           
        </div>
           </Box>
