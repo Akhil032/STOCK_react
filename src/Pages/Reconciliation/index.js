@@ -115,6 +115,7 @@ const initialsearch = {
   LOCATION: [],
   TRN_TYPE: [],
   AREF: [],
+  TRN_NAME:[],
   TRN_POST_DATE: "",
 };
 
@@ -125,11 +126,12 @@ const initialItemData = {
   ITEM: "",
 };
 
-const initialTRName={
-  TRN_NAME:[]
-}
+
 
 const Reconciliation = () => {
+  const [input, setInput] = useState("");
+  const [inputLoc, setInputLoc] = useState("");
+  const [inputTrn,setInputTrn] = useState("");
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -148,6 +150,7 @@ const Reconciliation = () => {
   const [valLoc,setValLoc]=useState([]);
   const [freeze, setFreeze] = useState(false);
   const [valTrnType,setValTrnType]=useState([]);
+  const [load, setLoad] = useState(0);
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -294,10 +297,13 @@ const Reconciliation = () => {
       DailySkuRollupData?.data?.Data &&
       Array.isArray(DailySkuRollupData?.data?.Data)
     ) {
+      if (load===0){
       setTabledata(serializedata(DailySkuRollupData?.data?.Data));
       setAllData(serializedata(DailySkuRollupData?.data?.Data));
+      }
       setLoading(false);
       setSearch(false);
+      setLoad(0);
     } else {
       setSearch(false);
     }
@@ -338,10 +344,70 @@ const Reconciliation = () => {
   };
 
   const handleSubmit = (event) => {
+    var check=0;
+  if( input.length>0){
+    for(var i = 0; i < UniqDept.length; i++) {
+      check=1
+      if ((UniqDept[i].HIER1).toUpperCase() === input.toUpperCase()) {
+          handleHier1(0,UniqDept[i])
+          setInput("");
+          check=2;
+          break;
+      }
+    } 
+  }if ( inputLoc.length>0 && (check===0 || check===2)){
+    if(locationData.length>0){      
+      for(var i = 0; i < locationData.length; i++) {  
+        if (locationData[i].LOCATION=== parseInt(inputLoc)) {
+            selectLocation(0,locationData[i]);
+            setInputLoc("");
+            check=2;
+            break;
+        }else{
+          check=1; }
+      }
+    }
+    else{
+      check=1;
+    }
+  }if ( inputTrn.length>0 && (check===0 || check===2)){
+    console.log("inputTrn",inputTrn)
+    if(trnTypeValue.length>0){      
+      for(var i = 0; i < trnTypeValue.length; i++) {  
+        if (trnTypeValue[i].TRN_NAME.toUpperCase()=== inputTrn.toUpperCase()) {
+           // selectLocation(0,locationData[i]);
+           console.log("inputTrn4343",trnTypeValue[i].TRN_NAME)
+           selectTrantype(0,trnTypeValue[i])
+            // searchData.TRN_NAME.push(trnTypeValue[i].TRN_NAME)
+            // searchData.TRN_TYPE=trnTypeValue[i].TRN_TYPE
+            // searchData.AREF=trnTypeValue[i].AREF
+            setInputTrn("");
+            check=2;
+            break;
+        }else{
+          check=1; }
+      }
+    }
+    else{
+      check=1;
+    }
+  }
+  if (check===1){
+    swal(
+      <div>     
+        <p>{"No Data Found"}</p>
+      </div>
+    )
     event.preventDefault();
-    setSearch(true);
-    setSort(1);
-    setState({ ...state, right: open });
+    setState({ ...state, 'right': open });
+    setLoad(1)
+  }else{ 
+      setLoad(0);
+      event.preventDefault();
+      setSearch(true);
+      setState({ ...state, 'right': open });
+    }
+  
   };
 
   const onChange = (e) => {
@@ -383,13 +449,17 @@ const Reconciliation = () => {
     initialsearch.TRN_TYPE = [];
     initialsearch.TRN_POST_DATE = [];
     initialsearch.AREF = [];
+    initialsearch.TRN_NAME = [];
     setSearchData(initialsearch);
     setSearch(false);
+    setLoad(0);
+    setInput("");
+    setInputLoc("");
+    setInputTrn("");
     setSort(1);
     setValH1([]);
     setValLoc([]);
     setValTrnType([]);
-    initialTRName.TRN_NAME=[];
     setTabledata("");
     setInputValue("");
     setAllData("");
@@ -446,21 +516,35 @@ const Reconciliation = () => {
     let selectedDept = [];
     if (value.option) {     
         valH1.push(value.option)
+        // if (value.option.HIER1===input){ 
+        //   setInput("");
+        // }
+        if ((value.option.HIER1).includes(input)){
+          setInput("");
+        } 
     }else if (value.removedValue) {
-        let index = valH1.indexOf(value.removedValue.HIER1);
-        valH1.splice(index,1);
-    //}
+      let index=0        
+      for(var i=0;i<valH1.length;i++)
+      {
+        if(valH1[i]["HIER1"]===value.removedValue.HIER1){
+          index=i;
+          break;
+        }
+      }
+     valH1.splice(index,1);
     }else if(value.action==="clear"){ 
         valH1.splice(0,valH1.length);
     }
-  //console.log("V1",valH1);
-//Filtering HIER2 based on HIER1
-    if (valH1.length >0) {
-      const filterClass = itemData.filter((item) => {      
-        return (valH1).some((val) => {
-          return item.HIER1 === val.HIER1;
-        });     
-      });
+//manual input handle input and filter itemdata
+  if(e===0){
+    valH1.push(value);}
+  //Filtering HIER2 based on HIER1
+ if (valH1.length >0) {
+      // const filterClass = itemData.filter((item) => {      
+      //   return (valH1).some((val) => {
+      //     return item.HIER1 === val.HIER1;
+      //   });     
+      // });
       // let UniqClass =
       //     filterClass.length > 0
       //       ? [
@@ -478,7 +562,9 @@ const Reconciliation = () => {
                 ...prev,
                 HIER1: selectedDept,
               };
-            });          
+              
+            });     
+     
     }else {
       //setFilterClass([])
       setSearchData((prev) => {
@@ -489,120 +575,113 @@ const Reconciliation = () => {
       });
     }
 }
-  // const selectDept = (event, value) => {
-  //   let selectedDept = [];
-  //   if (value.length > 0) {
-  //     const filterClass = itemData.filter((item) => {
-  //       return value.some((val) => {
-  //         return item.HIER1 === val.HIER1;
-  //       });
-  //     });
-
-  //     console.log(filterClass);
-
-  //     value.map((item) => {
-  //       selectedDept.push(item.HIER1);
-  //     });
-  //     setSearchData((prev) => {
-  //       return {
-  //         ...prev,
-  //         HIER1: selectedDept,
-  //       };
-  //     });
-  //   } else {
-  //     setSearchData((prev) => {
-  //       return {
-  //         ...prev,
-  //         HIER1: [],
-  //       };
-  //     });
-  //   }
-  // };
-  const selectLocation = (event, value) => {
-
-    let selectedLocation = [];
-    if (value.option) {     
-          valLoc.push(value.option)
-      }else if (value.removedValue) {
-          let index = valLoc.indexOf(value.removedValue.LOCATION);
-          valLoc.splice(index,1);
-      }else if(value.action==="clear"){ 
-        valLoc.splice(0,valLoc.length);
-      }
-   
-    if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
-      valLoc.map(
-        (item) => {
-          selectedLocation.push(item.LOCATION);
-        }
-      )
-      //console.log(value);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION : selectedLocation,
-        };
-      });
-    }else if(value.length > 0){
-          //console.log(value);
-          swal(
-            <div>     
-              <p>{"Please Choose valid LOCATION"}</p>
-            </div>
-          )  
-    }else {
-      initialsearch.LOCATION = "";
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION : [],
-        };
-      });
-    }
-   }
-   const selectTrantype=(e,value) =>{
-    let selectedTrantype = [];
-    let selectedAref = [];
-    let selectedTranName=[]
-    if (value.option) {
-      valTrnType.push(value.option)
+const selectLocation = (event, value) => {
+  let selectedLocation = [];
+  if (value.option) {     
+        valLoc.push(value.option);
+        // if (value.option.LOCATION===parseInt(inputLoc)){ 
+        //   console.log(1234)
+        //   setInputLoc("");
+        // }
+        if (String(value.option.LOCATION).includes(inputLoc)){
+          setInputLoc("");
+        } 
     }else if (value.removedValue) {
-      let index=0;      
-      for(var i=0;i<valTrnType.length;i++) {
-        if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
-          index=i;        
+      let index=0        
+      for(var i=0;i<valLoc.length;i++)
+      {
+        if(valLoc[i]["LOCATION"]===value.removedValue.LOCATION){
+          index=i;
           break;
         }
       }
-      valTrnType.splice(index,1);
-    }else if(value.action="clear"){
-      valTrnType.splice(0,valTrnType.length);
+      valLoc.splice(index,1);
+    }else if(value.action==="clear"){ 
+      valLoc.splice(0,valLoc.length);
     }
-    if (valTrnType.length >0) {
-      valTrnType.map((item) => {
-        selectedTrantype.push(item.TRN_TYPE);
-        selectedAref.push(item.AREF)
-        selectedTranName.push(item.TRN_NAME)
-      });
-      initialTRName.TRN_NAME=(selectedTranName);
-      setSearchData((prev) => {
-          return {
-            ...prev,
-            TRN_TYPE: selectedTrantype,
-            AREF:selectedAref
-          };
-        });
-    }else {
-        initialTRName.TRN_NAME=[];
-        setSearchData((prev) => {
+    if(event===0){
+      valLoc.push(value)
+    }
+  if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
+    valLoc.map(
+      (item) => {
+        selectedLocation.push(item.LOCATION);
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        LOCATION : selectedLocation,
+      };
+    });
+  }else if(value.length > 0){
+        swal(
+          <div>     
+            <p>{"Please Choose valid LOCATION"}</p>
+          </div>
+        )  
+  }else {
+    initialsearch.LOCATION = "";
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        LOCATION : [],
+      };
+    });
+  }
+ }
+ const selectTrantype=(e,value) =>{
+  let selectedTrantype = [];
+  let selectedAref = [];
+  let selectedTranName=[]
+  if (value.option) {
+    valTrnType.push(value.option)
+    if ((value.option.TRN_NAME).toUpperCase().includes(inputTrn.toUpperCase())){
+      setInputTrn("");
+    } 
+  }else if (value.removedValue) {
+    let index=0;      
+    for(var i=0;i<valTrnType.length;i++) {
+      if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
+        index=i;        
+        break;
+      }
+    }
+    valTrnType.splice(index,1);
+  }else if(value.action="clear"){
+    valTrnType.splice(0,valTrnType.length);
+  }
+
+  if(e===0){
+    valTrnType.push(value)
+  }
+
+  if (valTrnType.length >0) {
+    valTrnType.map((item) => {
+      selectedTrantype.push(item.TRN_TYPE);
+      selectedAref.push(item.AREF)
+      selectedTranName.push(item.TRN_NAME)
+    });
+    setSearchData((prev) => {
         return {
           ...prev,
-          TRN_TYPE : [],
-          AREF: []
+          TRN_TYPE: selectedTrantype,
+          AREF:selectedAref,
+          TRN_NAME:selectedTranName,
         };
-        });
-    }
+      });
+  }else {
+      setSearchData((prev) => {
+      return {
+        ...prev,
+        TRN_TYPE : [],
+        AREF: [],
+        TRN_NAME:[],
+      };
+      });
   }
+ 
+}
 
   let UniqDept =
     itemData.length > 0
@@ -691,6 +770,13 @@ const Reconciliation = () => {
                 getOptionValue={option => option.HIER1}
                 options={UniqDept.length > 0 ? UniqDept : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  // only set the input when the action that caused the
+                  // change equals to "input-change" and ignore the other
+                  // ones like: "set-value", "input-blur", and "menu-close"
+                  if (action.action === "input-change") setInput(value); // <---
+                }}
+                inputValue={input}
                 onChange={handleHier1}
                 placeholder={"Choose HIER1"}
                 styles={styleSelect}
@@ -708,6 +794,10 @@ const Reconciliation = () => {
                 getOptionValue={option => option.LOCATION}
                 options={locationData.length > 0 ? locationData : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputLoc(value);
+                }}
+                inputValue={inputLoc}                
                 onChange={selectLocation}
                 placeholder={"Choose a Location"}
                 styles={styleSelect}
@@ -725,11 +815,15 @@ const Reconciliation = () => {
                 getOptionValue={option => option.TRN_NAME}
                 options={trnTypeValue}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputTrn(value);
+                }}
+                inputValue={inputTrn}
                 onChange={selectTrantype}
                 placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
                 components={animatedComponents} 
-                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}
+                value={trnTypeValue.filter(obj => searchData?.TRN_NAME.includes(obj.TRN_NAME))}
                 isMulti 
                 />
 

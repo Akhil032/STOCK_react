@@ -120,6 +120,7 @@ const initialsearch = {
   LOCATION: [],
   TRN_TYPE: [],
   AREF: [],
+  TRN_NAME:[],
   CREATE_ID: JSON.parse(localStorage.getItem("userData"))?.username,
   TRN_DATE: "",
 };
@@ -131,10 +132,14 @@ const initialItemData = {
   ITEM: "",
 };
 
-const initialTRName={
-  TRN_NAME:[]
-}
+
 const EditTransaction = () => {
+  const [input, setInput] = useState("");
+  const [inputH2, setInputH2] = useState("");
+  const [inputH3, setInputH3] = useState("");
+  const [inputItem, setInputItem] = useState("");
+  const [inputLoc, setInputLoc] = useState("");
+  const [inputTrn,setInputTrn] = useState("");
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -160,6 +165,7 @@ const EditTransaction = () => {
   const [valLoc,setValLoc]=useState([]);
   const [valTrnType,setValTrnType]=useState([]);
   const [freeze, setFreeze] = useState(false);
+  const [load, setLoad] = useState(0);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [state, setState] = React.useState({
@@ -313,11 +319,14 @@ const EditTransaction = () => {
 
   useEffect(() => {
     if (editTransactionData?.data?.Data && Array.isArray(editTransactionData?.data?.Data)) {
-      setTabledata(serializedata(editTransactionData?.data?.Data));
-      setAllData(serializedata(editTransactionData?.data?.Data));
+      if (load===0){
+        setTabledata(serializedata(editTransactionData?.data?.Data));
+        setAllData(serializedata(editTransactionData?.data?.Data))
+      }
       setLoading(false);
       setSubmit(false);
       setSearch(false);
+      setLoad(0);
     } else if (
       editTransactionData?.data?.itemData &&
       Array.isArray(editTransactionData?.data?.itemData)
@@ -380,6 +389,7 @@ const EditTransaction = () => {
       initialsearch.LOCATION = [];
       initialsearch.TRN_TYPE = [];
       initialsearch.TRN_DATE = [];
+      initialsearch.TRN_NAME = [];
       initialsearch.AREF = [];
       initialsearch.CREATE_ID = [];
       if((searchData).length===0){
@@ -393,11 +403,124 @@ const EditTransaction = () => {
       setOpen(false);
     }
   };
-  const handleSubmit = (event) => {
+const handleSubmit = (event) => {
+  var check=0;
+  if( input.length>0){
+    for(var i = 0; i < UniqDept.length; i++) {
+      check=1
+      if ((UniqDept[i].HIER1).toUpperCase() === input.toUpperCase()) {
+          handleHier1(0,UniqDept[i])
+          setInput("");
+          check=2;
+          break;
+      }
+    } 
+  }if ( inputH2.length>0 && (check===0 || check===2)){
+    if(filterClass.length>0){      
+      for(var i = 0; i < filterClass.length; i++) {      
+        if ((filterClass[i].HIER2).toUpperCase() === inputH2.toUpperCase()) {
+            handleHier2(0,filterClass[i])
+            setInputH2("");
+            check=2;
+            break;
+        }
+        else{
+          check=1
+        }
+      }
+    }
+    else{
+      check=1
+    }
+  }if ( inputH3.length>0 && (check===0 || check===2)){
+    if(subfilterClass.length>0){      
+      for(var i = 0; i < subfilterClass.length; i++) {      
+        if ((subfilterClass[i].HIER3).toUpperCase() === inputH3.toUpperCase()) {
+            handleHier3(0,subfilterClass[i]);
+            setInputH3("");
+            check=2;
+            break;
+        }
+        else{
+          check=1;
+        }
+      }
+    }
+    else{
+      check=1
+    }
+  }if ( inputItem.length>0 && (check===0 || check===2)){
+    if(filterItem.length>0){      
+      for(var i = 0; i < filterItem.length; i++) {      
+        if ((filterItem[i].ITEM).toUpperCase() === inputItem.toUpperCase()) {
+            handleItem(0,filterItem[i]);
+            setInputItem("");
+            check=2;
+            break;
+        }
+        else{
+          check=1;
+        }
+      }
+    }
+    else{
+      check=1
+    }
+  }if ( inputLoc.length>0 && (check===0 || check===2)){
+    if(locationData.length>0){      
+      for(var i = 0; i < locationData.length; i++) {  
+        if (locationData[i].LOCATION=== parseInt(inputLoc)) {
+            selectLocation(0,locationData[i]);
+            setInputLoc("");
+            check=2;
+            break;
+        }else{
+          check=1; }
+      }
+    }
+    else{
+      check=1;
+    }
+  }if ( inputTrn.length>0 && (check===0 || check===2)){
+    console.log("inputTrn",inputTrn)
+    if(trnTypeValue.length>0){      
+      for(var i = 0; i < trnTypeValue.length; i++) {  
+        if (trnTypeValue[i].TRN_NAME.toUpperCase()=== inputTrn.toUpperCase()) {
+           // selectLocation(0,locationData[i]);
+           console.log("inputTrn4343",trnTypeValue[i].TRN_NAME)
+           selectTrantype(0,trnTypeValue[i])
+            // searchData.TRN_NAME.push(trnTypeValue[i].TRN_NAME)
+            // searchData.TRN_TYPE=trnTypeValue[i].TRN_TYPE
+            // searchData.AREF=trnTypeValue[i].AREF
+            setInputTrn("");
+            check=2;
+            break;
+        }else{
+          check=1; }
+      }
+    }
+    else{
+      check=1;
+    }
+  }
+  if (check===1){
+    swal(
+      <div>     
+        <p>{"No Data Found"}</p>
+      </div>
+    )
     event.preventDefault();
-    setSearch(true);
-    setState({ ...state, right: open });
+    setState({ ...state, 'right': open });
+    setLoad(1)
+  }else{ 
+      setLoad(0);
+      event.preventDefault();
+      setSearch(true);
+      setState({ ...state, 'right': open });
+    }
+  
   };
+
 
   const onChange = (e) => {
     setSearchData((prev) => {
@@ -489,18 +612,25 @@ const EditTransaction = () => {
     initialsearch.ITEM = [];
     initialsearch.LOCATION = [];
     initialsearch.TRN_TYPE = [];
+    initialsearch.TRN_NAME = [];
     initialsearch.TRN_DATE = [];
     initialsearch.AREF = [];
     initialsearch.CREATE_ID = [];
     //console.log("datainitial", initialsearch);
     setSearchData(initialsearch);
+    setLoad(0);
+    setInput("");
+    setInputH2("");
+    setInputH3("");
+    setInputItem("");
+    setInputLoc("");
+    setInputTrn("");
     setValH1([]);
     setValH2([]);
     setValH3([]);
     setValLoc([]);
     setValItem([]);
     setValTrnType([]);
-    initialTRName.TRN_NAME=[];
     setFilterClass([]);
     setsubFilterClass([]);
     setFilterItem([]);
@@ -515,16 +645,30 @@ const EditTransaction = () => {
     let selectedDept = [];
     if (value.option) {     
         valH1.push(value.option)
+        // if (value.option.HIER1===input){ 
+        //   setInput("");
+        // }
+        if ((value.option.HIER1).includes(input)){
+          setInput("");
+        } 
     }else if (value.removedValue) {
-        let index = valH1.indexOf(value.removedValue.HIER1);
-        valH1.splice(index,1);
-    //}
+      let index=0        
+      for(var i=0;i<valH1.length;i++)
+      {
+        if(valH1[i]["HIER1"]===value.removedValue.HIER1){
+          index=i;
+          break;
+        }
+      }
+     valH1.splice(index,1);
     }else if(value.action==="clear"){ 
         valH1.splice(0,valH1.length);
     }
-  //console.log("V1",valH1);
-//Filtering HIER2 based on HIER1
-    if (valH1.length >0) {
+//manual input handle input and filter itemdata
+  if(e===0){
+    valH1.push(value);}
+  //Filtering HIER2 based on HIER1
+ if (valH1.length >0) {
       const filterClass = itemData.filter((item) => {      
         return (valH1).some((val) => {
           return item.HIER1 === val.HIER1;
@@ -547,9 +691,15 @@ const EditTransaction = () => {
                 ...prev,
                 HIER1: selectedDept,
               };
-            });          
+              
+            });     
+      if(value.removedValue){
+        handleHier2("Filter",UniqClass)
+      }
     }else {
       setFilterClass([])
+      setsubFilterClass([]);
+      setFilterItem([]);
       setSearchData((prev) => {
         return {
           ...prev,
@@ -558,21 +708,43 @@ const EditTransaction = () => {
       });
     }
 }
-
 const handleHier2=(e,value) =>
   {
-    let selectedHier2 = [];
-    if (value.option) {
-      valH2.push(value.option)
-    }else if (value.removedValue) {
-        let index = valH2.indexOf(value.removedValue.HIER2);
-        valH2.splice(index,1);
-   
-    }else if(value.action==="clear"){      
-      valH2.splice(0,valH2.length);
+    if (e==="Filter"){
+       valH2.splice(0,valH2.length);
+       valH2.push(...value);
     }
+    let selectedHier2 = [];
+    if (value){
+      if (value.option) {
+        valH2.push(value.option)
+        if ((value.option.HIER2).includes(inputH2)){
+          setInputH2("");
+        } 
+      }else if (value.removedValue) {
+        let index=0        
+        for(var i=0;i<valH2.length;i++)
+        {
+          if(valH2[i]["HIER2"]===value.removedValue.HIER2){
+            index=i;
+            break;
+          }
+        }
+       valH2.splice(index,1);
+     
+    
+      }else if(value.action==="clear"){      
+        valH2.splice(0,valH2.length);
+      }
+    }
+//manual input handle input and filter itemdata
+  if(e===0){
+    valH2.push(value);   
+  }
+  console.log("filter",valH2)
 //Filtering HIER2 based on HIER1
   if (valH2.length >0) {
+    console.log(1232)
     const filterSubClass = itemData.filter((item) => {      
       return (valH2).some((val) => {
         return item.HIER2 === val.HIER2;
@@ -595,9 +767,13 @@ const handleHier2=(e,value) =>
               ...prev,
               HIER2: selectedHier2,
             };
-          });          
+          });    
+          if(e==="Filter" ||value.removedValue) {
+            handleHier3("Filter",UniqClass)
+          }    
     }else {
       setsubFilterClass([]);
+      setFilterItem([]);
       setSearchData((prev) => {
         return {
           ...prev,
@@ -606,20 +782,37 @@ const handleHier2=(e,value) =>
       });
   }
 }
-
-
 const handleHier3=(e,value) =>
   {
+    if (e==="Filter"){
+      valH3.splice(0,valH3.length);
+      valH3.push(...value);
+   }
+
     let selectedHier3 = [];
     if (value.option) {
       valH3.push(value.option)
+      if ((value.option.HIER3).includes(inputH3)){
+        setInputH3("");
+      } 
     }else if (value.removedValue) {
-        let index = valH3.indexOf(value.removedValue.HIER3);
-        valH3.splice(index,1);
+      let index=0        
+      for(var i=0;i<valH3.length;i++)
+      {
+        if(valH3[i]["HIER3"]===value.removedValue.HIER3){
+          index=i;
+          break;
+        }
+      }
+      valH3.splice(index,1);
     
     }else if(value.action==="clear"){      
       valH3.splice(0,valH3.length);
     }
+//manual input handle input and filter itemdata
+if(e===0){
+  valH3.push(value)
+}
 //Filtering HIER3 based on HIER2
     if (valH3.length >0) {
       const filterItem = itemData.filter((item) => {      
@@ -652,13 +845,27 @@ const handleItem=(e,value) =>
     let selectedItem = [];
     if (value.option) {
       valItem.push(value.option)
+      if ((value.option.ITEM).includes(inputItem)){
+        setInputItem("");
+      } 
   }else if (value.removedValue) {
-      let index = valItem.indexOf(value.removedValue.ITEM);
-      valItem.splice(index,1);
+    let index=0        
+    for(var i=0;i<valItem.length;i++)
+    {
+      if(valItem[i]["ITEM"]===value.removedValue.ITEM){
+        index=i;
+        break;
+      }
+    }
+    valItem.splice(index,1);
    
   }else if(value.action==="clear"){      
     valItem.splice(0,valItem.length);
    }
+   //manual input handle input and filter itemdata
+  if(e===0){
+    valItem.push(value);
+  }
 //Filtering ITEM based on HIER3
 if (valItem.length >0) {
   
@@ -680,94 +887,115 @@ if (valItem.length >0) {
   });
 }
 }
-
-  const selectLocation = (event, value) => {
-
-    let selectedLocation = [];
-    if (value.option) {     
-          valLoc.push(value.option)
-      }else if (value.removedValue) {
-          let index = valLoc.indexOf(value.removedValue.LOCATION);
-          valLoc.splice(index,1);
-      }else if(value.action==="clear"){ 
-        valLoc.splice(0,valLoc.length);
-      }
-   
-    if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
-      valLoc.map(
-        (item) => {
-          selectedLocation.push(item.LOCATION);
-        }
-      )
-      //console.log(value);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION : selectedLocation,
-        };
-      });
-    }else if(value.length > 0){
-          //console.log(value);
-          swal(
-            <div>     
-              <p>{"Please Choose valid LOCATION"}</p>
-            </div>
-          )  
-    }else {
-      initialsearch.LOCATION = "";
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          LOCATION : [],
-        };
-      });
-    }
-   }
-
-
-   const selectTrantype=(e,value) =>{
-    let selectedTrantype = [];
-    let selectedAref = [];
-    let selectedTranName=[]
-    if (value.option) {
-      valTrnType.push(value.option)
+const selectLocation = (event, value) => {
+  let selectedLocation = [];
+  if (value.option) {     
+        valLoc.push(value.option);
+        // if (value.option.LOCATION===parseInt(inputLoc)){ 
+        //   console.log(1234)
+        //   setInputLoc("");
+        // }
+        if (String(value.option.LOCATION).includes(inputLoc)){
+          setInputLoc("");
+        } 
     }else if (value.removedValue) {
-      let index=0;      
-      for(var i=0;i<valTrnType.length;i++) {
-        if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
-          index=i;        
+      let index=0        
+      for(var i=0;i<valLoc.length;i++)
+      {
+        if(valLoc[i]["LOCATION"]===value.removedValue.LOCATION){
+          index=i;
           break;
         }
       }
-      valTrnType.splice(index,1);
-    }else if(value.action="clear"){
-      valTrnType.splice(0,valTrnType.length);
+      valLoc.splice(index,1);
+    }else if(value.action==="clear"){ 
+      valLoc.splice(0,valLoc.length);
     }
-    if (valTrnType.length >0) {
-      valTrnType.map((item) => {
-        selectedTrantype.push(item.TRN_TYPE);
-        selectedAref.push(item.AREF)
-        selectedTranName.push(item.TRN_NAME)
-      });
-      initialTRName.TRN_NAME=(selectedTranName);
-      setSearchData((prev) => {
-          return {
-            ...prev,
-            TRN_TYPE: selectedTrantype,
-            AREF:selectedAref
-          };
-        });
-    }else {
-        initialTRName.TRN_NAME=[];
-        setSearchData((prev) => {
+    if(event===0){
+      valLoc.push(value)
+    }
+  if(valLoc.length > 0 && typeof valLoc[0]['LOCATION'] !== "undefined"){
+    valLoc.map(
+      (item) => {
+        selectedLocation.push(item.LOCATION);
+      }
+    )
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        LOCATION : selectedLocation,
+      };
+    });
+  }else if(value.length > 0){
+        swal(
+          <div>     
+            <p>{"Please Choose valid LOCATION"}</p>
+          </div>
+        )  
+  }else {
+    initialsearch.LOCATION = "";
+    setSearchData((prev) => {
+      return {
+        ...prev,
+        LOCATION : [],
+      };
+    });
+  }
+ }
+
+
+ const selectTrantype=(e,value) =>{
+  let selectedTrantype = [];
+  let selectedAref = [];
+  let selectedTranName=[]
+  if (value.option) {
+    valTrnType.push(value.option)
+    if ((value.option.TRN_NAME).toUpperCase().includes(inputTrn.toUpperCase())){
+      setInputTrn("");
+    } 
+  }else if (value.removedValue) {
+    let index=0;      
+    for(var i=0;i<valTrnType.length;i++) {
+      if(valTrnType[i]["TRN_TYPE"]===value.removedValue.TRN_TYPE && valTrnType[i]["AREF"]===value.removedValue.AREF ){
+        index=i;        
+        break;
+      }
+    }
+    valTrnType.splice(index,1);
+  }else if(value.action="clear"){
+    valTrnType.splice(0,valTrnType.length);
+  }
+
+  if(e===0){
+    valTrnType.push(value)
+  }
+
+  if (valTrnType.length >0) {
+    valTrnType.map((item) => {
+      selectedTrantype.push(item.TRN_TYPE);
+      selectedAref.push(item.AREF)
+      selectedTranName.push(item.TRN_NAME)
+    });
+    setSearchData((prev) => {
         return {
           ...prev,
-          TRN_TYPE : [],
-          AREF: []
+          TRN_TYPE: selectedTrantype,
+          AREF:selectedAref,
+          TRN_NAME:selectedTranName,
         };
-        });
-    }
+      });
+  }else {
+      setSearchData((prev) => {
+      return {
+        ...prev,
+        TRN_TYPE : [],
+        AREF: [],
+        TRN_NAME:[],
+      };
+      });
   }
+ 
+}
 
   let UniqDept =
     itemData.length > 0
@@ -792,38 +1020,6 @@ if (valItem.length >0) {
         sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
       >
         <Stack spacing={2} sx={{ width: 250 }}>
-          {/* <Autocomplete
-              multiple
-              size="small"
-              id="combo-box-dept"
-              options={itemData}
-              //value={(searchData?.HIER1.length > 0)?searchData?.HIER1:[]}
-              sx={{ width: 250 }}
-              onChange={selectDept} 
-              renderInput={(params) => <TextField {...params} label="HIER1" variant="standard" />}
-            />
-           
-            <Autocomplete
-              multiple
-              size="small"
-              id="combo-box-class"
-              options={(filterClass.length > 0)?filterClass:[]}
-             // value={(searchData?.HIER2.length > 0)?searchData?.HIER2:[]}
-              sx={{ width: 250 }}
-              onChange={selectClass} 
-              renderInput={(params) => <TextField {...params} label="HIER2" variant="standard" />}
-            />
-         
-            <Autocomplete
-              multiple
-              size="small"
-              id="combo-box-subclass"
-              options={(subfilterClass.length > 0)?subfilterClass:[]}
-             // value={(searchData?.HIER3.length > 0)?searchData?.HIER3:[]}
-              sx={{ width: 250 }}
-              onChange={selectSubClass} 
-              renderInput={(params) => <TextField {...params} label="HIER3" variant="standard" />}
-            /> */}
           <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
@@ -833,6 +1029,13 @@ if (valItem.length >0) {
                 getOptionValue={option => option.HIER1}
                 options={UniqDept.length > 0 ? UniqDept : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  // only set the input when the action that caused the
+                  // change equals to "input-change" and ignore the other
+                  // ones like: "set-value", "input-blur", and "menu-close"
+                  if (action.action === "input-change") setInput(value); // <---
+                }}
+                inputValue={input}
                 onChange={handleHier1}
                 placeholder={"Choose HIER1"}
                 styles={styleSelect}
@@ -852,6 +1055,10 @@ if (valItem.length >0) {
                 getOptionValue={option => option.HIER2}
                 options={(filterClass.length > 0) ? filterClass : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputH2(value);
+                }}
+                inputValue={inputH2}
                 onChange={handleHier2}
                 placeholder={"Choose a HIER2"}
                 styles={styleSelect}
@@ -870,6 +1077,10 @@ if (valItem.length >0) {
                 getOptionValue={option => option.HIER2}
                 options={(subfilterClass.length > 0) ? subfilterClass : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputH3(value);
+                }}
+                inputValue={inputH3}
                 onChange={handleHier3}
                 placeholder={"Choose a HIER3"}
                 styles={styleSelect}
@@ -888,6 +1099,10 @@ if (valItem.length >0) {
                 getOptionValue={option => option.ITEM}
                 options={(filterItem.length > 0) ? filterItem : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputItem(value);
+                }}
+                inputValue={inputItem}
                 onChange={handleItem}
                 placeholder={"Choose a ITEM"}
                 styles={styleSelect}
@@ -905,6 +1120,10 @@ if (valItem.length >0) {
                 getOptionValue={option => option.LOCATION}
                 options={locationData.length > 0 ? locationData : []}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputLoc(value);
+                }}
+                inputValue={inputLoc}
                 onChange={selectLocation}
                 placeholder={"Choose a Location"}
                 styles={styleSelect}
@@ -922,27 +1141,17 @@ if (valItem.length >0) {
                 getOptionValue={option => option.TRN_NAME}
                 options={trnTypeValue}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputTrn(value);
+                }}
+                inputValue={inputTrn}
                 onChange={selectTrantype}
                 placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
                 components={animatedComponents} 
-                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}  
+                value={trnTypeValue.filter(obj => searchData?.TRN_NAME.includes(obj.TRN_NAME))}
                 isMulti 
                 />
-
-          {/* <Autocomplete
-            multiple
-            disablePortal
-            size="small"
-            id="combo-box-err-type"
-            //  value={(searchData?.ERR_MSG.length > 0)?searchData?.ERR_MSG:[]}
-            options={errorList.length > 0 ? errorList : []}
-            sx={{ width: 250 }}
-            onChange={selectError}
-            renderInput={(params) => (
-              <TextField {...params} label="ERR MESSAGE" variant="standard" />
-            )}
-          /> */}
           <TextField
             className={editTransactionClasses.textField}
             //disabled

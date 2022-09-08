@@ -96,14 +96,12 @@ const useStyles = makeStyles({
 const initialsearch = {
   TRN_TYPE: [] ,
   AREF: [],
-}
-
-const initialTRName={
   TRN_NAME:[]
 }
 
  
 const SystemConfig = () => {
+  const [inputTrn,setInputTrn] = useState("");
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -119,6 +117,7 @@ const SystemConfig = () => {
   const [open, setOpen] = useState(false);
   const [valTrnType,setValTrnType]=useState([]);
   const theme = useTheme();
+  const [load, setLoad] = useState(0);
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [state, setState] = React.useState({
     top: false,
@@ -246,18 +245,21 @@ useEffect(() => {
 
   useEffect(() => {
         if(ConfigData?.data?.Data && Array.isArray(ConfigData?.data?.Data)){
+          if (load===0){
           setTabledata(serializedata(ConfigData?.data?.Data));
           setAllData(serializedata(ConfigData?.data?.Data));
+          }
           setLoading(false);
           setSubmit(false);
           setSearch(false);
+          setLoad(0);
         }else {
           setSearch(false)
         }
         
   },[ConfigData?.data])
 
-console.log("asdasds",searchData)
+  //console.log("asdasds",searchData)
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value == "") {
@@ -312,10 +314,42 @@ const confirmSubmit = () => {
     
   };
 const handleSubmit = (event) => {
-  event.preventDefault();
-    setSearch(true);
+  var check=0;
+  if ( inputTrn.length>0 ){
+    console.log("inputTrn",valTrnType)
+    if(trnTypeValue.length>0){      
+      for(var i = 0; i < trnTypeValue.length; i++) {  
+        if (trnTypeValue[i].TRN_NAME.toUpperCase()=== inputTrn.toUpperCase()) {
+           console.log("inputTrn4343",trnTypeValue[i])
+           selectTrantype(0,trnTypeValue[i])
+            setInputTrn("");
+            check=2;
+            break;
+        }else{
+          check=1; }
+      }
+    }
+    else{
+      check=1;
+    }
+  }
+  if (check===1){
+    swal(
+      <div>     
+        <p>{"No Data Found"}</p>
+      </div>
+    )
+    event.preventDefault();
     setState({ ...state, 'right': open });
-}
+    setLoad(1)
+  }else{ 
+      setLoad(0);
+      event.preventDefault();
+      setSearch(true);
+      setState({ ...state, 'right': open });
+    }
+  
+  };
 
 const handleSearchColumn = (e) => {
   //console.log("Handle Search Column",e);
@@ -384,6 +418,7 @@ const onReset = (event) => {
 
     initialsearch.TRN_TYPE= [];
     initialsearch.AREF = [];
+    initialsearch.TRN_NAME = [];
     //console.log('datainitial',initialsearch);
       setSearchData(initialsearch)
       //console.log('data',searchData);
@@ -391,17 +426,18 @@ const onReset = (event) => {
       setTabledata("");
       setInputValue("");
       setValTrnType([]);
-      initialTRName.TRN_NAME=[];
+      setInputTrn("")
       dispatch(resetSystemConfig());
 }
-console.log("ASSDCDFGFD",initialTRName)
 const selectTrantype=(e,value) =>{
-  
   let selectedTrantype = [];
   let selectedAref = [];
   let selectedTranName=[]
   if (value.option) {
     valTrnType.push(value.option)
+    if ((value.option.TRN_NAME).toUpperCase().includes(inputTrn.toUpperCase())){
+      setInputTrn("");
+    } 
   }else if (value.removedValue) {
     let index=0;      
     for(var i=0;i<valTrnType.length;i++) {
@@ -414,27 +450,35 @@ const selectTrantype=(e,value) =>{
   }else if(value.action="clear"){
     valTrnType.splice(0,valTrnType.length);
   }
+  console.log("valTrnType",valTrnType)
+  if(e===0){
+    console.log("dfdf",value,valTrnType)
+    valTrnType.push(value)
+    console.log("dfdf2",valTrnType)
+
+  }
+
   if (valTrnType.length >0) {
     valTrnType.map((item) => {
       selectedTrantype.push(item.TRN_TYPE);
       selectedAref.push(item.AREF)
       selectedTranName.push(item.TRN_NAME)
     });
-    initialTRName.TRN_NAME=(selectedTranName);
     setSearchData((prev) => {
         return {
           ...prev,
           TRN_TYPE: selectedTrantype,
-          AREF:selectedAref
+          AREF:selectedAref,
+          TRN_NAME:selectedTranName,
         };
       });
   }else {
-      initialTRName.TRN_NAME=[];
       setSearchData((prev) => {
       return {
         ...prev,
         TRN_TYPE : [],
-        AREF: []
+        AREF: [],
+        TRN_NAME:[],
       };
       });
   }
@@ -482,11 +526,15 @@ const searchPanel = () => (
                 getOptionValue={option => option.TRN_NAME}
                 options={trnTypeValue}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputTrn(value);
+                }}
+                inputValue={inputTrn}
                 onChange={selectTrantype}
                 placeholder={"Choose a Trn Type"}
                 styles={styleSelect}
                 components={animatedComponents} 
-                value={trnTypeValue.filter(obj => initialTRName?.TRN_NAME.includes(obj.TRN_NAME))}  
+                value={trnTypeValue.filter(obj => searchData?.TRN_NAME.includes(obj.TRN_NAME))}
                 isMulti 
                 />
             <div>

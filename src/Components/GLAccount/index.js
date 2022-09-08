@@ -120,6 +120,8 @@ const initialItemData = {
 };
 
 const GlAccount = () => {
+  const [inputCurr, setInputCurr] = useState("");
+  const [load, setLoad] = useState(0);
   const [tabledata, setTabledata] = useState("");
   const [inputValue, setInputValue] = useState();
   const [allData, setAllData] = useState("");
@@ -260,11 +262,14 @@ const GlAccount = () => {
 
   useEffect(() => {
     if (GlAccountData?.data?.Data && Array.isArray(GlAccountData?.data?.Data)) {
-      setTabledata(serializedata(GlAccountData?.data?.Data));
-      setAllData(serializedata(GlAccountData?.data?.Data));
+      if (load===0){
+        setTabledata(serializedata(GlAccountData?.data?.Data));
+        setAllData(serializedata(GlAccountData?.data?.Data));
+      }
       setLoading(false);
       setSubmit(false);
       setSearch(false);
+      setLoad(0);
     } else if(GlAccountData?.data?.CURRENCYDATA && Array.isArray(GlAccountData?.data?.CURRENCYDATA)){
       setItemData(GlAccountData?.data?.CURRENCYDATA);
       setOrigItemData(GlAccountData?.data?.CURRENCYDATA);
@@ -316,9 +321,34 @@ console.log("test",tabledata)
     }
   };
   const handleSubmit = (event) => {
+    var check=0;
+  if( inputCurr.length>0){
+    for(var i = 0; i < itemData.length; i++) {
+      check=1
+      if ((itemData[i].CURRENCY).toUpperCase() === inputCurr.toUpperCase()) {
+        selectCurrency(0,itemData[i])
+          setInputCurr("");
+          check=2;
+          break;
+      }
+    } 
+  }
+  if (check===1){
+    swal(
+      <div>     
+        <p>{"No Data Found"}</p>
+      </div>
+    )
     event.preventDefault();
-    setSearch(true);
-    setState({ ...state, right: open });
+    setState({ ...state, 'right': open });
+    setLoad(1)
+  }else{ 
+      setLoad(0);
+      event.preventDefault();
+      setSearch(true);
+      setState({ ...state, 'right': open });
+    }
+  
   };
 
   const onChange = (e) => {
@@ -343,6 +373,7 @@ console.log("test",tabledata)
     initialsearch.PRIMARY_ACCOUNT = [];
     initialsearch.CURRENCY = [];
     console.log("datainitial", initialsearch);
+    setInputCurr("");
     setSearchData(initialsearch);
     setFilterClass([]);
     setsubFilterClass([]);
@@ -412,13 +443,18 @@ console.log("test",tabledata)
     let selectedCurrency = [];
     if (value.option) {     
           valCurr.push(value.option)
+          if ((value.option.CURRENCY).toUpperCase().includes(inputCurr.toUpperCase())){
+            setInputCurr("");
+          }
       }else if (value.removedValue) {
           let index = valCurr.indexOf(value.removedValue.CURRENCY);
           valCurr.splice(index,1);
       }else if(value.action==="clear"){ 
         valCurr.splice(0,valCurr.length);
       }
-   
+      if(event===0){
+        valCurr.push(value)
+      }
     if(valCurr.length > 0 && typeof valCurr[0]['CURRENCY'] !== "undefined"){
       valCurr.map(
         (item) => {
@@ -450,6 +486,7 @@ console.log("test",tabledata)
     }
    }
 
+   
   let UniqDept =
     itemData.length > 0
       ? [...new Map(itemData.map((item) => [item["HIER1"], item])).values()]
@@ -527,6 +564,10 @@ console.log("test",tabledata)
                 getOptionValue={option => option.CURRENCY}
                 options={itemData}
                 isSearchable={true}
+                onInputChange={(value, action) => {
+                  if (action.action === "input-change") setInputCurr(value);
+                }}
+                inputValue={inputCurr}
                 onChange={selectCurrency}
                 placeholder={"Choose a Currency"}
                 styles={styleSelect}

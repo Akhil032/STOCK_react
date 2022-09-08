@@ -115,6 +115,9 @@ console.log("valus:", sendGLData)
 const Forms = () => {
     // we're using react-hook-form library 
     //const { register, handleSubmit } = useForm();
+    
+    const [inputCurr, setInputCurr] = useState("");
+    const [load, setLoad] = useState(0);
     const [itemData, setItemData] = useState(initialItemData);
     const [filterClass, setFilterClass] = useState([]);
     const [searchData, setSearchData] = useState(initialsearch);
@@ -205,8 +208,8 @@ const Forms = () => {
         //   setSearch(false);
         //}
         if (GlAccountData?.data?.CURRENCYDATA && Array.isArray(GlAccountData?.data?.CURRENCYDATA)) {
-            setItemData(GlAccountData?.data?.CURRENCYDATA);
-            setOrigItemData(GlAccountData?.data?.CURRENCYDATA);
+                setItemData(GlAccountData?.data?.CURRENCYDATA);
+                setOrigItemData(GlAccountData?.data?.CURRENCYDATA);
 
 
             //setLoading(false);
@@ -228,48 +231,62 @@ const Forms = () => {
     //    // console.log(itemData)
     //      Alert("stop") 
     //   };
+
+
     const selectCurrency = (event, value) => {
 
-    let selectedCurrency = [];
-    if (value.option) {     
-          valCurr.push(value.option)
-      }else if (value.removedValue) {
-          let index = valCurr.indexOf(value.removedValue.CURRENCY);
-          valCurr.splice(index,1);
-      }else if(value.action==="clear"){ 
-        valCurr.splice(0,valCurr.length);
-      }
-   
-    if(valCurr.length > 0 && typeof valCurr[0]['CURRENCY'] !== "undefined"){
-      valCurr.map(
-        (item) => {
-          selectedCurrency.push(item.CURRENCY);
-        }
-      )
-      //console.log(value);
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          CURRENCY : selectedCurrency,
-        };
-      });
-    }else if(value.length > 0){
+        let selectedCurrency = [];
+        if (value.option) {     
+              valCurr.push(value.option)
+              if ((value.option.CURRENCY).toUpperCase().includes(inputCurr.toUpperCase())){
+                setInputCurr("");
+              }
+          }else if (value.removedValue) {
+              let index=0        
+                for(var i=0;i<valCurr.length;i++)
+                {
+                    if(valCurr[i]["CURRENCY"]===value.removedValue.CURRENCY){
+                    index=i;
+                    break;
+                    }
+                }
+                valCurr.splice(index,1);
+          }else if(value.action==="clear"){ 
+            valCurr.splice(0,valCurr.length);
+          }
+          if(event===0){
+            valCurr.push(value)
+          }
+        if(valCurr.length > 0 && typeof valCurr[0]['CURRENCY'] !== "undefined"){
+          valCurr.map(
+            (item) => {
+              selectedCurrency.push(item.CURRENCY);
+            }
+          )
           //console.log(value);
-          swal(
-            <div>     
-              <p>{"Please Choose valid CURRENCY"}</p>
-            </div>
-          )  
-    }else {
-      initialsearch.CURRENCY = "";
-      setSearchData((prev) => {
-        return {
-          ...prev,
-          CURRENCY : [],
-        };
-      });
-    }
-   }
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              CURRENCY : selectedCurrency,
+            };
+          });
+        }else if(value.length > 0){
+              //console.log(value);
+              swal(
+                <div>     
+                  <p>{"Please Choose valid CURRENCY"}</p>
+                </div>
+              )  
+        }else {
+          initialsearch.CURRENCY = "";
+          setSearchData((prev) => {
+            return {
+              ...prev,
+              CURRENCY : [],
+            };
+          });
+        }
+       }
 
     const handleCancel = () => {
         setOpen(false)
@@ -278,7 +295,28 @@ const Forms = () => {
         //setIsValidExcel(true);
         setOpen(false);
     };
-    const handleClickOpen = () => setOpen(true);
+const handleClickOpen = () => {
+    var check=0;
+    if( inputCurr.length>0){
+        for(var i = 0; i < itemData.length; i++) {
+        check=1
+        if ((itemData[i].CURRENCY).toUpperCase() === inputCurr.toUpperCase()) {
+            selectCurrency(0,itemData[i])
+            setInputCurr("");
+            check=2;
+            break;
+        }
+        } 
+    }
+    if (check===1){
+        swal(
+        <div>     
+            <p>{"No Data Found"}</p>
+        </div>
+        )
+    }
+    setOpen(true);
+    };
     return (
         <Box className={GLCreateClasses.maindiv}>
             <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
