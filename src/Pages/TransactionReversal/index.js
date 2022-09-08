@@ -979,7 +979,7 @@ const selectLocation = (event, value) => {
       }
     }
     valTrnType.splice(index,1);
-  }else if(value.action="clear"){
+  }else if(value.action==="clear"){
     valTrnType.splice(0,valTrnType.length);
   }
 

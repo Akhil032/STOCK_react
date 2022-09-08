@@ -315,8 +315,9 @@ const confirmSubmit = () => {
   };
 const handleSubmit = (event) => {
   var check=0;
+  console.log("inputTrn",valTrnType)
   if ( inputTrn.length>0 ){
-    console.log("inputTrn",valTrnType)
+    
     if(trnTypeValue.length>0){      
       for(var i = 0; i < trnTypeValue.length; i++) {  
         if (trnTypeValue[i].TRN_NAME.toUpperCase()=== inputTrn.toUpperCase()) {
@@ -447,7 +448,8 @@ const selectTrantype=(e,value) =>{
       }
     }
     valTrnType.splice(index,1);
-  }else if(value.action="clear"){
+  }else if(value.action==="clear"){
+    console.log(12232)
     valTrnType.splice(0,valTrnType.length);
   }
   console.log("valTrnType",valTrnType)
