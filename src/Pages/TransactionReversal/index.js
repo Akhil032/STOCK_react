@@ -286,6 +286,7 @@ const TransactionReversal = () => {
             <p>{TransactionReversalData["messgae"]}</p>
           </div>
         )  
+        TransactionReversalData.isError=false;
     }else if(TransactionReversalData.isSuccess){
       setIsSuccess(true);
       swal(

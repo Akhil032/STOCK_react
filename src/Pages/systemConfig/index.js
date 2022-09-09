@@ -204,6 +204,7 @@ const SystemConfig = () => {
             <p>{ConfigData["messgae"]}</p>
           </div>
         )  
+        ConfigData.isError=false;
         setSearch(false);
     }else if(ConfigData.isSuccess && ConfigData.isupdate ){
       setIsSuccess(true);

@@ -277,10 +277,11 @@ const ErrorProcessing = () => {
   //   } else {
   //     setIsError(false);
   //     setTabledata("");
-  //   }
+  //   } 
   // }, [ErrorProcessingData]);
 
   useEffect(() => {
+    console.log("ErrorProcessingData",ErrorProcessingData)
     if (ErrorProcessingData.isError) {
         setIsError(true)
         swal(
@@ -288,6 +289,7 @@ const ErrorProcessing = () => {
             <p>{ErrorProcessingData["messgae"]}</p>
           </div>
         )  
+        ErrorProcessingData.isError=false;
     }else if(ErrorProcessingData.isSuccess && ErrorProcessingData.isupdate ){
       setIsSuccess(true);
       swal(
@@ -312,6 +314,7 @@ const ErrorProcessing = () => {
  
   useEffect(() => {
     if (isSearch) {
+      //console.log("issearchData",searchData)
       dispatch(getErrorProcessingRequest([searchData]));
       setSearch(false)
     }

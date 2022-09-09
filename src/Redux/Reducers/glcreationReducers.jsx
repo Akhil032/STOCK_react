@@ -3,7 +3,7 @@ const initialState = {
   isLoading: false,
   data: [],
   isError: false,
-  messgae: "",
+  message: "",
   isSuccess: false,
 };
 
@@ -15,7 +15,7 @@ const glcreationReducers = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
-        messgae: "",
+        message: "",
         isSuccess: false,
       };
 
@@ -42,7 +42,7 @@ const glcreationReducers = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        messgae: action.payload?.Data?.message,
+        message: action.payload?.Data?.message,
         isSuccess: false,
       };
       case actions.GET_GLCURRENCY_SUCCESS:
@@ -51,7 +51,7 @@ const glcreationReducers = (state = initialState, action) => {
         isLoading: false,
         data: action.payload,
         isError: false,
-        messgae: action.payload?.Data?.message,
+        message: action.payload?.Data?.message,
         isSuccess: false,
       };
 
@@ -60,7 +60,7 @@ const glcreationReducers = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        messgae: action.payload?.Data?.message,
+        message: action.payload?.Data?.message,
         isSuccess: false,
       };
       
@@ -69,7 +69,7 @@ const glcreationReducers = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
-        messgae: "",
+        message: "",
         isSuccess: false,
       };
     
@@ -79,7 +79,7 @@ const glcreationReducers = (state = initialState, action) => {
         isLoading: false,
         data: action.payload,
         isError: false,
-        messgae: action.payload?.Data?.message,
+        message: action.payload?.Data?.message,
         isSuccess: true,
       };
     case actions.POST_GLCREATION_ERROR:
@@ -87,7 +87,7 @@ const glcreationReducers = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        messgae: action.payload?.Data?.message,
+        message: action.payload?.Data?.message,
         isSuccess: false,
       };      
     default:

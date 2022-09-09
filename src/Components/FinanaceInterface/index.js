@@ -170,6 +170,7 @@ const CostChange = () => {
           <p>{FinanceInterfaceClasses["messgae"]}</p>
         </div>
       )
+      FinanceInterfaceData.isError=false;
     }else if(FinanceInterfaceData.isSuccess){
      
       setIsSuccess(true);

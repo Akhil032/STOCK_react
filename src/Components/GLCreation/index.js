@@ -90,11 +90,11 @@ const useStyles = makeStyles({
 });
 
 const initialsearch = {
-    CURRENCY: [],
+    CURRENCY: "",
 }
 
 const initialItemData = {
-    CURRENCY: [],
+    CURRENCY: "",
 }
 
 
@@ -132,7 +132,7 @@ const Forms = () => {
     const [valCurr,setValCurr]=useState([]);
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
     const GlAccountData = useSelector(
-        (state) => state.glaccountReducers
+        (state) => state.glcreationReducers
     );
     const [validatePrimaryAccount, setValidatePrimaryAccount] = useState(false)
     const [validateSetOfBooksId, setValidateSetOfBooksId] = useState(false)
@@ -158,11 +158,13 @@ const Forms = () => {
             // console.log("ps",updateRow)
 
             if (sendData.PRIMARY_ACCOUNT.length >= 1 && sendData.SET_OF_BOOKS_ID.length >= 1) {
+                console.log("sendData", sendData)
                 dispatch(postGlcreationRequest([sendData]));
+                
                 setOpen(true);
                 setLoading(true); 
                 initialsearch.PRIMARY_ACCOUNT = [];
-                setTimeout(() => window.location.reload(), 500)
+                //setTimeout(() => window.location.reload(), 500)
             }
 
             //setSubmit(true);
@@ -180,7 +182,26 @@ const Forms = () => {
     //const Forms = () => {
     // we're using react-hook-form library 
     //const { register, handleSubmit } = useForm();
-
+    // useEffect(() => {
+    //     console.log("ErrorProcessingData",GlAccountData)
+    //     if (GlAccountData.isError && GlAccountData.message) {
+    //         swal(
+    //           <div>     
+    //             <p>{GlAccountData["message"]}</p>
+    //           </div>
+    //         )  
+    //         GlAccountData.isError=false;
+    //     }else if(GlAccountData.isSuccess && GlAccountData.message){
+    //       swal(
+    //         <div>     
+    //            <p>{GlAccountData["message"]}</p>
+    //         </div>
+    //       )
+    //       GlAccountData.isSuccess=false;
+    //       setLoading(true);
+    //     }
+    //   }, [GlAccountData])
+    
 
     const onChange = (sendData) => {
         console.log("at", sendData)
@@ -221,7 +242,7 @@ const Forms = () => {
         }
 
     }, [GlAccountData?.data])
-
+console.log("GlAccountData",GlAccountData)
     // const handleSubmit = (evt) => {
     //     evt.preventDefault();
     //     //var a={itemData,sendData}
@@ -232,9 +253,31 @@ const Forms = () => {
     //      Alert("stop") 
     //   };
 
-
-    const selectCurrency = (event, value) => {
-
+    const selectCurrency=(value)=>{
+        console.log("asda",value)
+        
+        if((value.CURRENCY).length>0){
+            console.log("asdasds",value.CURRENCY)
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                CURRENCY : value.CURRENCY,
+              };
+            });
+          }else {
+            initialsearch.CURRENCY = "";
+            setSearchData((prev) => {
+              return {
+                ...prev,
+                CURRENCY : [],
+              };
+            });
+          }
+          
+    }
+    console.log("Sds",searchData)
+    const selectCurrency2 = (event, value) => {
+        console.log("2343",value)
         let selectedCurrency = [];
         if (value.option) {     
               valCurr.push(value.option)
@@ -456,7 +499,8 @@ const handleClickOpen = () => {
 
                             //   {...register('SEGMENT7', { required: false })}
                             />
-            <Select 
+            <div style={{width: '320px'}}>              
+            {/* <Select 
                 closeMenuOnSelect={true}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -465,13 +509,26 @@ const handleClickOpen = () => {
                 getOptionValue={option => option.CURRENCY}
                 options={itemData}
                 isSearchable={true}
-                onChange={selectCurrency}
+                onChange={selectCurrency(itemData)}
                 placeholder={"Choose a Currency"}
                 styles={styleSelect}
                 components={animatedComponents} 
                 //value={itemData.filter(obj => searchData?.CURRENCY.includes(obj.CURRENCY))}  
-                isMulti 
-                />
+                isMulti */}
+                <Select
+                        closeMenuOnSelect={true}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        getOptionLabel={option =>
+                            `${option.CURRENCY.toString()}`}
+                          getOptionValue={option => option.CURRENCY}
+                          options={itemData}
+                        isSearchable={true}
+                        onChange={selectCurrency}
+                        placeholder={'Choose a Currency'}
+                        styles={styleSelect}
+                /></div>  
+
                             <Grid item xs={6}>
                                 <Box display="flex"
                                     justifyContent="flex-end"

@@ -143,23 +143,22 @@ const DailyView = () => {
       
     }
   }, [inputValue]);
-
   useEffect(() => {
     if (DailyViewData.isError) {
-      //console.log("hello",DailyViewData["messgae"])
-
+      
       setIsError(true);
       swal(
         <div>     
-          <p>{DailyViewClasses["message"]}</p>
+          <p>{DailyViewData["message"]}</p>
         </div>
       )
+      //DailyViewData.isError=false;
     }else if(DailyViewData.isSuccess){
      
       setIsSuccess(true);
       swal(
         <div>     
-          <p>{DailyViewClasses["message"]}</p>
+          <p>{DailyViewData["message"]}</p>
         </div>
       )
     }else {

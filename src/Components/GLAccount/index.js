@@ -227,6 +227,7 @@ const GlAccount = () => {
             <p>{GlAccountData["message"]}</p>
           </div>
         )  
+        GlAccountData.isError=false;
     }else if(GlAccountData.isSuccess){
       setIsSuccess(true);
       swal(

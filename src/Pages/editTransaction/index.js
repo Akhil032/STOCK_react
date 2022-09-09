@@ -283,6 +283,7 @@ const EditTransaction = () => {
             <p>{editTransactionData["messgae"]}</p>
           </div>
         )  
+        editTransactionData.isError=false;
     }else if(editTransactionData.isSuccess){
       setIsSuccess(true);
       swal(

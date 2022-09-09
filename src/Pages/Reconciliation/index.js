@@ -259,6 +259,7 @@ const Reconciliation = () => {
             <p>{DailySkuRollupData["messgae"]}</p>
           </div>
         )  
+        DailySkuRollupData.isError=false;
     }else if(DailySkuRollupData.isSuccess && DailySkuRollupData.isupdate ){
       setIsSuccess(true);
       swal(

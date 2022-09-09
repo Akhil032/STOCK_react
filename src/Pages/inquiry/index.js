@@ -263,6 +263,7 @@ const InquryScreen = () => {
             <p>{InquiryData["messgae"]}</p>
           </div>
         )  
+        InquiryData.isError=false;
         setSearch(false);
     }else if(InquiryData.isSuccess && InquiryData.isupdate ){
       setIsSuccess(true);

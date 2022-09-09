@@ -207,7 +207,7 @@ const CostChange = () => {
           <p>{CostChangeData?.message}</p>
         </div>
       )
-        
+      CostChangeData.isError=false;
          setSearch(false);
       }
     } else if (CostChangeData.isSuccess) {
