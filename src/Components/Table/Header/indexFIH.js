@@ -45,6 +45,7 @@ export default function EnhancedTableHead(props) {
     freeze,
   } = props;
   const createSortHandler = (property) => (event) => {
+    //console.log("sort",property,event)
     onRequestSort(event, property);
   };
 
@@ -151,3 +152,4 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
+console.log("xcv",EnhancedTableHead)

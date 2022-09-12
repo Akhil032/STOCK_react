@@ -166,7 +166,7 @@ const CommonTable = ({
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row?.SR_NO?row?.SR_NO:row?.TRAN_SEQ_NO);
+                  const isItemSelected = isSelected(row?.SR_NO);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow

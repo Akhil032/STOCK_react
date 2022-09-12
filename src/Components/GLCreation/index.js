@@ -164,7 +164,7 @@ const Forms = () => {
                 setOpen(true);
                 setLoading(true); 
                 initialsearch.PRIMARY_ACCOUNT = [];
-                //setTimeout(() => window.location.reload(), 500)
+                setTimeout(() => window.location.reload(), 500)
             }
 
             //setSubmit(true);
@@ -182,25 +182,24 @@ const Forms = () => {
     //const Forms = () => {
     // we're using react-hook-form library 
     //const { register, handleSubmit } = useForm();
-    // useEffect(() => {
-    //     console.log("ErrorProcessingData",GlAccountData)
-    //     if (GlAccountData.isError && GlAccountData.message) {
-    //         swal(
-    //           <div>     
-    //             <p>{GlAccountData["message"]}</p>
-    //           </div>
-    //         )  
-    //         GlAccountData.isError=false;
-    //     }else if(GlAccountData.isSuccess && GlAccountData.message){
-    //       swal(
-    //         <div>     
-    //            <p>{GlAccountData["message"]}</p>
-    //         </div>
-    //       )
-    //       GlAccountData.isSuccess=false;
-    //       setLoading(true);
-    //     }
-    //   }, [GlAccountData])
+    useEffect(() => {
+        if (GlAccountData.isError && GlAccountData.message) {
+            swal(
+              <div>     
+                <p>{GlAccountData["message"]}</p>
+              </div>
+            )  
+            GlAccountData.isError=false;
+        }else if(GlAccountData.isSuccess && GlAccountData.message){
+          swal(
+            <div>     
+               <p>{GlAccountData["message"]}</p>
+            </div>
+          )
+          GlAccountData.isSuccess=false;
+          setLoading(true);
+        }
+      }, [GlAccountData])
     
 
     const onChange = (sendData) => {

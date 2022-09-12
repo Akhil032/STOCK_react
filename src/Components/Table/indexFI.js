@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Button from "@mui/material/Button";
 
 function descendingComparator(a, b, orderBy) {
-
+  //console.log("order",a,b,orderBy)
   let c,d;
   if(orderBy == "LOCATION_NAME"){
       c = b[orderBy].replace('STORE-','');
@@ -17,6 +17,8 @@ function descendingComparator(a, b, orderBy) {
   }else {
      c = isNaN(b[orderBy])?b[orderBy]:parseInt(b[orderBy]);
      d = isNaN(a[orderBy])?a[orderBy]:parseInt(a[orderBy]);
+    console.log("order",c,d)
+
   }  
   if (c < d) {
     return -1;
@@ -28,23 +30,29 @@ function descendingComparator(a, b, orderBy) {
 }
 
 function getComparator(order, orderBy) {
+  console.log("hhh",order,orderBy)
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function stableSort(array, comparator) {
+  console.log("ar",array,comparator)
   const stabilizedThis = array.map((el, index) => [el, index]);
+  console.log("stabilizedThis1",stabilizedThis)
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
+    console.log("or",a[0], b[0])
     if (order !== 0) {
       return order;
     }
+
     return a[1] - b[1];
   });
+  console.log("stabilizedThis",stabilizedThis)
   return stabilizedThis.map((el) => el[0]);
 }
-console.log("cost",CommonTable)
+//console.log("cost",CommonTable)
 export default function EnhancedTable({
   tableData,
   handleSearch,
