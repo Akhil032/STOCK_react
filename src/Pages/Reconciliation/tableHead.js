@@ -21,7 +21,8 @@ export const headCells = [
     width: "130px",
   },
   {
-    id: "END_OF_PERIOD",
+    //id: "END_OF_PERIOD",
+    id:"TRN_POST_DATE",
     numeric: true,
     disablePadding: false,
     label: "END OF PERIOD",

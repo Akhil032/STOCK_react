@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Button from "@mui/material/Button";
 
 function descendingComparator(a, b, orderBy) {
-
+ // console.log("sort",typeof a[orderBy],b[orderBy],a,orderBy)
   let c,d;
   if(orderBy == "LOCATION_NAME"){
       c = b[orderBy].replace('STORE-','');
@@ -14,16 +14,36 @@ function descendingComparator(a, b, orderBy) {
        c = isNaN(c)?c:parseInt(c);
        d = isNaN(d)?d:parseInt(d);
       
+  }else if(orderBy == "TRAN_SEQ_NO"){
+     c =(b[orderBy]);
+     d =(a[orderBy]);
   }else {
+    //var regExp = /[a-zA-Z]/g;
+    
      c = isNaN(b[orderBy])?b[orderBy]:parseInt(b[orderBy]);
      d = isNaN(a[orderBy])?a[orderBy]:parseInt(a[orderBy]);
   }  
+  //console.log("sort",c,d)
+  if(c==="NULL" || d==="NULL")
+  {
+    if(c==="NULL" && d !=="NULL"){
+      return -1
+    }
+    else if (d==="NULL" && c !=="NULL"){
+      return 1
+    }
+    else{
+      return 1
+    }
+  }
+  else{
   if (c < d) {
     return -1;
   }
   if (c > d) {
     return 1;
   }
+}
   return 0;
 }
 
